@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc1155";
+//import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc1155";
 import {
 	ConnectButton,
 	MediaRenderer,
@@ -11,24 +11,35 @@ import {
 import {
 	accountAbstraction,
 	client,
-	editionDropContract,
-	editionDropTokenId,
+	//editionDropContract,
+	//editionDropTokenId,
 } from "../constants";
 import Link from "next/link";
+import { defineChain, getContract } from "thirdweb";
+import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
-	const { data: nft, isLoading: isNftLoading } = useReadContract(getNFT, {
-		contract: editionDropContract,
-		tokenId: editionDropTokenId,
+
+	const nftpEd1Contract = getContract({
+		client,
+		chain: defineChain(137),
+		address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
 	});
-	const { data: ownedNfts } = useReadContract(getOwnedNFTs, {
-		contract: editionDropContract,
+
+ 	const { data: nft, isLoading: isNftLoading } = useReadContract(getNFT, {
+		contract: nftpEd1Contract,
+		tokenId: 0n,
+	});
+/* 	const { data: ownedNfts } = useReadContract(getOwnedNFTs, {
+		contract: nftpEd1Contract,
 		address: smartAccount?.address!,
 		queryOptions: { enabled: !!smartAccount },
-	});
+	});  */
+
 	return (
 		<div className="flex flex-col items-center">
+
 			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
 				Sponsored Transactions YR Tests
 			</h1>
@@ -53,17 +64,17 @@ const GaslessHome: React.FC = () => {
 						) : null}
 						{smartAccount ? (
 							<>
-								<p className="font-semibold text-center mb-2">
+{/* 								<p className="font-semibold text-center mb-2">
 									You own {ownedNfts?.[0]?.quantityOwned.toString() || "0"}{" "}
-									Kittens
-								</p>
+									NFT
+								</p> */}
 								<TransactionButton
 									transaction={() =>
 										claimTo({
-											contract: editionDropContract,
-											tokenId: editionDropTokenId,
+											contract: nftpEd1Contract,
 											to: smartAccount.address,
 											quantity: 1n,
+											from: "0x...",
 										})
 									}
 									onError={(error) => {
