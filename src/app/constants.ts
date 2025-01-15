@@ -1,9 +1,7 @@
-import { createThirdwebClient, getContract } from "thirdweb";
-import { baseSepolia } from "thirdweb/chains";
+import { createThirdwebClient, defineChain, getContract } from "thirdweb";
+import { polygon } from "thirdweb/chains";
 import { SmartWalletOptions } from "thirdweb/wallets";
 
-// Replace this with your client ID string
-// refer to https://portal.thirdweb.com/typescript/v5/client on how to get a client ID
 const clientId = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 
 if (!clientId) {
@@ -14,7 +12,9 @@ export const client = createThirdwebClient({
 	clientId: clientId,
 });
 
-export const chain = baseSepolia;
+export const chain = polygon;
+
+// Demo contracts
 export const tokenDropAddress = "0xd64A548A82c190083707CBEFD26958E5e6551D18";
 export const editionDropAddress = "0x638263e3eAa3917a53630e61B1fBa685308024fa";
 export const editionDropTokenId = 0n;
@@ -30,6 +30,16 @@ export const tokenDropContract = getContract({
 	chain,
 	client,
 });
+
+// NFTP contracts
+export const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+
+// connect to your contract
+const nftpNftsEd1Contract = getContract({
+	client,
+	chain: defineChain(80002),
+	address: nftpNftsEd1Address,
+  });
 
 export const accountAbstraction: SmartWalletOptions = {
 	chain,

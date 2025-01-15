@@ -10,6 +10,7 @@ export default function Home() {
 			<Header />
 
 			<div className="flex justify-center mb-20">
+				Yoann v1
 				<ConnectButton
 					client={client}
 					accountAbstraction={accountAbstraction}
