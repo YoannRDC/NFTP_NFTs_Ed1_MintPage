@@ -1,7 +1,7 @@
-import { createThirdwebClient } from "thirdweb";
 import { polygon } from "thirdweb/chains";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
+import { client } from "../constants";
 
 // ************
 // Construit avec: 
@@ -9,9 +9,6 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 //************* */
 
 export default function ConnectBtnNFTP() {
-  const client = createThirdwebClient({
-    clientId: "....",
-  });
 
   const wallets = [
     inAppWallet({

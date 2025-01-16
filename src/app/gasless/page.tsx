@@ -51,7 +51,7 @@ const GaslessHome: React.FC = () => {
 					size: "compact",
 				}}
 			/> */}
-			<ConnectBtnNFTP/>
+			<ConnectBtnNFTP />
 			<div className="flex flex-col">
 				{isNftLoading ? (
 					<div className="w-full mt-24">Loading...</div>
@@ -76,7 +76,6 @@ const GaslessHome: React.FC = () => {
 											contract: nftpEd1Contract,
 											to: smartAccount.address,
 											quantity: 1n,
-											from: "0x...",
 										})
 									}
 									onError={(error) => {
