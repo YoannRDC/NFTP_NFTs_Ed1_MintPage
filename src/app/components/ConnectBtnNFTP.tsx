@@ -24,6 +24,7 @@ export default function ConnectBtnNFTP() {
   ];
 
   return (
+    // Smart wallet 
     <ConnectButton
       client={client}
       wallets={wallets}

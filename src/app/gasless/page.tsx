@@ -18,6 +18,7 @@ import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
 import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
 import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
+import { createWallet, inAppWallet } from "thirdweb/wallets";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
@@ -38,6 +39,19 @@ const GaslessHome: React.FC = () => {
 		queryOptions: { enabled: !!smartAccount },
 	});  */
 
+	  const wallets = [
+		inAppWallet({
+		  auth: {
+			options: ["google", "email", "passkey", "phone"],
+		  },
+		}),
+		createWallet("io.metamask"),
+		createWallet("com.coinbase.wallet"),
+		createWallet("me.rainbow"),
+		createWallet("io.rabby"),
+		createWallet("io.zerion.wallet"),
+	  ];
+
 	return (
 		<div className="flex flex-col items-center">
 
@@ -51,7 +65,16 @@ const GaslessHome: React.FC = () => {
 					size: "compact",
 				}}
 			/> */}
+			-- Smart Wallet --
 			<ConnectBtnNFTP />
+
+			-- EOA Wallet --
+			<ConnectButton
+			client={client}
+			wallets={wallets}
+			connectModal={{ size: "compact" }}
+			/>
+
 			<div className="flex flex-col">
 				{isNftLoading ? (
 					<div className="w-full mt-24">Loading...</div>
@@ -102,6 +125,7 @@ const GaslessHome: React.FC = () => {
 					</>
 				)}
 			</div>
+
 			<Link href={"/"} className="text-sm text-gray-400 mt-8">
 				Back to menu
 			</Link>
