@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
 import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
+import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
@@ -43,13 +44,14 @@ const GaslessHome: React.FC = () => {
 			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
 				Sponsored Transactions YR Tests
 			</h1>
-			<ConnectButton
+{/* 			<ConnectButton
 				client={client}
 				accountAbstraction={accountAbstraction}
 				connectModal={{
 					size: "compact",
 				}}
-			/>
+			/> */}
+			<ConnectBtnNFTP/>
 			<div className="flex flex-col">
 				{isNftLoading ? (
 					<div className="w-full mt-24">Loading...</div>
@@ -95,7 +97,7 @@ const GaslessHome: React.FC = () => {
 									marginTop: "10px",
 								}}
 							>
-								Login to claim this Kitten!
+								Login to claim an NFT !
 							</p>
 						)}
 					</>
