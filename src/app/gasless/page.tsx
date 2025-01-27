@@ -67,13 +67,17 @@ const GaslessHome: React.FC = () => {
 			/> */}
 			-- Smart Wallet --
 			<ConnectBtnNFTP />
-
+			<br/>
 			-- EOA Wallet --
 			<ConnectButton
 			client={client}
 			wallets={wallets}
 			connectModal={{ size: "compact" }}
 			/>
+			<br/>
+			
+			-- Add to Free Mint --
+
 
 			<div className="flex flex-col">
 				{isNftLoading ? (
