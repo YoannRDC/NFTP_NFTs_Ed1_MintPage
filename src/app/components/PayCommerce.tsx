@@ -10,7 +10,7 @@ const PayCommerce = () => {
       payOptions={{
         mode: "direct_payment",
         paymentInfo: {
-          amount: "35",
+          amount: "1",
           chain: base,
           token: getDefaultToken(base, "USDC"),
           sellerAddress: nftpNftsEd1Address,
