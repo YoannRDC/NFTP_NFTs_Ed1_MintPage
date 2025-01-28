@@ -66,8 +66,10 @@ const GaslessHome: React.FC = () => {
 					size: "compact",
 				}}
 			/> */}
+			<br/>
 			-- Smart Wallet --
 			<ConnectBtnNFTP />
+			<br/>
 			<br/>
 			-- EOA Wallet --
 			<ConnectButton
@@ -76,6 +78,8 @@ const GaslessHome: React.FC = () => {
 			connectModal={{ size: "compact" }}
 			/>
 
+<br/>
+<br/>
 			-- Pay Commerce --
 			<PayCommerce />
 

@@ -1,5 +1,5 @@
 import { PayEmbed, getDefaultToken } from "thirdweb/react";
-import { base } from "thirdweb/chains";
+import { base, polygon } from "thirdweb/chains";
 import { client, nftpNftsEd1Address } from "../constants";
 
 const PayCommerce = () => {
@@ -11,8 +11,8 @@ const PayCommerce = () => {
         mode: "direct_payment",
         paymentInfo: {
           amount: "1",
-          chain: base,
-          token: getDefaultToken(base, "USDC"),
+          chain: polygon,
+          token: getDefaultToken(polygon, "USDC"),
           sellerAddress: nftpNftsEd1Address,
         },
         metadata: {
