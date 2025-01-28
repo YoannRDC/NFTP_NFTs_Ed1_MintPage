@@ -18,6 +18,7 @@ import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
 import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
 import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
+import PayCommerce from "../components/PayCommerce";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 
 const GaslessHome: React.FC = () => {
@@ -74,6 +75,9 @@ const GaslessHome: React.FC = () => {
 			wallets={wallets}
 			connectModal={{ size: "compact" }}
 			/>
+
+			<PayCommerce />
+
 			<br/>
 			
 			-- Add to Free Mint --
@@ -123,7 +127,7 @@ const GaslessHome: React.FC = () => {
 									marginTop: "10px",
 								}}
 							>
-								Login to claim an NFT !
+								Login to claim or buy an NFT (49 POL)
 							</p>
 						)}
 					</>
