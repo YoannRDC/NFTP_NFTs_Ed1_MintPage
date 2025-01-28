@@ -1,6 +1,6 @@
 import { PayEmbed, getDefaultToken } from "thirdweb/react";
 import { base } from "thirdweb/chains";
-import { client } from "../constants";
+import { client, nftpNftsEd1Address } from "../constants";
 
 const PayCommerce = () => {
   return (
@@ -13,7 +13,7 @@ const PayCommerce = () => {
           amount: "35",
           chain: base,
           token: getDefaultToken(base, "USDC"),
-          sellerAddress: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
+          sellerAddress: nftpNftsEd1Address,
         },
         metadata: {
           name: "Black Hoodie (Size L)",
