@@ -11,28 +11,23 @@ import {
 import {
 	accountAbstraction,
 	client,
+	nftpNftsEd1Contract,
 	//editionDropContract,
 	//editionDropTokenId,
 } from "../constants";
 import Link from "next/link";
-import { defineChain, getContract } from "thirdweb";
-import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
+import { claimTo, getOwnedNFTs } from "thirdweb/extensions/erc721";
 import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
 import PayCommerce from "../components/PayCommerce";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import ClaimCondForm from "../components/ClaimCondForm";
+import ClaimConditionComponent from "../components/ClaimCondition";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
 
-	const nftpEd1Contract = getContract({
-		client,
-		chain: defineChain(137),
-		address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
-	});
-
  	const { data: ownedNfts, isLoading: isNftLoading  } = useReadContract(getOwnedNFTs, {
-		contract: nftpEd1Contract,
+		contract: nftpNftsEd1Contract,
 		owner: smartAccount?.address ?? "",
 	}); 
 	console.log("ownedNfts :", ownedNfts);
@@ -82,6 +77,11 @@ const GaslessHome: React.FC = () => {
 
 			<br/>
 			<br/>
+			-- Claim condition component --
+			<ClaimConditionComponent/>
+
+			<br/>
+			<br/>
 			-- Pay Commerce --
 			<PayCommerce />
 
@@ -125,7 +125,7 @@ const GaslessHome: React.FC = () => {
 								<TransactionButton
 									transaction={() =>
 										claimTo({
-											contract: nftpEd1Contract,
+											contract: nftpNftsEd1Contract,
 											to: smartAccount.address,
 											quantity: 1n,
 										})
