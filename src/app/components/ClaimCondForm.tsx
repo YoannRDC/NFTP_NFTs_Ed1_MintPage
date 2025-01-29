@@ -19,7 +19,11 @@ const ClaimConditionsTable = () => {
       if (!nftpNftsEd1Contract) return;
       try {
         setLoading(true);
-        const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract });
+
+        // **********************
+        // Claim conditins of the contract
+
+/*         const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract });
 
         console.log("Claim Conditions récupérées :", conditions);
 
@@ -35,7 +39,17 @@ const ClaimConditionsTable = () => {
         } else {
           setClaimConditionsState([]);
           setError("Aucune condition de claim trouvée.");
-        }
+        } */
+
+        
+        // **********************
+        // Claim conditins of the TokenID 1
+
+        const tokenId = 1n; // ID du token concerné
+        const conditionsToken = await getClaimConditions({ contract: nftpNftsEd1Contract  });
+
+        console.log("Claim Conditions récupérées :", conditionsToken);
+
       } catch (err) {
         console.error("Erreur lors de la récupération des conditions :", err);
         setError("Impossible de récupérer les conditions.");

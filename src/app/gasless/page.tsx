@@ -9,6 +9,7 @@ import {
 	useReadContract,
 } from "thirdweb/react";
 import {
+	accountAbstraction,
 	client,
 	//editionDropContract,
 	//editionDropTokenId,
@@ -34,11 +35,11 @@ const GaslessHome: React.FC = () => {
 		contract: nftpEd1Contract,
 		tokenId: 0n,
 	});
-/* 	const { data: ownedNfts } = useReadContract(getOwnedNFTs, {
+
+ 	const { data: ownedNfts } = useReadContract(getOwnedNFTs, {
 		contract: nftpEd1Contract,
-		address: smartAccount?.address!,
-		queryOptions: { enabled: !!smartAccount },
-	});  */
+		owner: smartAccount?.address ?? "",
+	}); 
 
 	  const wallets = [
 		inAppWallet({
@@ -59,13 +60,13 @@ const GaslessHome: React.FC = () => {
 			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
 				Sponsored Transactions YR Tests 4
 			</h1>
-{/* 			<ConnectButton
+ 			<ConnectButton
 				client={client}
 				accountAbstraction={accountAbstraction}
 				connectModal={{
 					size: "compact",
 				}}
-			/> */}
+			/> 
 			<br/>
 			-- Smart Wallet --
 			<ConnectBtnNFTP />
@@ -79,7 +80,7 @@ const GaslessHome: React.FC = () => {
 			/>
 			<br/>
 			<br/>
-			-- EOA Wallet --
+			-- Claim condition form --
 			<ClaimCondForm />
 
 			<br/>
@@ -89,26 +90,38 @@ const GaslessHome: React.FC = () => {
 
 			<br/>
 			<br/>
-			
+			<MediaRenderer
+				client={client}
+				src="/preview.gif"
+				style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+			/>
 			-- Add to Free Mint --
+
 			<div className="flex flex-col">
 				{isNftLoading ? (
 					<div className="w-full mt-24">Loading...</div>
 				) : (
 					<>
-						{nft ? (
-							<MediaRenderer
-								client={client}
-								src={nft.metadata.image}
-								style={{ width: "100%", marginTop: "10px" }}
-							/>
-						) : null}
+						{ownedNfts && ownedNfts.length > 0 ? (
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								{ownedNfts.map((nft, index) => (
+									<div key={index} className="border p-4 rounded-lg shadow-lg text-center">
+										<MediaRenderer
+											client={client}
+											src={nft.metadata.image}
+											style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+										/>
+										<p className="font-semibold mt-2">{nft.metadata.name || "NFT"}</p>
+									</div>
+								))}
+							</div>
+						) : (
+							<p className="text-center mt-4 text-gray-400">You don’t own any NFTs.</p>
+						)}
+
+						<br/>
 						{smartAccount ? (
 							<>
-{/* 								<p className="font-semibold text-center mb-2">
-									You own {ownedNfts?.[0]?.quantityOwned.toString() || "0"}{" "}
-									NFT
-								</p> */}
 								<TransactionButton
 									transaction={() =>
 										claimTo({
@@ -141,6 +154,7 @@ const GaslessHome: React.FC = () => {
 					</>
 				)}
 			</div>
+
 
 			<Link href={"/"} className="text-sm text-gray-400 mt-8">
 				Back to menu
