@@ -1,6 +1,6 @@
 import { PayEmbed, getDefaultToken } from "thirdweb/react";
 import { base, polygon } from "thirdweb/chains";
-import { client, nftpNftsEd1Address } from "../constants";
+import { client, nftpPubKey } from "../constants";
 
 const PayCommerce = () => {
   return (
@@ -13,7 +13,7 @@ const PayCommerce = () => {
           amount: "1",
           chain: polygon,
           token: getDefaultToken(polygon, "USDC"),
-          sellerAddress: nftpNftsEd1Address,
+          sellerAddress: nftpPubKey,
         },
         metadata: {
           name: "Black Hoodie (Size L)",

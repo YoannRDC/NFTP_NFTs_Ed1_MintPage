@@ -34,6 +34,9 @@ export const tokenDropContract = getContract({
 // NFTP contracts
 export const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
 
+// NFTP pubKey:
+export const nftpPubKey = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
+
 // connect to your contract
 export const nftpNftsEd1Contract = getContract({
 	client,
