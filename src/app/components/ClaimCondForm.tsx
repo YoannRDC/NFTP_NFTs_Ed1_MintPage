@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getClaimConditions, setClaimConditions } from "thirdweb/extensions/erc1155";
+import { getClaimConditions, setClaimConditions } from "thirdweb/extensions/erc721";
 import { nftpNftsEd1Contract } from "../constants";
 
 // Adresse du contrat ERC-1155 et Token ID concerné
@@ -19,7 +19,7 @@ const ClaimConditionsForm = () => {
       if (!nftpNftsEd1Contract) return;
       try {
         setLoading(true);
-        const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract, tokenId });
+        const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract });
 
         console.log("Claim Conditions récupérées :", conditions);
 /* 
@@ -81,7 +81,7 @@ const ClaimConditionsForm = () => {
         startTime: new Date(),
       }));
 
-      await setClaimConditions({ contract: nftpNftsEd1Contract, tokenId, phases: formattedPhases });
+      await setClaimConditions({ contract: nftpNftsEd1Contract, phases: formattedPhases });
 
       alert("Conditions de claim mises à jour avec succès !");
     } catch (error) {

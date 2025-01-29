@@ -9,7 +9,6 @@ import {
 	useReadContract,
 } from "thirdweb/react";
 import {
-	accountAbstraction,
 	client,
 	//editionDropContract,
 	//editionDropTokenId,
