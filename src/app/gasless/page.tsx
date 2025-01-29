@@ -20,6 +20,7 @@ import { claimTo, getNFT, getOwnedNFTs } from "thirdweb/extensions/erc721";
 import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
 import PayCommerce from "../components/PayCommerce";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
+import ClaimCondForm from "../components/ClaimCondForm";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
@@ -77,17 +78,20 @@ const GaslessHome: React.FC = () => {
 			wallets={wallets}
 			connectModal={{ size: "compact" }}
 			/>
+			<br/>
+			<br/>
+			-- EOA Wallet --
+			<ClaimCondForm />
 
-<br/>
-<br/>
+			<br/>
+			<br/>
 			-- Pay Commerce --
 			<PayCommerce />
 
 			<br/>
+			<br/>
 			
 			-- Add to Free Mint --
-
-
 			<div className="flex flex-col">
 				{isNftLoading ? (
 					<div className="w-full mt-24">Loading...</div>

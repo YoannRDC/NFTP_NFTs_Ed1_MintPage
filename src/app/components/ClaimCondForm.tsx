@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ClaimForm = () => {
+const ClaimCondForm = () => {
   const [formData, setFormData] = useState([
     { address: "0xc80f8c3c2cd988b1098809f8728b70b1038ba5b9", maxClaimable: 1, price: 0, currencyAddress: "" },
     { address: "0x7b91F60Faa743275Bd31247aa17B2d67781c3621", maxClaimable: 1, price: 0, currencyAddress: "" },
