@@ -31,34 +31,30 @@ const GaslessHome: React.FC = () => {
 		address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
 	});
 
- 	const { data: nft, isLoading: isNftLoading } = useReadContract(getNFT, {
-		contract: nftpEd1Contract,
-		tokenId: 0n,
-	});
-
- 	const { data: ownedNfts } = useReadContract(getOwnedNFTs, {
+ 	const { data: ownedNfts, isLoading: isNftLoading  } = useReadContract(getOwnedNFTs, {
 		contract: nftpEd1Contract,
 		owner: smartAccount?.address ?? "",
 	}); 
+	console.log("ownedNfts :", ownedNfts);
 
-	  const wallets = [
-		inAppWallet({
-		  auth: {
-			options: ["google", "email", "passkey", "phone"],
-		  },
-		}),
-		createWallet("io.metamask"),
-		createWallet("com.coinbase.wallet"),
-		createWallet("me.rainbow"),
-		createWallet("io.rabby"),
-		createWallet("io.zerion.wallet"),
-	  ];
+	const wallets = [
+	inAppWallet({
+		auth: {
+		options: ["google", "email", "passkey", "phone"],
+		},
+	}),
+	createWallet("io.metamask"),
+	createWallet("com.coinbase.wallet"),
+	createWallet("me.rainbow"),
+	createWallet("io.rabby"),
+	createWallet("io.zerion.wallet"),
+	];
 
 	return (
 		<div className="flex flex-col items-center">
 
 			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
-				Sponsored Transactions YR Tests 4
+				Sponsored Transactions YR Tests 5
 			</h1>
  			<ConnectButton
 				client={client}
@@ -93,7 +89,7 @@ const GaslessHome: React.FC = () => {
 			<MediaRenderer
 				client={client}
 				src="/preview.gif"
-				style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+				style={{ width: "50%", height: "auto", borderRadius: "10px" }}
 			/>
 			-- Add to Free Mint --
 
