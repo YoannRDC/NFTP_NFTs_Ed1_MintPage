@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useContract } from "thirdweb/react";
 import { getClaimConditions, setClaimConditions } from "thirdweb/extensions/erc1155";
-import { base } from "thirdweb/chains";
+import { nftpNftsEd1Contract } from "../constants";
 
 // Adresse du contrat ERC-1155 et Token ID concerné
-const contractAddress = "VOTRE_CONTRACT_ADDRESS"; // Remplacez par l'adresse de votre contrat
 const tokenId = 1n;
 
 const ClaimConditionsForm = () => {
-  const { contract } = useContract(contractAddress);
   const [claimConditions, setClaimConditionsState] = useState<
     { address: string; maxClaimable: bigint; price: number; currencyAddress: string }[]
   >([]);
@@ -19,23 +16,25 @@ const ClaimConditionsForm = () => {
   /** 🚀 1. Récupérer les conditions de claim depuis la blockchain */
   useEffect(() => {
     const fetchConditions = async () => {
-      if (!contract) return;
+      if (!nftpNftsEd1Contract) return;
       try {
         setLoading(true);
-        const conditions = await getClaimConditions({ contract, tokenId });
+        const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract, tokenId });
 
-        if (conditions?.phases.length > 0) {
-          const formattedConditions = conditions.phases.map((phase) => ({
-            address: phase.merkleRoot || "", // On met l'adresse de la whitelist si applicable
-            maxClaimable: phase.maxClaimablePerWallet || 0n,
-            price: phase.price || 0,
-            currencyAddress: phase.currencyAddress || "",
+        console.log("Claim Conditions récupérées :", conditions);
+/* 
+        if (conditions.length > 0) {
+          const formattedConditions = conditions.map((phase) => ({
+            address: phase.merkleRoot || "", // Adresse si applicable
+            maxClaimable: BigInt(phase.quantityLimitPerTransaction || 0), // Correction ici
+            price: phase.priceInWei ? Number(phase.priceInWei) / 1e18 : 0, // Correction ici
+            currencyAddress: phase.currency || "", // Correction ici
           }));
           setClaimConditionsState(formattedConditions);
         } else {
           setClaimConditionsState([]);
           setError("Aucune condition de claim trouvée.");
-        }
+        } */
       } catch (err) {
         console.error("Erreur lors de la récupération des conditions :", err);
         setError("Impossible de récupérer les conditions.");
@@ -45,7 +44,7 @@ const ClaimConditionsForm = () => {
     };
 
     fetchConditions();
-  }, [contract]);
+  }, [nftpNftsEd1Contract]);
 
   /** ✅ 2. Gérer les mises à jour dans le formulaire */
   const handleChange = (index: number, field: string, value: string | bigint | number) => {
@@ -70,7 +69,7 @@ const ClaimConditionsForm = () => {
 
   /** 💾 3. Mettre à jour les conditions sur la blockchain */
   const updateClaimConditions = async () => {
-    if (!contract) return;
+    if (!nftpNftsEd1Contract) return;
     setUpdating(true);
 
     try {
@@ -82,7 +81,7 @@ const ClaimConditionsForm = () => {
         startTime: new Date(),
       }));
 
-      await setClaimConditions({ contract, tokenId, phases: formattedPhases });
+      await setClaimConditions({ contract: nftpNftsEd1Contract, tokenId, phases: formattedPhases });
 
       alert("Conditions de claim mises à jour avec succès !");
     } catch (error) {
