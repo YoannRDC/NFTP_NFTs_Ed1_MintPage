@@ -36,6 +36,7 @@ const GaslessHome: React.FC = () => {
 		owner: smartAccount?.address ?? "",
 	}); 
 	console.log("ownedNfts :", ownedNfts);
+	console.log("smartAccount?.address", smartAccount?.address ?? "No smart account connected");
 
 	const wallets = [
 	inAppWallet({
@@ -98,8 +99,11 @@ const GaslessHome: React.FC = () => {
 					<div className="w-full mt-24">Loading...</div>
 				) : (
 					<>
+					Bef ownedNfts nb.
 						{ownedNfts && ownedNfts.length > 0 ? (
+
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								ownedNfts nb: {ownedNfts.length};
 								{ownedNfts.map((nft, index) => (
 									<div key={index} className="border p-4 rounded-lg shadow-lg text-center">
 										<MediaRenderer
@@ -147,6 +151,8 @@ const GaslessHome: React.FC = () => {
 								Login to claim or buy an NFT (49 POL)
 							</p>
 						)}
+						
+					Aft ownedNfts nb.
 					</>
 				)}
 			</div>
