@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { getClaimConditions, setClaimConditions } from "thirdweb/extensions/erc721";
 import { nftpNftsEd1Contract } from "../constants";
 
-// Adresse du contrat ERC-1155 et Token ID concerné
+// Token ID concerné
 const tokenId = 1n;
 
-const ClaimConditionsForm = () => {
+const ClaimConditionsTable = () => {
   const [claimConditions, setClaimConditionsState] = useState<
-    { address: string; maxClaimable: bigint; price: number; currencyAddress: string }[]
+    { currency: string; maxClaimableSupply: bigint; pricePerToken: bigint; quantityLimitPerWallet: bigint; startTimestamp: bigint }[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,19 +22,20 @@ const ClaimConditionsForm = () => {
         const conditions = await getClaimConditions({ contract: nftpNftsEd1Contract });
 
         console.log("Claim Conditions récupérées :", conditions);
-/* 
+
         if (conditions.length > 0) {
-          const formattedConditions = conditions.map((phase) => ({
-            address: phase.merkleRoot || "", // Adresse si applicable
-            maxClaimable: BigInt(phase.quantityLimitPerTransaction || 0), // Correction ici
-            price: phase.priceInWei ? Number(phase.priceInWei) / 1e18 : 0, // Correction ici
-            currencyAddress: phase.currency || "", // Correction ici
+          const formattedConditions = conditions.map((condition) => ({
+            currency: condition.currency,
+            maxClaimableSupply: BigInt(condition.maxClaimableSupply.toString()),
+            pricePerToken: BigInt(condition.pricePerToken.toString()),
+            quantityLimitPerWallet: BigInt(condition.quantityLimitPerWallet.toString()),
+            startTimestamp: BigInt(Math.floor(Number(condition.startTimestamp) / 1000)), // Converti en bigint UNIX timestamp
           }));
           setClaimConditionsState(formattedConditions);
         } else {
           setClaimConditionsState([]);
           setError("Aucune condition de claim trouvée.");
-        } */
+        }
       } catch (err) {
         console.error("Erreur lors de la récupération des conditions :", err);
         setError("Impossible de récupérer les conditions.");
@@ -46,24 +47,10 @@ const ClaimConditionsForm = () => {
     fetchConditions();
   }, [nftpNftsEd1Contract]);
 
-  /** ✅ 2. Gérer les mises à jour dans le formulaire */
-  const handleChange = (index: number, field: string, value: string | bigint | number) => {
+  /** ✅ 2. Mise à jour des valeurs dans le tableau */
+  const handleChange = (index: number, field: string, value: string | bigint) => {
     const updatedConditions = [...claimConditions];
     updatedConditions[index] = { ...updatedConditions[index], [field]: value };
-    setClaimConditionsState(updatedConditions);
-  };
-
-  /** ➕ Ajouter une nouvelle ligne */
-  const addRow = () => {
-    setClaimConditionsState([
-      ...claimConditions,
-      { address: "", maxClaimable: 0n, price: 0, currencyAddress: "" },
-    ]);
-  };
-
-  /** ❌ Supprimer une ligne */
-  const removeRow = (index: number) => {
-    const updatedConditions = claimConditions.filter((_, i) => i !== index);
     setClaimConditionsState(updatedConditions);
   };
 
@@ -74,11 +61,11 @@ const ClaimConditionsForm = () => {
 
     try {
       const formattedPhases = claimConditions.map((cond) => ({
-        merkleRoot: cond.address, // Adresse du bénéficiaire si applicable
-        maxClaimablePerWallet: cond.maxClaimable,
-        price: cond.price,
-        currencyAddress: cond.currencyAddress,
-        startTime: new Date(),
+        currency: cond.currency,
+        maxClaimableSupply: cond.maxClaimableSupply,
+        pricePerToken: cond.pricePerToken,
+        quantityLimitPerWallet: cond.quantityLimitPerWallet,
+        startTimestamp: cond.startTimestamp, // Déjà en bigint
       }));
 
       await setClaimConditions({ contract: nftpNftsEd1Contract, phases: formattedPhases });
@@ -93,7 +80,7 @@ const ClaimConditionsForm = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "auto", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ padding: "20px", maxWidth: "900px", margin: "auto", fontFamily: "Arial, sans-serif" }}>
       <h2>Gestion des Conditions de Claim</h2>
 
       {loading ? (
@@ -101,46 +88,63 @@ const ClaimConditionsForm = () => {
       ) : error ? (
         <p style={{ color: "red" }}>{error}</p>
       ) : (
-        <form>
-          {claimConditions.map((entry, index) => (
-            <div key={index} style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-              <input
-                type="text"
-                placeholder="Adresse"
-                value={entry.address}
-                onChange={(e) => handleChange(index, "address", e.target.value)}
-                style={{ flex: "2", padding: "5px" }}
-              />
-              <input
-                type="number"
-                placeholder="Max Claimable"
-                value={String(entry.maxClaimable)}
-                onChange={(e) => handleChange(index, "maxClaimable", BigInt(e.target.value))}
-                style={{ flex: "1", padding: "5px" }}
-              />
-              <input
-                type="number"
-                placeholder="Prix"
-                value={entry.price}
-                onChange={(e) => handleChange(index, "price", parseFloat(e.target.value))}
-                style={{ flex: "1", padding: "5px" }}
-              />
-              <input
-                type="text"
-                placeholder="Currency Address"
-                value={entry.currencyAddress}
-                onChange={(e) => handleChange(index, "currencyAddress", e.target.value)}
-                style={{ flex: "2", padding: "5px" }}
-              />
-              <button type="button" onClick={() => removeRow(index)} style={{ background: "red", color: "white" }}>
-                ❌
-              </button>
-            </div>
-          ))}
-          <button type="button" onClick={addRow} style={{ padding: "5px 10px", background: "green", color: "white" }}>
-            ➕ Ajouter une ligne
-          </button>
-        </form>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
+          <thead>
+            <tr style={{ background: "#007bff", color: "white" }}>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Currency</th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Max Claimable Supply</th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Price Per Token</th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Max Per Wallet</th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Start Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {claimConditions.map((entry, index) => (
+              <tr key={index} style={{ borderBottom: "1px solid #ddd" }}>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <input
+                    type="text"
+                    value={entry.currency}
+                    onChange={(e) => handleChange(index, "currency", e.target.value)}
+                    style={{ width: "100%" }}
+                  />
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <input
+                    type="number"
+                    value={entry.maxClaimableSupply.toString()}
+                    onChange={(e) => handleChange(index, "maxClaimableSupply", BigInt(e.target.value))}
+                    style={{ width: "100%" }}
+                  />
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <input
+                    type="number"
+                    value={entry.pricePerToken.toString()}
+                    onChange={(e) => handleChange(index, "pricePerToken", BigInt(e.target.value))}
+                    style={{ width: "100%" }}
+                  />
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <input
+                    type="number"
+                    value={entry.quantityLimitPerWallet.toString()}
+                    onChange={(e) => handleChange(index, "quantityLimitPerWallet", BigInt(e.target.value))}
+                    style={{ width: "100%" }}
+                  />
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <input
+                    type="datetime-local"
+                    value={new Date(Number(entry.startTimestamp) * 1000).toISOString().slice(0, 16)}
+                    onChange={(e) => handleChange(index, "startTimestamp", BigInt(Math.floor(new Date(e.target.value).getTime() / 1000)))}
+                    style={{ width: "100%" }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       <button
@@ -165,4 +169,4 @@ const ClaimConditionsForm = () => {
   );
 };
 
-export default ClaimConditionsForm;
+export default ClaimConditionsTable;
