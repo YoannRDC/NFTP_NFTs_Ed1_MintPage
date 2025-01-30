@@ -53,7 +53,7 @@ const GaslessHome: React.FC = () => {
 		<div className="flex flex-col items-center">
 
 			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
-				Sponsored Transactions YR Tests 6
+				Sponsored Transactions YR Tests 7
 			</h1>
  			<ConnectButton
 				client={client}
@@ -151,7 +151,6 @@ const GaslessHome: React.FC = () => {
 					</>
 				)}
 			</div>
-
 
 			<Link href={"/"} className="text-sm text-gray-400 mt-8">
 				Back to menu
