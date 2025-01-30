@@ -21,6 +21,7 @@ import ConnectBtnNFTP from "../components/ConnectBtnNFTP";
 import PayCommerce from "../components/PayCommerce";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import ClaimCondForm from "../components/ClaimCondForm";
+
 import ClaimConditionComponent from "../components/ClaimCondition";
 import FetchOwnedNFTs from "../components/FetchOwnedNFTs";
 import TokenClaimed from "../components/TokenClaimed";
@@ -61,6 +62,7 @@ const GaslessHome: React.FC = () => {
 					size: "compact",
 				}}
 			/> 
+			
 			<br/>
 			<br/>
 			-- Smart Wallet --
@@ -85,7 +87,10 @@ const GaslessHome: React.FC = () => {
 			-- FetchOwnedNFTs --
 			<FetchOwnedNFTs />
 
-
+			<br/>
+			<br/>
+			-- TokenClaimed --
+			<TokenClaimed />
 
 			<br/>
 			<br/>
@@ -111,60 +116,38 @@ const GaslessHome: React.FC = () => {
 					<div className="w-full mt-24">Loading...</div>
 				) : (
 					<>
-					Bef ownedNfts nb.
-						{ownedNfts && ownedNfts.length > 0 ? (
-
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-								ownedNfts nb: {ownedNfts.length};
-								{ownedNfts.map((nft, index) => (
-									<div key={index} className="border p-4 rounded-lg shadow-lg text-center">
-										<MediaRenderer
-											client={client}
-											src={nft.metadata.image}
-											style={{ width: "100%", height: "auto", borderRadius: "10px" }}
-										/>
-										<p className="font-semibold mt-2">{nft.metadata.name || "NFT"}</p>
-									</div>
-								))}
-							</div>
-						) : (
-							<p className="text-center mt-4 text-gray-400">You don’t own any NFTs.</p>
-						)}
-
-						<br/>
-						{smartAccount ? (
-							<>
-								<TransactionButton
-									transaction={() =>
-										claimTo({
-											contract: nftpNftsEd1Contract,
-											to: smartAccount.address,
-											quantity: 1n,
-										})
-									}
-									onError={(error) => {
-										alert(`Error: ${error.message}`);
-									}}
-									onTransactionConfirmed={async () => {
-										alert("Claim successful!");
-									}}
-								>
-									Claim!
-								</TransactionButton>
-							</>
-						) : (
-							<p
-								style={{
-									textAlign: "center",
-									width: "100%",
-									marginTop: "10px",
+					<br/>
+					{smartAccount ? (
+						<>
+							<TransactionButton
+								transaction={() =>
+									claimTo({
+										contract: nftpNftsEd1Contract,
+										to: smartAccount.address,
+										quantity: 1n,
+									})
+								}
+								onError={(error) => {
+									alert(`Error: ${error.message}`);
+								}}
+								onTransactionConfirmed={async () => {
+									alert("Claim successful!");
 								}}
 							>
-								Login to claim or buy an NFT (49 POL)
-							</p>
-						)}
-						
-					Aft ownedNfts nb.
+								Claim!
+							</TransactionButton>
+						</>
+					) : (
+						<p
+							style={{
+								textAlign: "center",
+								width: "100%",
+								marginTop: "10px",
+							}}
+						>
+							Login to claim or buy an NFT (49 POL)
+						</p>
+					)}
 					</>
 				)}
 			</div>
