@@ -85,10 +85,7 @@ const GaslessHome: React.FC = () => {
 			-- FetchOwnedNFTs --
 			<FetchOwnedNFTs />
 
-			<br/>
-			<br/>
-			-- TokenClaimed --
-			<TokenClaimed />
+
 
 			<br/>
 			<br/>
