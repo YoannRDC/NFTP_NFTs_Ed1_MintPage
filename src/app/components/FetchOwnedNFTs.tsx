@@ -1,6 +1,5 @@
-import { useActiveAccount, useContractEvents  } from "thirdweb/react";
+import { useActiveAccount, useContractEvents } from "thirdweb/react";
 import { nftpNftsEd1Contract } from "../constants";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react";
 import { tokensClaimedEvent } from "thirdweb/extensions/erc721";
 
 export default function FetchOwnedNFTs() {
@@ -22,11 +21,15 @@ export default function FetchOwnedNFTs() {
   return (
     <div>
       <h2>Owned NFTs</h2>
+
+      {/* ✅ Affiche l'adresse du compte connecté */}
+      <p><strong>Connected Account:</strong> {account?.address || "Not connected"}</p>
+
       {isLoading ? (
         <p>Loading...</p>
       ) : ownedTokenIds.length > 0 ? (
         <ul>
-          {ownedTokenIds.map((id: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, index: Key | null | undefined) => (
+          {ownedTokenIds.map((id, index) => (
             <li key={index}>NFT ID: {id}</li>
           ))}
         </ul>
