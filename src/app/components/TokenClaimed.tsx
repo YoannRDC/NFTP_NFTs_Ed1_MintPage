@@ -1,17 +1,16 @@
 import { useActiveAccount, useContractEvents } from "thirdweb/react";
 import { nftpNftsEd1Contract } from "../constants";
 import { tokensClaimedEvent } from "thirdweb/extensions/erc721";
-import { readContract } from "thirdweb";
 
-export default async function FetchOwnedNFTs() {
+export default function TokenClaimed() {
   const account = useActiveAccount();
 
   const { data: transferEvents, isLoading } = useContractEvents({
     contract: nftpNftsEd1Contract,
     events: [tokensClaimedEvent({ claimer: account?.address })],
   });
-  
-  // Extraire les ID de NFT possédés à partir des événements
+
+  // ✅ Récupère les IDs des NFT en parcourant `startTokenId` et `quantityClaimed`
   const ownedTokenIds = transferEvents?.flatMap((event) => {
     const { startTokenId, quantityClaimed } = event.args;
     return Array.from({ length: Number(quantityClaimed) }, (_, i) =>
@@ -22,8 +21,6 @@ export default async function FetchOwnedNFTs() {
   return (
     <div>
       <h2>Owned NFTs</h2>
-
-      {/* ✅ Affiche l'adresse du compte connecté */}
       <p><strong>Connected Account:</strong> {account?.address || "Not connected"}</p>
 
       {isLoading ? (

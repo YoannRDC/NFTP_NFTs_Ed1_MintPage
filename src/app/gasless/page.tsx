@@ -23,6 +23,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import ClaimCondForm from "../components/ClaimCondForm";
 import ClaimConditionComponent from "../components/ClaimCondition";
 import FetchOwnedNFTs from "../components/FetchOwnedNFTs";
+import TokenClaimed from "../components/TokenClaimed";
 
 const GaslessHome: React.FC = () => {
 	const smartAccount = useActiveAccount();
@@ -76,17 +77,22 @@ const GaslessHome: React.FC = () => {
 
 			<br/>
 			<br/>
-			-- Claim condition form --
+			-- ClaimCondForm --
 			<ClaimCondForm />
 
 			<br/>
 			<br/>
-			-- User NFTs --
+			-- FetchOwnedNFTs --
 			<FetchOwnedNFTs />
 
 			<br/>
 			<br/>
-			-- Claim condition component --
+			-- TokenClaimed --
+			<TokenClaimed />
+
+			<br/>
+			<br/>
+			-- ClaimConditionComponent --
 			<ClaimConditionComponent/>
 
 			<br/>
