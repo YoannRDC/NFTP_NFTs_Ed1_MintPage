@@ -1,115 +1,152 @@
-import Image from "next/image";
-import { ConnectButton } from "thirdweb/react";
-import thirdwebIcon from "@public/thirdweb.svg";
-import { accountAbstraction, client } from "./constants";
+"use client";
+import React, { useEffect, useState } from "react";
+import {
+  ConnectButton,
+  MediaRenderer,
+  TransactionButton,
+  useActiveAccount,
+  useReadContract,
+} from "thirdweb/react";
+import {
+  accountAbstraction,
+  client,
+  nftpNftsEd1Contract,
+} from "./constants";
+import { claimTo } from "thirdweb/extensions/erc721";
 import Link from "next/link";
+import ConnectBtnNFTP from "./components/ConnectBtnNFTP";
+import PayCommerce from "./components/PayCommerce";
+import ClaimCondForm from "./components/ClaimCondForm";
+import ClaimConditionComponent from "./components/ClaimCondition";
 
-export default function Home() {
-	return (
-		<div className="py-20">
-			<Header />
+import { getOwnedERC721s } from "./components/getOwnedERC721s";
+import { createWallet, inAppWallet } from "thirdweb/wallets";
 
-			<div className="flex justify-center mb-20">
-				Yoann v2
-				<br/>
-				<ConnectButton
-					client={client}
-					accountAbstraction={accountAbstraction}
-				/>
-			</div>
+const GaslessHome: React.FC = () => {
+  const smartAccount = useActiveAccount();
+  const [nfts, setNfts] = useState<any[]>([]);
+  const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-			<Menu />
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      if (!smartAccount?.address) return;
 
-			<Footer />
-		</div>
-	);
-}
+      setIsLoadingNfts(true);
+      try {
+        const fetchedNfts = await getOwnedERC721s({
+          contract: nftpNftsEd1Contract,
+          owner: smartAccount.address,
+          requestPerSec: 99,
+        });
+        setNfts(fetchedNfts || []);
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+      } finally {
+        setIsLoadingNfts(false);
+      }
+    };
 
-function Header() {
-	return (
-		<header className="flex flex-col items-center mb-20 md:mb-20">
-			<Image
-				src={thirdwebIcon}
-				alt=""
-				width={120}
-				style={{
-					filter: "drop-shadow(0px 0px 24px #a726a9a8)",
-				}}
-			/>
+    fetchNFTs();
+  }, [smartAccount?.address]);
 
-			<h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-6 text-zinc-100">
-				Account Abstraction Examples
-			</h1>
+  const wallets = [
+    inAppWallet({
+      auth: { options: ["google", "email", "passkey", "phone"] },
+    }),
+    createWallet("io.metamask"),
+    createWallet("com.coinbase.wallet"),
+    createWallet("me.rainbow"),
+    createWallet("io.rabby"),
+    createWallet("io.zerion.wallet"),
+  ];
 
-			<p className="text-zinc-300 text-base">
-				Collection of ERC4337 examples using the thirdweb{" "}
-				<a
-					className="text-purple-400"
-					target="_blank"
-					href="https://portal.thirdweb.com/connect"
-				>
-					Connect SDK
-				</a>
-				.
-			</p>
-		</header>
-	);
-}
+  return (
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
+        Sponsored Transactions YR Tests 7
+      </h1>
 
-function Menu() {
-	return (
-		<div className="grid gap-4 lg:grid-cols-3 justify-center">
-			<MenuItem
-				title="Sponsored transactions"
-				href="/gasless"
-				description="Execute transactions without requiring users to hold ETH."
-			/>
+      <ConnectButton
+        client={client}
+        accountAbstraction={accountAbstraction}
+        connectModal={{ size: "compact" }}
+      />
 
-			<MenuItem
-				title="Multichain transactions"
-				href="/multichain"
-				description="Execute transactions on different chains maintaining the same smart account address."
-			/>
+      <br />
+      <br />
+      -- Smart Wallet --
+      <ConnectBtnNFTP />
 
-			<MenuItem
-				title="Session keys"
-				href="/session-keys"
-				description="Add other admins and signers to your smart accounts"
-			/>
+      <br />
+      <br />
+      -- EOA Wallet --
+      <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} />
 
-			<MenuItem
-				title="Batching transactions"
-				href="/batching"
-				description="Execute multiple transactions atomically."
-			/>
-		</div>
-	);
-}
+      <br />
+      <br />
+      <MediaRenderer
+        client={client}
+        src="/preview.gif"
+        style={{ width: "50%", height: "auto", borderRadius: "10px" }}
+      />
+      -- Add to Free Mint --
 
-function MenuItem(props: { title: string; href: string; description: string }) {
-	return (
-		<Link
-			href={props.href}
-			className="flex flex-col border border-zinc-800 p-4 rounded-lg hover:bg-zinc-900 transition-colors hover:border-zinc-700"
-		>
-			<article>
-				<h2 className="text-lg font-semibold mb-2">{props.title}</h2>
-				<p className="text-sm text-zinc-400">{props.description}</p>
-			</article>
-		</Link>
-	);
-}
+      <div className="flex flex-col">
+        {smartAccount ? (
+          <TransactionButton
+            transaction={() =>
+              claimTo({
+                contract: nftpNftsEd1Contract,
+                to: smartAccount.address,
+                quantity: 1n,
+              })
+            }
+            onError={(error) => {
+              alert(`Error: ${error.message}`);
+            }}
+            onTransactionConfirmed={async () => {
+              alert("Claim successful!");
+            }}
+          >
+            Claim!
+          </TransactionButton>
+        ) : (
+          <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
+            Login to claim or buy an NFT (49 POL)
+          </p>
+        )}
+      </div>
 
-function Footer() {
-	return (
-		<div className="flex flex-col items-center mt-20">
-			<Link
-				className="text-center text-sm text-gray-400"
-				target="_blank"
-				href="https://github.com/thirdweb-example/account-abstraction"
-			>
-				View code on GitHub
-			</Link>
-		</div>
-	);
-}
+	  <br />
+      <br />
+      -- NFTs by getOwnedERC721s.ts --
+
+      {isLoadingNfts ? (
+        <p>My NFTs</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {nfts.length > 0 ? (
+            nfts.map((nft, index) => (
+              <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
+                <MediaRenderer
+                  client={client}
+                  src={nft.metadata?.image || "/preview.gif"}
+                  style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+                />
+                <p className="font-semibold mt-2">{nft.metadata?.name || "NFT"}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-center mt-4 text-gray-400">You don’t own any NFTs.</p>
+          )}
+        </div>
+      )}
+
+      <Link href={"/"} className="text-sm text-gray-400 mt-8">
+        Back to menu
+      </Link>
+    </div>
+  );
+};
+
+export default GaslessHome;
