@@ -15,7 +15,6 @@ import {
 import { claimTo } from "thirdweb/extensions/erc721";
 import Link from "next/link";
 import ConnectBtnNFTP from "./components/ConnectBtnNFTP";
-import PayCommerce from "./components/PayCommerce";
 import ClaimCondForm from "./components/ClaimCondForm";
 import ClaimConditionComponent from "./components/ClaimCondition";
 
