@@ -9,6 +9,7 @@ import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
 import ConnectButtonFR from "./components/ConnectButtonFR";
+import ClaimSnapshot from "./components/ClaimSnapshot";
 
 export default function Home() {
 	return (
@@ -27,6 +28,10 @@ export default function Home() {
 			</p>
 			<Menu />
 			<Footer />
+
+			<p>-- ClaimSnapshot --</p>
+			<ClaimSnapshot />
+			<p>-- ClaimSnapshot Done --</p>
 		</div>
 	);
 }

@@ -1,0 +1,111 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import {
+  createThirdwebClient,
+  defineChain,
+  getContract,
+} from "thirdweb";
+import {
+  getActiveClaimCondition,
+} from "thirdweb/extensions/erc721";
+import { download } from "thirdweb/storage";
+import { client } from "../constants";
+import { getContractMetadata } from "thirdweb/extensions/common";
+
+const CHAIN_ID = 137; // Remplace par ton ID de blockchain
+const CONTRACT_ADDRESS = "0xYourContractAddress"; // Remplace par ton adresse de contrat
+
+export default function ClaimSnapshot() {
+  const [snapshot, setSnapshot] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+
+        const contract = getContract({
+          client,
+          chain: defineChain(CHAIN_ID),
+          address: CONTRACT_ADDRESS,
+        });
+
+        // ✅ Récupération des métadonnées du contrat
+        const metadata = await getContractMetadata({ contract });
+
+        // ✅ Obtention de la condition de claim active
+        const activeClaimCondition = await getActiveClaimCondition({ contract });
+
+        // ✅ Récupération du snapshot Merkle
+        const fetchedSnapshot = await fetchSnapshot(
+          activeClaimCondition.merkleRoot,
+          metadata.merkle,
+          client
+        );
+
+        setSnapshot(fetchedSnapshot);
+      } catch (err) {
+        console.error("Error fetching snapshot:", err);
+        setError("Échec du chargement du snapshot.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  return (
+    <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white">
+      <h2 className="text-xl font-semibold">Claim Snapshot</h2>
+      {loading ? (
+        <p>Chargement...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <div>
+          <p className="text-green-400">Snapshot récupéré avec succès !</p>
+          <pre className="text-sm overflow-auto max-h-80 p-2 bg-gray-800 rounded-lg">
+            {JSON.stringify(snapshot, null, 2)}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ✅ Fonction de récupération du snapshot Merkle
+async function fetchSnapshot(
+  merkleRoot: string,
+  merkleMetadata: Record<string, string> | undefined,
+  client: any
+) {
+  if (!merkleMetadata) return null;
+
+  try {
+    const snapshotUri = merkleMetadata[merkleRoot];
+    if (snapshotUri) {
+      const raw = await download({ uri: snapshotUri, client }).then((r) => r.json());
+
+      if (raw.isShardedMerkleTree && raw.merkleRoot === merkleRoot) {
+        return download({ uri: raw.originalEntriesUri, client })
+          .then((r) => r.json())
+          .catch(() => null);
+      }
+
+      if (merkleRoot === raw.merkleRoot) {
+        return raw.claims.map((claim: { address: string; maxClaimable: bigint; price: bigint; currencyAddress: string }) => ({
+          address: claim.address,
+          maxClaimable: claim.maxClaimable.toString(),
+          price: claim.price.toString(),
+          currencyAddress: claim.currencyAddress,
+        }));
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error("Échec du chargement du snapshot", e);
+    return null;
+  }
+}
