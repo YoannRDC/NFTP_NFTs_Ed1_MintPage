@@ -47,7 +47,7 @@ function Header() {
 function Menu() {
 	return (
 		<div>
-			<div className="flex justify-center mb-5">
+			<div className="flex justify-center mb-20">
 				<Image 
 					src="/Les_Collections_v4.png"
 					alt="Les Collections"
@@ -71,7 +71,7 @@ function Menu() {
 					title="Nicole Mathieu"
 					href="/nicole_mathieu_ed1"
 					description="First NFT collection of Nicole Mathieu."
-					imageSrc="/Nicole_Mathieu.png"
+					imageSrc="/Nicole_Mathieu.jpg"
 				/>
 			</div>
 		</div>
