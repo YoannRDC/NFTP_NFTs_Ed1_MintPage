@@ -97,7 +97,7 @@ const NFTPed1: React.FC = () => {
               alert("Claim successful!");
             }}
           >
-            Claim!
+            Acheter un NFT (couleur aléatoire) !
           </TransactionButton>
         ) : (
           <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
