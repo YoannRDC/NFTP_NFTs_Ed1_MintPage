@@ -17,10 +17,10 @@ export default function Home() {
 			{/* ✅ Supprimé le `py-20` qui limitait le header */}
 			<Header />
 
-			<div className="flex justify-center mb-20">
+			<div className="flex justify-center">
 				<ConnectButtonFR client={client} accountAbstraction={accountAbstraction} />
 			</div>
-			<p className="text-center text-sm text-gray-400">
+			<p className="text-center text-sm text-gray-400 mb-10">
 				Besoin d’aide ? 
 				<Link className="text-center text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">
 				Vidéo explicative (TODO)
