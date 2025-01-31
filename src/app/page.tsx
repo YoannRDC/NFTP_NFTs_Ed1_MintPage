@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
@@ -18,7 +20,7 @@ export default function Home() {
 				<ConnectButtonFR client={client} accountAbstraction={accountAbstraction} />
 			</div>
 			<p className="text-center text-sm text-gray-400">
-				Besoin d'aide ? 
+				Besoin d’aide ? 
 				<Link className="text-center text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">
 				Vidéo explicative (TODO)
 			</Link> 
@@ -71,7 +73,7 @@ function Menu() {
 					title="Nicole Mathieu"
 					href="/nicole_mathieu_ed1"
 					description="First NFT collection of Nicole Mathieu."
-					imageSrc="/Nicole_Mathieu.jpg"
+					imageSrc="/Nicole_Mathieu.png"
 				/>
 			</div>
 		</div>
