@@ -20,6 +20,11 @@ export default function Home() {
 			<div className="flex justify-center">
 				<ConnectButtonFR client={client} accountAbstraction={accountAbstraction} />
 			</div>
+
+			<div className="flex justify-center">
+				<ConnectButton client={client} accountAbstraction={accountAbstraction} />
+			</div>
+
 			<p className="text-center text-sm text-gray-400 mb-10">
 				Besoin d’aide ? 
 				<Link className="text-center text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">

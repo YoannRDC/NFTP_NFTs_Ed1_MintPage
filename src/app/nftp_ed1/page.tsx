@@ -14,8 +14,6 @@ import {
 } from "../constants";
 import { claimTo } from "thirdweb/extensions/erc721";
 import Link from "next/link";
-import ClaimCondForm from "../components/ClaimCondForm";
-import ClaimConditionComponent from "../components/ClaimCondition";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
