@@ -6,15 +6,23 @@ import nftpLogoImage from "@public/Logo_20ko.png";
 import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
+import ConnectButtonFR from "./components/ConnectButtonFR";
 
 export default function Home() {
 	return (
 		<div className="py-20">
 			{/* ✅ Supprimé le `py-20` qui limitait le header */}
 			<Header />
+
 			<div className="flex justify-center mb-20">
-				<ConnectButton client={client} accountAbstraction={accountAbstraction} />
+				<ConnectButtonFR client={client} accountAbstraction={accountAbstraction} />
 			</div>
+			<p className="text-center text-sm text-gray-400">
+				Besoin d'aide ? 
+				<Link className="text-center text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">
+				Vidéo explicative (TODO)
+			</Link> 
+			</p>
 			<Menu />
 			<Footer />
 		</div>
