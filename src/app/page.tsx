@@ -18,10 +18,6 @@ export default function Home() {
 			<Header />
 
 			<div className="flex justify-center">
-				<ConnectButtonFR client={client} accountAbstraction={accountAbstraction} />
-			</div>
-
-			<div className="flex justify-center">
 				<ConnectButton client={client} accountAbstraction={accountAbstraction} />
 			</div>
 

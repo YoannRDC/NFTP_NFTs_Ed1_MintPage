@@ -2,19 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  createThirdwebClient,
-  defineChain,
-  getContract,
-} from "thirdweb";
-import {
   getActiveClaimCondition,
 } from "thirdweb/extensions/erc721";
 import { download } from "thirdweb/storage";
-import { client } from "../constants";
+import { client, nftpNftsEd1Contract } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
-
-const CHAIN_ID = 137; // Remplace par ton ID de blockchain
-const CONTRACT_ADDRESS = "0xYourContractAddress"; // Remplace par ton adresse de contrat
 
 export default function ClaimSnapshot() {
   const [snapshot, setSnapshot] = useState<any>(null);
@@ -25,17 +17,11 @@ export default function ClaimSnapshot() {
     async function fetchData() {
       try {
 
-        const contract = getContract({
-          client,
-          chain: defineChain(CHAIN_ID),
-          address: CONTRACT_ADDRESS,
-        });
-
         // ✅ Récupération des métadonnées du contrat
-        const metadata = await getContractMetadata({ contract });
+        const metadata = await getContractMetadata({ contract: nftpNftsEd1Contract });
 
         // ✅ Obtention de la condition de claim active
-        const activeClaimCondition = await getActiveClaimCondition({ contract });
+        const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
 
         // ✅ Récupération du snapshot Merkle
         const fetchedSnapshot = await fetchSnapshot(
