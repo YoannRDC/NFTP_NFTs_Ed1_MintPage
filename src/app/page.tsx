@@ -8,7 +8,6 @@ import nftpLogoImage from "@public/Logo_20ko.png";
 import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
-import ConnectButtonFR from "./components/ConnectButtonFR";
 import ClaimSnapshot from "./components/ClaimSnapshot";
 
 export default function Home() {
@@ -30,9 +29,7 @@ export default function Home() {
 			<Menu />
 			<Footer />
 
-			<p>-- ClaimSnapshot --</p>
 			<ClaimSnapshot />
-			<p>-- ClaimSnapshot Done --</p>
 		</div>
 	);
 }
