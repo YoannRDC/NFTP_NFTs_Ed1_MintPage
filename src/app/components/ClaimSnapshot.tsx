@@ -20,6 +20,8 @@ export default function ClaimSnapshot() {
         // ✅ Récupération des métadonnées du contrat
         const metadata = await getContractMetadata({ contract: nftpNftsEd1Contract });
 
+        console.log("metadata:" , metadata);
+
         // ✅ Obtention de la condition de claim active
         const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
 

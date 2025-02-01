@@ -17,7 +17,7 @@ export default function Home() {
 			<Header />
 
 			<div className="flex justify-center">
-				<ConnectButton client={client} accountAbstraction={accountAbstraction} />
+				<ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
 			</div>
 
 			<p className="text-center text-sm text-gray-400 mb-10">
