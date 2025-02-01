@@ -64,7 +64,7 @@ const NFTPed1: React.FC = () => {
       <br />
       <br />
       -- My Wallet --
-      <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} />
+      <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
       First step, connect to the website.
       <br />
       <br />
