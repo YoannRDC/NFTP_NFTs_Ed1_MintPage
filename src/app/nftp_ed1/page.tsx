@@ -8,7 +8,6 @@ import {
   useReadContract,
 } from "thirdweb/react";
 import {
-  accountAbstraction,
   client,
   nftpNftsEd1Contract,
 } from "../constants";
