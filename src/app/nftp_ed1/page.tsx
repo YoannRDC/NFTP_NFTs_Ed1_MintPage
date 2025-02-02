@@ -57,15 +57,13 @@ const NFTPed1: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 text-zinc-100">
+      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 mt-20 text-zinc-100">
       NFT Propulsion NFTs Edition 1.
       </h1>
 
       <br />
       <br />
-      -- My Wallet --
       <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
-      First step, connect to the website.
       <br />
       <br />
 
@@ -98,7 +96,7 @@ const NFTPed1: React.FC = () => {
           </TransactionButton>
         ) : (
           <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
-            Login to claim or buy an NFT (49 POL)
+             to claim or buy an NFT (49 POL)
           </p>
         )}
       </div>

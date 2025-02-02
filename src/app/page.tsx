@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
 import bannerImage from "@public/Banner.png";
-import nftpLogoImage from "@public/Logo_20ko.png";
+import youtube_logo from "@public/youtube_logo.png";
 import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
@@ -13,19 +13,28 @@ import ClaimSnapshot from "./components/ClaimSnapshot";
 export default function Home() {
 	return (
 		<div className="py-20">
-			{/* ✅ Supprimé le `py-20` qui limitait le header */}
 			<Header />
-
 			<div className="flex justify-center">
 				<ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
 			</div>
-
+			<br/>
 			<p className="text-center text-sm text-gray-400 mb-10">
-				Besoin d’aide ? 
-				<Link className="text-center text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">
-				Vidéo explicative (TODO)
-			</Link> 
+				<Link className="text-sm text-gray-400" target="_blank" href="https://www.youtube.com/@NFTPropulsion/shorts">
+					<span className="underline">Besoin d’aide ?</span>{" "}
+					<Image
+					src={youtube_logo}
+					alt="Logo Youtube"
+					width={20}
+					style={{
+						filter: "drop-shadow(0px 0px 30px rgba(255, 255, 255, 0.66))",
+						display: "inline",
+						verticalAlign: "middle",
+						marginLeft: "5px",
+					}}
+					/>
+				</Link>
 			</p>
+
 			<Menu />
 			<Footer />
 
@@ -97,6 +106,7 @@ function MenuItem(props: { title: string; href: string; description: string; ima
 				<h2 className="text-lg font-semibold mb-2">{props.title}</h2>
 				<p className="text-sm text-zinc-400">{props.description}</p>
 			</article>
+			<br/>
 		</Link>
 	);
 }
