@@ -9,6 +9,7 @@ import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
 import ClaimSnapshot from "./components/ClaimSnapshot";
+import MenuItem from "./components/MenuItem";
 
 export default function Home() {
 	return (
@@ -91,26 +92,6 @@ function Menu() {
 		</div>
 	);
 }
-
-
-function MenuItem(props: { title: string; href: string; description: string; imageSrc: string }) {
-	return (
-		<Link href={props.href} className="flex flex-row items-center border border-zinc-800 p-4 rounded-lg hover:bg-zinc-900 transition-colors hover:border-zinc-700">
-			{/* ✅ Image à gauche */}
-			<div className="w-16 h-16 overflow-hidden rounded-lg mr-4">
-				<img src={props.imageSrc} alt={props.title} className="object-cover w-full h-full" />
-			</div>
-
-			{/* ✅ Texte à droite */}
-			<article>
-				<h2 className="text-lg font-semibold mb-2">{props.title}</h2>
-				<p className="text-sm text-zinc-400">{props.description}</p>
-			</article>
-			<br/>
-		</Link>
-	);
-}
-
 
 function Footer() {
 	return (
