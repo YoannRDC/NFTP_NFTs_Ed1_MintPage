@@ -7,6 +7,7 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import {
+  accountAbstraction,
   client,
   nftpNftsEd1Contract,
 } from "../constants";
@@ -80,6 +81,10 @@ const NFTPed1: React.FC = () => {
         NFT Propulsion NFTs Edition 1.
       </h1>
       <br />
+            <div className="flex justify-center">
+              <ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
+            </div>
+            <br/>
       <MenuItem
         title="NFT Propulsion Edition 1"
         href="/nftp_ed1"
