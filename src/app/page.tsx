@@ -11,8 +11,12 @@ import Link from "next/link";
 import ClaimSnapshot from "./components/ClaimSnapshot";
 import MenuItem from "./components/MenuItem";
 import ClaimConditionForm from "./components/ClaimConditionForm";
+import { useState } from "react";
 
 export default function Home() {
+	
+	const [snapshotData, setSnapshotData] = useState<any[]>([]);
+
 	return (
 		<div className="py-20">
 			<Header />
@@ -40,10 +44,8 @@ export default function Home() {
 			<Menu />
 			<Footer />
 
-			<ClaimSnapshot />
-
-			
-			<ClaimConditionForm />
+			<ClaimSnapshot onSnapshotFetched={setSnapshotData} />
+			<ClaimConditionForm initialOverrides={snapshotData} />
 		</div>
 	);
 }

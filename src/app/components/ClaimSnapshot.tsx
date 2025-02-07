@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  getActiveClaimCondition,
-} from "thirdweb/extensions/erc721";
+import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { download } from "thirdweb/storage";
 import { client, nftpNftsEd1Contract } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
 
-export default function ClaimSnapshot() {
+export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched: (snapshot: any) => void }) {
   const [snapshot, setSnapshot] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,23 +14,12 @@ export default function ClaimSnapshot() {
   useEffect(() => {
     async function fetchData() {
       try {
-
-        // ✅ Récupération des métadonnées du contrat
         const metadata = await getContractMetadata({ contract: nftpNftsEd1Contract });
-
-        console.log("metadata:" , metadata);
-
-        // ✅ Obtention de la condition de claim active
         const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
-
-        // ✅ Récupération du snapshot Merkle
-        const fetchedSnapshot = await fetchSnapshot(
-          activeClaimCondition.merkleRoot,
-          metadata.merkle,
-          client
-        );
+        const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
         setSnapshot(fetchedSnapshot);
+        onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à ClaimConditionForm
       } catch (err) {
         console.error("Error fetching snapshot:", err);
         setError("Échec du chargement du snapshot.");
@@ -42,7 +29,7 @@ export default function ClaimSnapshot() {
     }
 
     fetchData();
-  }, []);
+  }, [onSnapshotFetched]);
 
   return (
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white">
@@ -63,12 +50,7 @@ export default function ClaimSnapshot() {
   );
 }
 
-// ✅ Fonction de récupération du snapshot Merkle
-async function fetchSnapshot(
-  merkleRoot: string,
-  merkleMetadata: Record<string, string> | undefined,
-  client: any
-) {
+async function fetchSnapshot(merkleRoot: string, merkleMetadata: Record<string, string> | undefined, client: any) {
   if (!merkleMetadata) return null;
 
   try {
