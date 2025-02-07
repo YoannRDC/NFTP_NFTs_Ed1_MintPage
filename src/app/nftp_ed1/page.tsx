@@ -125,7 +125,8 @@ const NFTPed1: React.FC = () => {
               alert("Achat réussi !");
             }}
           >
-            Acheter le NFT: {NFT_PRICE_POL} POL ~ {priceInEur !== null ? `${priceInEur.toFixed(2)} EUR` : "Chargement..."}
+            {/* Acheter le NFT: {NFT_PRICE_POL} POL ➝ {priceInEur !== null ? `${priceInEur.toFixed(2)} EUR` : "Chargement..."} */}
+            Acheter le NFT: {NFT_PRICE_POL} POL
             <p>(couleur aléatoire)</p>
           </TransactionButton>
         ) : (

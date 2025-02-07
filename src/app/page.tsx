@@ -10,6 +10,7 @@ import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
 import ClaimSnapshot from "./components/ClaimSnapshot";
 import MenuItem from "./components/MenuItem";
+import ClaimConditionForm from "./components/ClaimConditionForm";
 
 export default function Home() {
 	return (
@@ -40,6 +41,9 @@ export default function Home() {
 			<Footer />
 
 			<ClaimSnapshot />
+
+			
+			<ClaimConditionForm />
 		</div>
 	);
 }
