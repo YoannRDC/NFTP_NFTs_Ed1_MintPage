@@ -15,7 +15,7 @@ export default function ClaimConditionForm() {
   const [maxPerWallet, setMaxPerWallet] = useState(1);
   const [currencyAddress, setCurrencyAddress] = useState("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
   const [price, setPrice] = useState(0.1);
-  const [overrideList, setOverrideList] = useState([{ address: "", maxClaimable: "unlimited", price: "0" }]);
+  const [overrideList, setOverrideList] = useState([{ address: "", maxClaimable: "", price: "" }]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
