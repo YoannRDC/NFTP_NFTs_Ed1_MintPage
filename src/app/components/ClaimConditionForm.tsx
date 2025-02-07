@@ -30,7 +30,7 @@ export default function ClaimConditionForm() {
 
   const handleSetClaimConditions = async () => {
     if (!smartAccount || !isAdmin) {
-      alert("Seul l'administrateur peut effectuer cette action.");
+      alert("Only Admin.");
       return;
     }
 
@@ -89,7 +89,7 @@ export default function ClaimConditionForm() {
     return (
       <div className="p-4 border border-red-500 rounded-lg bg-gray-900 text-white max-w-md mx-auto mt-6 text-center">
         <h2 className="text-xl font-semibold text-red-400">⛔ Accès refusé</h2>
-        <p className="text-gray-400 mt-2">Vous n'êtes pas autorisé à accéder à cette page.</p>
+        <p className="text-gray-400 mt-2">Only admin page.</p>
       </div>
     );
   }
