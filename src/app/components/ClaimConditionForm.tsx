@@ -69,7 +69,7 @@ export default function ClaimConditionForm() {
   };
 
   const addAddress = () => {
-    setOverrideList([...overrideList, { address: "", maxClaimable: "unlimited", price: "0" }]);
+    setOverrideList([...overrideList, { address: "", maxClaimable: "", price: "" }]);
   };
 
   const removeAddress = (index: number) => {
@@ -104,21 +104,21 @@ export default function ClaimConditionForm() {
         <div key={index} className="flex flex-col gap-2 mb-4 bg-gray-800 p-3 rounded-lg">
           <input
             type="text"
-            placeholder="Adresse"
+            placeholder="Adresse Ex: 0x7b91F60Faa743275Bd31247aa17B2d67781c3621"
             value={entry.address}
             onChange={(e) => handleChange(index, "address", e.target.value)}
             className="w-full p-2 bg-gray-700 rounded text-white"
           />
           <input
             type="text"
-            placeholder="Max Claimable (ou 'unlimited')"
+            placeholder="Max Claimable (Ex: 1 ou unlimited)"
             value={entry.maxClaimable}
             onChange={(e) => handleChange(index, "maxClaimable", e.target.value)}
             className="w-full p-2 bg-gray-700 rounded text-white"
           />
           <input
             type="text"
-            placeholder="Prix (en ETH/MATIC)"
+            placeholder="Prix en MATIC, Ex: 1"
             value={entry.price}
             onChange={(e) => handleChange(index, "price", e.target.value)}
             className="w-full p-2 bg-gray-700 rounded text-white"
