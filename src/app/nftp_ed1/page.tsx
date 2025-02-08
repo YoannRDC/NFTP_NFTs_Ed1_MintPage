@@ -159,7 +159,7 @@ const NFTPed1: React.FC = () => {
                 className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
                 onClick={() =>
                   window.open(
-                    `https://polygon.nftscan.com/${nftpNftsEd1Contract}/${nft.metadata?.id}`,
+                    `https://polygon.nftscan.com/${nftpNftsEd1Contract.address}/${nft.metadata?.id || nft.id}`,
                     "_blank" // ✅ Ouvre dans un nouvel onglet
                   )
                 }
@@ -176,6 +176,7 @@ const NFTPed1: React.FC = () => {
             <p className="text-center mt-4 text-gray-400">Vous ne possédez pas encore de NFTs.</p>
           )}
         </div>
+
       )}
 
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
