@@ -151,10 +151,19 @@ const NFTPed1: React.FC = () => {
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> 
           {nfts.length > 0 ? (
             nfts.map((nft, index) => (
-              <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
+              <div
+                key={index}
+                className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                onClick={() =>
+                  window.open(
+                    `https://polygon.nftscan.com/${nftpNftsEd1Contract}/${nft.metadata?.id}`,
+                    "_blank" // ✅ Ouvre dans un nouvel onglet
+                  )
+                }
+              >
                 <MediaRenderer
                   client={client}
                   src={nft.metadata?.image || "/preview.gif"}
