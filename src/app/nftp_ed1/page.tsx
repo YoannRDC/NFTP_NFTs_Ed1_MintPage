@@ -20,6 +20,7 @@ import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import MenuItem from "../components/MenuItem";
 import { convertPolToEur } from "../utils/conversion";
+import VideoPresentation from "../components/NFTP_presentation";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
 
@@ -77,30 +78,42 @@ const NFTPed1: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-12 mt-20 text-zinc-100">
-        NFT Propulsion NFTs Edition 1.
-      </h1>
-      <br />
-            <div className="flex justify-center">
-              <ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
-            </div>
-            <br/>
-      <MenuItem
-        title="NFT Propulsion Edition 1"
-        href="/nftp_ed1"
-        description="First NFT collection of NFT Propulsion."
-        imageSrc="/logo_seul_11.png"
-      />
-      <br />
-      <p>
+
+      <div className="decorative-title">
+        -- Présentation de la collection --
+      </div>
+
+      <div className="decorative-subtitle">
+        NFT Propulsion Edition 1
+      </div>
+
+      <div className="mb-10">
+        <MenuItem
+          title="NFT Propulsion Edition 1"
+          href="/nftp_ed1"
+          description="First NFT collection of NFT Propulsion."
+          imageSrc="/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+        />
+      </div>
+
+      <div className="decorative-description">
         NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
-      </p>
-      <br />
-      <Link className="text-sm text-gray-400" target="_blank" href="https://nftpropulsion.fr">
+      </div>
+
+      {/* Artist preview */}
+      <VideoPresentation/>
+
+      <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
         Visit NFTpropulsion.fr
       </Link>
-      <br />
-      <br />
+
+      <div className="decorative-title">
+        -- NFTs à vendre --
+      </div>
+
+      <div className="flex justify-center m-10">
+        <ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
+      </div>
 
       {/* NFT preview */}
       <MediaRenderer
@@ -109,11 +122,8 @@ const NFTPed1: React.FC = () => {
         style={{ width: "50%", height: "auto", borderRadius: "10px" }}
       />
 
-      <br />
-      <br />
-
       {/* Mint section */}
-      <div className="flex flex-col">
+      <div className="flex flex-col m-10">
         {smartAccount ? (
           <TransactionButton
             transaction={() =>
@@ -135,18 +145,20 @@ const NFTPed1: React.FC = () => {
             <p>(couleur aléatoire)</p>
           </TransactionButton>
         ) : (
-          <div>
+          <div style={{ textAlign: "center"}}>
             <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
+
             <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
-              Connectez-vous pour acheter le NFT.
+              Connectez-vous pour acheter le NFT (euros ou crypto).
             </p>
           </div>
         )}
       </div>
 
-      <br />
-      <br />
-      -- Mes NFTs --
+
+      <div className="decorative-title">
+        -- Mes NFTs --
+      </div>
 
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
