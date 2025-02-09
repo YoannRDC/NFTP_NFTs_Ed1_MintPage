@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ConnectButton } from "thirdweb/react";
+import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
 import bannerImage from "@public/Banner.png";
 import youtube_logo from "@public/youtube_logo.png";
@@ -16,6 +16,9 @@ import { useState } from "react";
 export default function Home() {
 	
 	const [snapshotData, setSnapshotData] = useState<any[]>([]);
+	const account = useActiveAccount();
+	const adminAddress = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
+	const isAdmin = account?.address?.toLowerCase() === adminAddress.toLowerCase();
 
 	return (
 		<div className="py-20">
@@ -43,9 +46,15 @@ export default function Home() {
 
 			<Menu />
 			<Footer />
+		
+			{isAdmin && ( // ✅ Affiche uniquement si l'utilisateur est l'administrateur
+			<>
+				<Link className="text-center text-sm text-gray-400" target="_blank" href="./admin_page">
+					Gp to Admin Page
+				</Link>
+			</>
+      )}
 
-			<ClaimSnapshot onSnapshotFetched={setSnapshotData} />
-			<ClaimConditionForm initialOverrides={snapshotData} />
 		</div>
 	);
 }

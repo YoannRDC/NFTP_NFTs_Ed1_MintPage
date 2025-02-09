@@ -22,7 +22,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import { readContract } from "thirdweb";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
-const TOTAL_SUPPLY = 500;
+const TOTAL_SUPPLY = 100;
 
 const NFTPed1: React.FC = () => {
   const smartAccount = useActiveAccount();
