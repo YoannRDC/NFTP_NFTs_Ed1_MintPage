@@ -3,14 +3,10 @@
 import Image from "next/image";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
-import bannerImage from "@public/Banner.png";
 import youtube_logo from "@public/youtube_logo.png";
-import lesCollections from "@public/Les_Collections_v4.png";
 import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
-import ClaimSnapshot from "./components/ClaimSnapshot";
 import MenuItem from "./components/MenuItem";
-import ClaimConditionForm from "./components/ClaimConditionForm";
 import { useState } from "react";
 
 export default function Home() {
@@ -49,9 +45,15 @@ export default function Home() {
 		
 			{isAdmin && ( // ✅ Affiche uniquement si l'utilisateur est l'administrateur
 			<>
-				<Link className="text-center text-sm text-gray-400" target="_blank" href="./admin_page">
-					Gp to Admin Page
+				<div className="flex justify-center my-6">
+				<Link
+					className="px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
+					target="_blank"
+					href="./admin_page"
+				>
+					🚀 Go to Admin Page
 				</Link>
+				</div>
 			</>
       )}
 
