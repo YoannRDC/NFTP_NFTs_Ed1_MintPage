@@ -120,6 +120,10 @@ const NFTPed1: React.FC = () => {
         NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
       </div>
 
+      <div className="decorative-description">
+        Cette collection exclusive représente la 1ère édition de NFTs créés par NFT Propulsion. Limitée à 100 pièces uniques, chaque NFT incarne une vague aux couleurs distinctes, symbolisant la diversité et l'innovation dans l'univers numérique. Chaque pièce est numérotée individuellement, offrant à son détenteur un objet rare et authentique, ancré sur la blockchain. Rejoignez cette aventure et possédez un morceau de l'histoire de NFT Propulsion !
+      </div>
+
       {/* Artist preview */}
       <VideoPresentation/>
 
@@ -209,7 +213,9 @@ const NFTPed1: React.FC = () => {
               </div>
             ))
           ) : (
-            <p className="text-center mt-4 text-gray-400">Vous ne possédez pas de NFTs de cette collection.</p>
+            <div className="flex justify-center m-10">
+              <p className="text-center text-gray-400">Vous ne possédez pas de NFTs de cette collection.</p>
+            </div>
           )}
         </div>
 
