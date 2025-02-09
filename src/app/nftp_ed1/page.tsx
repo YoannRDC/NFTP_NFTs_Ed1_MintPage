@@ -13,22 +13,23 @@ import {
 } from "../constants";
 import { claimTo } from "thirdweb/extensions/erc721";
 import Link from "next/link";
-import Image from "next/image";
-import artist_logo from "@public/Logo_20ko.png";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import MenuItem from "../components/MenuItem";
 import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
+import { readContract } from "thirdweb";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
+const TOTAL_SUPPLY = 500;
 
 const NFTPed1: React.FC = () => {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
+  const [mintedCount, setMintedCount] = useState<number>(0);
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -43,6 +44,25 @@ const NFTPed1: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Get number of minted NFTs
+  useEffect(() => {
+    const fetchTotalMinted = async () => {
+      try {
+        const totalMinted = await readContract({
+          contract: nftpNftsEd1Contract,
+          method: "function totalMinted() view returns (uint256)",
+          params: [],
+        });
+        setMintedCount(Number(totalMinted)); // ✅ Stocker le résultat dans l'état
+      } catch (error) {
+        console.error("Erreur lors de la récupération du total minted :", error);
+      }
+    };
+
+    fetchTotalMinted();
+  }, []);
+
+  // Get user NFTs
   useEffect(() => {
     const fetchNFTs = async () => {
       if (!smartAccount?.address) return;
@@ -122,6 +142,10 @@ const NFTPed1: React.FC = () => {
         style={{ width: "50%", height: "auto", borderRadius: "10px" }}
       />
 
+      <div className="text-gray-500 mt-2">
+        {mintedCount}/{TOTAL_SUPPLY} NFTs vendus
+      </div>
+
       {/* Mint section */}
       <div className="flex flex-col m-10">
         {smartAccount ? (
@@ -185,7 +209,7 @@ const NFTPed1: React.FC = () => {
               </div>
             ))
           ) : (
-            <p className="text-center mt-4 text-gray-400">Vous ne possédez pas encore de NFTs.</p>
+            <p className="text-center mt-4 text-gray-400">Vous ne possédez pas de NFTs de cette collection.</p>
           )}
         </div>
 
