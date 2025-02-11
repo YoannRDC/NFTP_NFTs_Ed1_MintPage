@@ -19,6 +19,8 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
         const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
         console.log("Contract Metadata:", JSON.stringify(metadata, null, 2));
+        console.log("activeClaimCondition:", JSON.stringify(activeClaimCondition, null, 2));
+        console.log("fetchedSnapshot:", JSON.stringify(fetchedSnapshot, null, 2));
 
         setSnapshot(fetchedSnapshot);
         onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à ClaimConditionForm
