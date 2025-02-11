@@ -8,14 +8,7 @@ const CreditCardForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [returnUrl, setReturnUrl] = useState<string>("");
-
-  // ✅ Détermine dynamiquement l'URL actuelle
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setReturnUrl(window.location.href); // Utilise l'URL actuelle
-    }
-  }, []);
+  const returnUrl = "https://www.authentart.com/api/stripe-webhook";
 
   const handlePayment = async () => {
     if (!stripe || !elements) {

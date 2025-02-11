@@ -1,54 +1,57 @@
 "use client";
 
-import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import CreditCardForm from "./CreditCardForm";
+import { useAddress } from "@thirdweb-dev/react";
+import { useState } from "react";
 import { ConnectButton } from "thirdweb/react";
 import { accountAbstraction, client } from "../constants";
+import { Elements } from "@stripe/react-stripe-js";
+import CreditCardForm from "./CreditCardForm";
 
+// On initialise Stripe en dehors du composant pour éviter de le recréer à chaque rendu.
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function PurchasePage() {
   const buyerWalletAddress = useAddress();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string>("");
 
-  const handlePayment = async () => {
+  // Fonction pour récupérer le clientSecret depuis l'API Stripe.
+  const handleOnClick = async () => {
     try {
       const response = await fetch("/api/stripe-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ buyerWalletAddress }),
       });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la création du client secret");
+      }
       const data = await response.json();
       setClientSecret(data.clientSecret);
     } catch (error) {
-      console.error("Error creating payment intent:", error);
+      console.error("Erreur lors de la récupération du client secret :", error);
     }
   };
 
   return (
-    <div className="flex flex-col items-center">
-        <div className="flex justify-center m-10">
-            <ConnectButton client={client} accountAbstraction={accountAbstraction} locale="fr_FR"/>
-        </div>
+    <main>
+      <div className="flex justify-center m-10">
+        <ConnectButton
+          client={client}
+          accountAbstraction={accountAbstraction}
+          locale="fr_FR"
+        />
+      </div>
 
       {!clientSecret ? (
-        <button
-          onClick={handlePayment}
-          className="px-6 py-3 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
-        >
-          Buy with Credit Card
+        <button onClick={handleOnClick} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Buy with credit card
         </button>
       ) : (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CreditCardForm />
         </Elements>
       )}
-    </div>
+    </main>
   );
 }
-function useAddress() {
-    throw new Error("Function not implemented.");
-}
-
