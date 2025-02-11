@@ -18,9 +18,13 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
         const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
         const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
-        console.log("Contract Metadata:", JSON.stringify(metadata, null, 2));
-        console.log("activeClaimCondition:", JSON.stringify(activeClaimCondition, null, 2));
-        console.log("fetchedSnapshot:", JSON.stringify(fetchedSnapshot, null, 2));
+        // ✅ Fonction de conversion BigInt → String
+        const replacer = (_key: any, value: { toString: () => any; }) => (typeof value === "bigint" ? value.toString() : value);
+
+        // ✅ Affichage des données dans la console
+        console.log("Contract Metadata:", JSON.stringify(metadata, replacer, 2));
+        console.log("Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
+        console.log("Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
 
         setSnapshot(fetchedSnapshot);
         onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à ClaimConditionForm
