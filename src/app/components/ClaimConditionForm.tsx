@@ -56,6 +56,7 @@ export default function ClaimConditionForm({ initialOverrides = [] }: { initialO
             price: 0,
             startTime: new Date(),
             overrideList,
+            metadata: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0"
           },
         ],
       });
