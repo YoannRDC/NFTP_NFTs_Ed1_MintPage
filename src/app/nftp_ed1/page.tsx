@@ -20,6 +20,7 @@ import MenuItem from "../components/MenuItem";
 import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { readContract } from "thirdweb";
+import PurchasePage from "../components/PurchaseStripe";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
 const TOTAL_SUPPLY = 100;
@@ -30,6 +31,10 @@ const NFTPed1: React.FC = () => {
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
   const [mintedCount, setMintedCount] = useState<number>(0);
+
+  // Stripe payment
+  const buyerWalletAddress = useAddress();
+  const [clientSecret, setClientSecret] = useState("");
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -183,6 +188,8 @@ const NFTPed1: React.FC = () => {
         )}
       </div>
 
+      -- PurchasePage -- 
+      <PurchasePage />
 
       <div className="decorative-title">
         -- Mes NFTs --
@@ -229,3 +236,7 @@ const NFTPed1: React.FC = () => {
 };
 
 export default NFTPed1;
+function useAddress() {
+  throw new Error("Function not implemented.");
+}
+
