@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return;
   }
 
-  const stripe = new Stripe("<stripe_secret_key>", {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST as string, {
     apiVersion: "2025-01-27.acacia",
   });
 
