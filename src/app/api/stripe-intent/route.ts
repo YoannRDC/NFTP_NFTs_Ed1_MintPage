@@ -6,7 +6,7 @@ import Stripe from "stripe";
 export async function POST(req: Request) {
   const { buyerWalletAddress } = await req.json();
 
-  const stripe = new Stripe(process.env.STRIPE_WEBHOOK_SECRET as string, {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
     apiVersion: "2025-01-27.acacia",
   });
   
