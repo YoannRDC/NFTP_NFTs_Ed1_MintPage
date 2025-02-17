@@ -1,16 +1,16 @@
 // src/app/api/stripe-webhook/route.ts
 
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo } from "thirdweb/extensions/erc721";
+import { useSendTransaction } from "thirdweb/react";
 
 export async function POST(req: NextRequest) {
   // Validate the webhook signature
   // Source: https://stripe.com/docs/webhooks#secure-webhook
   const body = await req.text();
   const strip_signature = req.headers.get("stripe-signature");
+  const { mutate: sendTransaction } = useSendTransaction();
   
   console.log("Webhook called");
 
@@ -38,17 +38,12 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      const sdk = new ThirdwebSDK("mainnet", {
-        secretKey: process.env.THIRDWEB_API_KEY,
+      const transaction = claimTo({
+        contract:nftContractAddress,
+        to: buyerWalletAddress,
+        quantity: 1n,
       });
-      
-      const contractInstance = await sdk.getContract(nftContractAddress);
-
-      console.log("Mint in progress ...");
-
-      // Utilisez la méthode claimTo directement sur l'instance du contrat
-      const transaction = await contractInstance.erc721.claimTo(buyerWalletAddress, 1n);
-      console.log("Transaction:", transaction);
+      // sendTransaction(transaction);
 
     }   
     
