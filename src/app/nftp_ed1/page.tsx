@@ -23,7 +23,7 @@ import PurchasePage from "../components/PurchasePage";
 import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
-const NFT_PRICE_EUR = 15; // Prix du NFT en POL
+const NFT_PRICE_EUR = 15; // Prix du NFT en EUR
 const TOTAL_SUPPLY = 100;
 
 const NFTPed1: React.FC = () => {
@@ -31,6 +31,7 @@ const NFTPed1: React.FC = () => {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -68,9 +69,13 @@ const NFTPed1: React.FC = () => {
     fetchNFTs();
   }, [smartAccount?.address]);
 
+  // Sélecteur de quantité
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setQuantity(parseInt(e.target.value));
+  };
+
   return (
     <div className="flex flex-col items-center">
-
       <div className="decorative-title">
         -- Présentation de la collection --
       </div>
@@ -84,12 +89,11 @@ const NFTPed1: React.FC = () => {
           title="NFT Propulsion Edition 1"
           href="/nftp_ed1"
           description="First NFT collection of NFT Propulsion."
-          imageSrc="/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+          imageSrc="/logo_seul_11.png" // L'image doit être dans le dossier /public
         />
       </div>
-      
-      <div className="mb-10">
 
+      <div className="mb-10">
         <div className="decorative-description">
           NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
         </div>
@@ -101,15 +105,18 @@ const NFTPed1: React.FC = () => {
         </div>
 
         <div className="decorative-description">
-          Rejoignez cette aventure et possédez un morceau de l’histoire de NFT Propulsion ! 
+          Rejoignez cette aventure et possédez un morceau de l’histoire de NFT Propulsion !
         </div>
-
       </div>
 
       {/* Artist preview */}
-      <VideoPresentation/>
+      <VideoPresentation />
 
-      <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
+      <Link
+        className="text-sm text-gray-400 mt-5"
+        target="_blank"
+        href="https://nftpropulsion.fr"
+      >
         Visit NFTpropulsion.fr
       </Link>
 
@@ -117,8 +124,38 @@ const NFTPed1: React.FC = () => {
         -- NFTs à vendre --
       </div>
 
-      <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
-      
+      {/* Sélecteur de quantité */}
+      <div className="mb-4">
+        <label htmlFor="quantity" className="mr-2">
+          Quantity:
+        </label>
+        <select
+          id="quantity"
+          value={quantity}
+          onChange={handleQuantityChange}
+          className="border rounded px-2 py-1"
+        >
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+
+      <ItemERC721
+        totalSupply={TOTAL_SUPPLY}
+        priceInPol={NFT_PRICE_POL}
+        priceInEur={NFT_PRICE_EUR}
+        nftpContract={nftpNftsEd1Contract}
+        quantity={BigInt(quantity)}
+      />
+
       <div className="decorative-title">
         -- Mes NFTs --
       </div>
@@ -126,7 +163,7 @@ const NFTPed1: React.FC = () => {
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {nfts.length > 0 ? (
             nfts.map((nft, index) => (
               <div
@@ -135,7 +172,7 @@ const NFTPed1: React.FC = () => {
                 onClick={() =>
                   window.open(
                     `https://polygon.nftscan.com/${nftpNftsEd1Contract.address}/${nft.metadata?.id || nft.id}`,
-                    "_blank" // ✅ Ouvre dans un nouvel onglet
+                    "_blank"
                   )
                 }
               >
@@ -144,16 +181,19 @@ const NFTPed1: React.FC = () => {
                   src={nft.metadata?.image || "/preview.gif"}
                   style={{ width: "100%", height: "auto", borderRadius: "10px" }}
                 />
-                <p className="font-semibold mt-2">{nft.metadata?.name || "NFT"}</p>
+                <p className="font-semibold mt-2">
+                  {nft.metadata?.name || "NFT"}
+                </p>
               </div>
             ))
           ) : (
             <div className="flex justify-center m-10">
-              <p className="text-center text-gray-400">Vous ne possédez pas de NFTs de cette collection.</p>
+              <p className="text-center text-gray-400">
+                Vous ne possédez pas de NFTs de cette collection.
+              </p>
             </div>
           )}
         </div>
-
       )}
 
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
@@ -164,4 +204,3 @@ const NFTPed1: React.FC = () => {
 };
 
 export default NFTPed1;
-

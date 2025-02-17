@@ -2,23 +2,24 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    ConnectButton,
-    MediaRenderer,
-    TransactionButton,
-    useActiveAccount,
-  } from "thirdweb/react";
-  import PurchasePage from "./PurchasePage";
+  ConnectButton,
+  MediaRenderer,
+  TransactionButton,
+  useActiveAccount,
+} from "thirdweb/react";
+import PurchasePage from "./PurchasePage";
 import { client, nftpNftsEd1Contract } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
 
-// Vous pouvez définir une interface pour les props si nécessaire
+// Définition de l'interface pour les props, incluant quantity
 interface ItemERC721Props {
   totalSupply: number;
-  priceInPol: number | string| null;
+  priceInPol: number | string | null;
   priceInEur: number | string | null;
   nftpContract: any;
+  quantity: bigint;
 }
 
 export default function ItemERC721({
@@ -26,8 +27,8 @@ export default function ItemERC721({
   priceInPol,
   priceInEur,
   nftpContract,
+  quantity,
 }: ItemERC721Props) {
-
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
 
@@ -42,33 +43,32 @@ export default function ItemERC721({
     createWallet("io.zerion.wallet"),
   ];
 
-    // Get number of minted NFTs
-    useEffect(() => {
+  // Récupérer le nombre total de NFTs mintés
+  useEffect(() => {
     const fetchTotalMinted = async () => {
-        try {
+      try {
         const totalMinted = await readContract({
-            contract: nftpNftsEd1Contract,
-            method: "function totalMinted() view returns (uint256)",
-            params: [],
+          contract: nftpNftsEd1Contract,
+          method: "function totalMinted() view returns (uint256)",
+          params: [],
         });
-        setMintedCount(Number(totalMinted)); // ✅ Stocker le résultat dans l'état
-        } catch (error) {
-            console.error("Erreur lors de la récupération du total minted :", error);
-        }
+        setMintedCount(Number(totalMinted));
+      } catch (error) {
+        console.error("Erreur lors de la récupération du total minted :", error);
+      }
     };
 
     fetchTotalMinted();
-    }, []);
+  }, []);
 
   return (
     <div>
-        
-      {/* NFT preview */}
+      {/* Aperçu NFT */}
       <div className="text-center mt-10">
         <MediaRenderer
-            client={client}
-            src="/preview.gif"
-            style={{ width: "50%", height: "auto", borderRadius: "10px" }}
+          client={client}
+          src="/preview.gif"
+          style={{ width: "50%", height: "auto", borderRadius: "10px" }}
         />
       </div>
 
@@ -85,7 +85,7 @@ export default function ItemERC721({
         />
       </div>
 
-      {/* Mint section */}
+      {/* Section Mint */}
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
@@ -94,7 +94,7 @@ export default function ItemERC721({
                 claimTo({
                   contract: nftpContract,
                   to: smartAccount.address,
-                  quantity: 1n,
+                  quantity: quantity,
                 })
               }
               onError={(error: Error) => {
