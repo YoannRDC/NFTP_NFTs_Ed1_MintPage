@@ -138,7 +138,7 @@ const NFTPed1: React.FC = () => {
         Visit NFTpropulsion.fr
       </Link>
 
-      <div className="decorative-title">
+      <div className="decorative-title mb-10">
         -- NFTs à vendre --
       </div>
 
