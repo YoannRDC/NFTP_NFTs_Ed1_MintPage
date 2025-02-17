@@ -69,7 +69,7 @@ export default function ItemERC721({
   return (
     <div>
       {/* Aperçu NFT */}
-      <div className="text-center mt-10">
+      <div className="mt-10 flex justify-center">
         <MediaRenderer
           client={client}
           src="/preview.gif"
@@ -103,7 +103,7 @@ export default function ItemERC721({
                 id="quantity"
                 value={selectedQuantity.toString()}
                 onChange={handleQuantityChange}
-                className="border rounded px-2 py-1"
+                className="border rounded px-2 py-1 text-black"
               >
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -135,10 +135,9 @@ export default function ItemERC721({
             >
               Acheter en Crypto
             </TransactionButton>
-            <p className="mb-10">{priceInPol} POL</p>
+            <p className="mb-2">{priceInPol} POL</p>
             <PurchasePage />
-            <p>15 Euros</p>
-            <p>{priceInEur}</p>
+            <p>{priceInEur} Euros</p>
           </div>
         ) : (
           <div style={{ textAlign: "center" }}>
