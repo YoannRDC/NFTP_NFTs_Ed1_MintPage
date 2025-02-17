@@ -13,13 +13,13 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
 
-// Définition de l'interface pour les props, incluant quantity
+// Définition de l'interface pour les props, incluant une quantité par défaut
 interface ItemERC721Props {
   totalSupply: number;
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   nftpContract: any;
-  quantity: bigint;
+  quantity: bigint; // quantité par défaut
 }
 
 export default function ItemERC721({
@@ -31,6 +31,8 @@ export default function ItemERC721({
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
+  // State pour la quantité sélectionnée, initialisée à partir des props
+  const [selectedQuantity, setSelectedQuantity] = useState<bigint>(quantity);
 
   const wallets = [
     inAppWallet({
@@ -61,6 +63,11 @@ export default function ItemERC721({
     fetchTotalMinted();
   }, []);
 
+  // Handler pour mettre à jour la quantité sélectionnée
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedQuantity(BigInt(e.target.value));
+  };
+
   return (
     <div>
       {/* Aperçu NFT */}
@@ -89,12 +96,36 @@ export default function ItemERC721({
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
+            {/* Sélecteur de quantité */}
+            <div className="mb-4">
+              <label htmlFor="quantity" className="mr-2">
+                Quantity:
+              </label>
+              <select
+                id="quantity"
+                value={selectedQuantity.toString()}
+                onChange={handleQuantityChange}
+                className="border rounded px-2 py-1"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+
             <TransactionButton
               transaction={() =>
                 claimTo({
                   contract: nftpContract,
                   to: smartAccount.address,
-                  quantity: quantity,
+                  quantity: selectedQuantity,
                 })
               }
               onError={(error: Error) => {
@@ -104,7 +135,7 @@ export default function ItemERC721({
                 alert("Achat réussi !");
               }}
             >
-              Acheter le NFT
+              Acheter en Crypto
             </TransactionButton>
             <p className="mb-10">{priceInPol} POL</p>
             <PurchasePage />
