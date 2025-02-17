@@ -15,15 +15,15 @@ import { claimTo } from "thirdweb/extensions/erc721";
 
 // Vous pouvez définir une interface pour les props si nécessaire
 interface ItemERC721Props {
-  TOTAL_SUPPLY: number;
-  NFT_PRICE_POL: number | string;
+  totalSupply: number;
+  priceInPol: number | string| null;
   priceInEur: number | string | null;
   nftpContract: any;
 }
 
 export default function ItemERC721({
-  TOTAL_SUPPLY,
-  NFT_PRICE_POL,
+  totalSupply,
+  priceInPol,
   priceInEur,
   nftpContract,
 }: ItemERC721Props) {
@@ -62,15 +62,18 @@ export default function ItemERC721({
 
   return (
     <div>
+        
       {/* NFT preview */}
-      <MediaRenderer
-        client={client}
-        src="/preview.gif"
-        style={{ width: "50%", height: "auto", borderRadius: "10px" }}
-      />
+      <div className="text-center mt-10">
+        <MediaRenderer
+            client={client}
+            src="/preview.gif"
+            style={{ width: "50%", height: "auto", borderRadius: "10px" }}
+        />
+      </div>
 
       <div className="text-gray-500 mt-2">
-        {mintedCount}/{TOTAL_SUPPLY} NFTs vendus (couleur aléatoire)
+        {mintedCount}/{totalSupply} NFTs vendus (couleur aléatoire)
       </div>
 
       <div className="text-center mt-10">
@@ -103,7 +106,7 @@ export default function ItemERC721({
             >
               Acheter le NFT
             </TransactionButton>
-            <p className="mb-10">{NFT_PRICE_POL} POL</p>
+            <p className="mb-10">{priceInPol} POL</p>
             <PurchasePage />
             <p>15 Euros</p>
             <p>{priceInEur}</p>

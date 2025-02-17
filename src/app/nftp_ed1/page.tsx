@@ -23,6 +23,7 @@ import PurchasePage from "../components/PurchasePage";
 import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
+const NFT_PRICE_EUR = 15; // Prix du NFT en POL
 const TOTAL_SUPPLY = 100;
 
 const NFTPed1: React.FC = () => {
@@ -116,7 +117,7 @@ const NFTPed1: React.FC = () => {
         -- NFTs à vendre --
       </div>
 
-      <ItemERC721 TOTAL_SUPPLY={TOTAL_SUPPLY} NFT_PRICE_POL={NFT_PRICE_POL} priceInEur={null} nftpContract={nftpNftsEd1Contract} />
+      <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
       
       <div className="decorative-title">
         -- Mes NFTs --
