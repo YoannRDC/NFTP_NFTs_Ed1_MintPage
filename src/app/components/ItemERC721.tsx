@@ -19,7 +19,6 @@ interface ItemERC721Props {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   nftpContract: any;
-  quantity: bigint; // quantité par défaut
 }
 
 export default function ItemERC721({
@@ -27,12 +26,11 @@ export default function ItemERC721({
   priceInPol,
   priceInEur,
   nftpContract,
-  quantity,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
   // State pour la quantité sélectionnée, initialisée à partir des props
-  const [selectedQuantity, setSelectedQuantity] = useState<bigint>(quantity);
+  const [selectedQuantity, setSelectedQuantity] = useState<bigint>(1n);
 
   const wallets = [
     inAppWallet({
