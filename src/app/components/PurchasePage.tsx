@@ -26,6 +26,7 @@ export default function PurchasePage() {
         throw new Error("Erreur lors de la création du client secret");
       }
       const data = await response.json();
+      console.log("clientSecret:", clientSecret);
       setClientSecret(data.clientSecret);
     } catch (error) {
       console.error("Erreur lors de la récupération du client secret :", error);
@@ -33,15 +34,7 @@ export default function PurchasePage() {
   }; 
 
   return (
-    <div>
-      <div className="flex justify-center m-10">
-         <ConnectButton
-          client={client}
-          accountAbstraction={accountAbstraction}
-          locale="fr_FR"
-        />
-      </div>
-  
+    <div>  
       {!clientSecret ? (
         <button onClick={handleOnClick} className="px-4 py-2 bg-blue-500 text-white rounded">
           Buy with credit card

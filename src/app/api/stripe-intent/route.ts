@@ -11,8 +11,8 @@ export async function POST(req: Request) {
   });
   
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: 100_00,
-    currency: "usd",
+    amount: 5_00,
+    currency: "eur",
     payment_method_types: ["card"],
     // buyerWalletAddress is needed in the webhook.
     metadata: { buyerWalletAddress },

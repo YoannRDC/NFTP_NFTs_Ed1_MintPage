@@ -149,30 +149,36 @@ const NFTPed1: React.FC = () => {
 
       <div className="text-gray-500 mt-2">
         {mintedCount}/{TOTAL_SUPPLY} NFTs vendus
+        (couleur aléatoire)
       </div>
 
       {/* Mint section */}
       <div className="flex flex-col m-10">
         {smartAccount ? (
-          <TransactionButton
-            transaction={() =>
-              claimTo({
-                contract: nftpNftsEd1Contract,
-                to: smartAccount.address,
-                quantity: 1n,
-              })
-            }
-            onError={(error) => {
-              alert(`Erreur: ${error.message}`);
-            }}
-            onTransactionConfirmed={async () => {
-              alert("Achat réussi !");
-            }}
-          >
-            {/* Acheter le NFT: {NFT_PRICE_POL} POL ➝ {priceInEur !== null ? `${priceInEur.toFixed(2)} EUR` : "Chargement..."} */}
-            Acheter le NFT: {NFT_PRICE_POL} POL
-            <p>(couleur aléatoire)</p>
-          </TransactionButton>
+          <div className="text-center">
+            <TransactionButton
+              transaction={() =>
+                claimTo({
+                  contract: nftpNftsEd1Contract,
+                  to: smartAccount.address,
+                  quantity: 1n,
+                })
+              }
+              onError={(error) => {
+                alert(`Erreur: ${error.message}`);
+              }}
+              onTransactionConfirmed={async () => {
+                alert("Achat réussi !");
+              }}
+            >
+              {/* Acheter le NFT: {NFT_PRICE_POL} POL ➝ {priceInEur !== null ? `${priceInEur.toFixed(2)} EUR` : "Chargement..."} */}
+              Acheter le NFT
+            </TransactionButton>
+            <p className="mb-10">{NFT_PRICE_POL} POL</p>
+            <PurchasePage />
+            <p>15 Euros</p>
+            <p>{priceInEur}</p>
+          </div>
         ) : (
           <div style={{ textAlign: "center"}}>
             <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
@@ -182,10 +188,7 @@ const NFTPed1: React.FC = () => {
             </p>
           </div>
         )}
-      </div>
-
-      -- PurchasePage -- 
-      <PurchasePage />
+      </div>      
 
       <div className="decorative-title">
         -- Mes NFTs --

@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     
     if (event.type === "charge.succeeded") {
       const { buyerWalletAddress } = event.data.object.metadata;
+      console.log("buyerWalletAddress:", buyerWalletAddress);
       console.log("Mint in progress ...");
     }
     

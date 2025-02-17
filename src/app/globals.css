@@ -3,61 +3,96 @@
 @tailwind utilities;
 
 :root {
-	line-height: 1.5;
-	font-weight: 400;
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	font-family: 'Inter', sans-serif;
-	font-optical-sizing: auto;
-	font-style: normal;
-	font-variation-settings: 'slnt' 0;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: 'slnt' 0;
+}
+
+/* 1. Éviter tout débordement horizontal */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 @layer base {
-	body {
-		@apply bg-zinc-950 text-neutral-200;
-	}
+  body {
+    @apply bg-zinc-950 text-neutral-200;
+    overflow-x: hidden;
+  }
 }
 
-
- .decorative-title {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: 30px; 
-    letter-spacing: 0.5px; 
-    word-spacing: 4px; 
-    font-weight: 700;
-    font-style: italic;
-    font-variant: small-caps;
-    text-align: center;
-    background-image: linear-gradient(90deg, #8F9AFF, #D3E3FF);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-    margin-top: 2.5rem;
+/* Titres décoratifs */
+.decorative-title {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-size: clamp(24px, 5vw, 30px);
+  letter-spacing: 0.5px;
+  word-spacing: 4px;
+  font-weight: 700;
+  font-style: italic;
+  font-variant: small-caps;
+  text-align: center;
+  background-image: linear-gradient(90deg, #8F9AFF, #D3E3FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  margin-top: 2.5rem;
 }
 
 .decorative-subtitle {
-    font-size: 22px; 
-    word-spacing: 4px; 
-    font-weight: 700;
-    font-style: italic;
-    font-variant: small-caps;
-    text-align: center;
-    background-image: linear-gradient(90deg, #e6e7f7, #D3E3FF);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-    margin: 2.5rem;
+  font-size: clamp(18px, 4vw, 22px);
+  word-spacing: 4px;
+  font-weight: 700;
+  font-style: italic;
+  font-variant: small-caps;
+  text-align: center;
+  background-image: linear-gradient(90deg, #e6e7f7, #D3E3FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  margin: 2.5rem;
 }
 
 .decorative-description {
-	font-family: Arial, sans-serif;
-	color: #f6f7ff;
-	font-style: italic;
-	margin-bottom:20px;
-	justify-content: center;
+  font-family: Arial, sans-serif;
+  color: #f6f7ff;
+  font-style: italic;
+  margin-bottom: 20px;
+  justify-content: center;
+  /* 2. Forcer la coupure des mots trop longs */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* 3. Empêcher que le contenu .flex dépasse la largeur */
+.container,
+.flex {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 100%;
+}
+
+/* 4. Rendre les médias (images, iframes, vidéos, MediaRenderer) responsives */
+img,
+iframe,
+video,
+.MediaRenderer {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 5. Ajuster la marge m-10 sur mobile si besoin */
+@media (max-width: 640px) {
+  .m-10 {
+    margin: 1rem !important; /* Ajustez à votre convenance */
+  }
 }

@@ -19,9 +19,9 @@ export default function MenuItem({ title, href, description, imageSrc }: MenuIte
         <Image 
           src={imageSrc} 
           alt={title} 
-          layout="fill" 
-          objectFit="cover" 
-          className="rounded-lg" 
+          fill
+          style={{ objectFit: "cover" }}
+          className="rounded-lg"
         />
       </div>
 

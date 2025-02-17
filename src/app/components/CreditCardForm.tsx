@@ -47,8 +47,21 @@ const CreditCardForm = () => {
   };
 
   return (
-    <div>
-      <PaymentElement />
+    <div className="bg-white p-5 rounded">
+      <PaymentElement
+        options={
+          {
+            appearance: {
+              theme: "flat",
+              variables: {
+                colorBackground: "#ffffff",
+                fontFamily: "Arial, sans-serif",
+              },
+            },
+          } as any
+        }
+      />
+
       <button
         onClick={handlePayment}
         disabled={!stripe || isProcessing}
