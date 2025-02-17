@@ -1,5 +1,7 @@
 // src/app/api/stripe-webhook/route.ts
 
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo } from "thirdweb/extensions/erc721";
@@ -38,12 +40,28 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
+      /* // Nort working: Must be called on the client side.
       const transaction = claimTo({
         contract:nftContractAddress,
         to: buyerWalletAddress,
         quantity: 1n,
       });
-      // sendTransaction(transaction);
+      sendTransaction(transaction); */
+
+      // Initialize Thirdweb SDK for Polygon Mainnet using your API key.
+      const sdk = new ThirdwebSDK("polygon", {
+        // This API key is assumed to be set as an environment variable
+        clientId: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID,
+      });
+
+      // Get the NFT contract instance
+      const contract = await sdk.getContract(nftContractAddress);
+
+      // Claim the NFT by sending the transaction to claim 1 token to the buyer's wallet.
+      // Depending on your contract setup, you might use either `claim` or `claimTo`.
+      // Here we use `claimTo` for clarity.
+      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
+      console.log("NFT claimed successfully:", tx);
 
     }   
     
