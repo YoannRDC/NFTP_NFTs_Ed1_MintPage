@@ -1,18 +1,14 @@
 // src/app/api/stripe-webhook/route.ts
 
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { claimTo } from "thirdweb/extensions/erc721";
-import { useSendTransaction } from "thirdweb/react";
 
 export async function POST(req: NextRequest) {
   // Validate the webhook signature
   // Source: https://stripe.com/docs/webhooks#secure-webhook
   const body = await req.text();
   const strip_signature = req.headers.get("stripe-signature");
-  const { mutate: sendTransaction } = useSendTransaction();
   
   console.log("Webhook called");
 
@@ -39,14 +35,6 @@ export async function POST(req: NextRequest) {
       
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
-
-      /* // Nort working: Must be called on the client side.
-      const transaction = claimTo({
-        contract:nftContractAddress,
-        to: buyerWalletAddress,
-        quantity: 1n,
-      });
-      sendTransaction(transaction); */
 
       // Initialize Thirdweb SDK for Polygon Mainnet using your API key.
       const sdk = new ThirdwebSDK("polygon", {
