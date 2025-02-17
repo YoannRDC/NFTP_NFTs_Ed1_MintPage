@@ -113,22 +113,26 @@ const NFTPed1: React.FC = () => {
           title="NFT Propulsion Edition 1"
           href="/nftp_ed1"
           description="First NFT collection of NFT Propulsion."
-          imageSrc="/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+          imageSrc="./logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
         />
       </div>
+      
+      <div className="mb-10">
 
-      <div className="decorative-description">
-        NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
-      </div>
+        <div className="decorative-description">
+          NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
+        </div>
 
-      <div className="decorative-description">
-        Cette collection exclusive représente la 1ère édition de NFTs créés par NFT Propulsion. <br />
-        Limitée à 100 pièces uniques, chaque NFT incarne une vague aux couleurs distinctes, symbolisant la diversité et l’innovation dans l’univers numérique. <br />
-        Chaque pièce est numérotée individuellement, offrant à son détenteur un objet rare et authentique, ancré sur la blockchain.
-      </div>
+        <div className="decorative-description">
+          Cette collection exclusive représente la 1ère édition de NFTs créés par NFT Propulsion. <br />
+          Limitée à 100 pièces uniques, chaque NFT incarne une vague aux couleurs distinctes, symbolisant la diversité et l’innovation dans l’univers numérique. <br />
+          Chaque pièce est numérotée individuellement, offrant à son détenteur un objet rare et authentique, ancré sur la blockchain.
+        </div>
 
-      <div className="decorative-description">
-        Rejoignez cette aventure et possédez un morceau de l’histoire de NFT Propulsion ! 
+        <div className="decorative-description">
+          Rejoignez cette aventure et possédez un morceau de l’histoire de NFT Propulsion ! 
+        </div>
+
       </div>
 
       {/* Artist preview */}
@@ -152,6 +156,10 @@ const NFTPed1: React.FC = () => {
       <div className="text-gray-500 mt-2">
         {mintedCount}/{TOTAL_SUPPLY} NFTs vendus
         (couleur aléatoire)
+      </div>
+
+      <div className="text-center">
+        <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
       </div>
 
       {/* Mint section */}
@@ -183,8 +191,6 @@ const NFTPed1: React.FC = () => {
           </div>
         ) : (
           <div style={{ textAlign: "center"}}>
-            <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
-
             <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
               Connectez-vous pour acheter le NFT (euros ou crypto).
             </p>
