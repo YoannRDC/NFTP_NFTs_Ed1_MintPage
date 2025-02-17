@@ -1,3 +1,5 @@
+// src/app./components/PurchasePage.tsx
+
 "use client";
 export const dynamic = "force-dynamic";
 

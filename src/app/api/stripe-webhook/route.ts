@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      const sdk = new ThirdwebSDK("mainnet"); // Remplacez "mainnet" par votre réseau si besoin
+      const sdk = new ThirdwebSDK("mainnet", {
+        secretKey: process.env.THIRDWEB_API_KEY,
+      });
+      
       const contractInstance = await sdk.getContract(nftContractAddress);
 
       console.log("Mint in progress ...");
