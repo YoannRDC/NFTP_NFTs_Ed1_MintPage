@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 export async function POST(req: Request) {
-  const { buyerWalletAddress } = await req.json();
+  const { metadata } = await req.json();
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE as string, {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST as string, {
     apiVersion: "2025-01-27.acacia",
   });
   
@@ -14,8 +14,7 @@ export async function POST(req: Request) {
     amount: 5_00,
     currency: "eur",
     payment_method_types: ["card"],
-    // buyerWalletAddress is needed in the webhook.
-    metadata: { buyerWalletAddress },
+    metadata: { metadata },
   });
 
   return NextResponse.json({

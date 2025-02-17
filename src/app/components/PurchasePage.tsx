@@ -4,11 +4,11 @@ export const dynamic = "force-dynamic";
 import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import { accountAbstraction, client } from "../constants";
+import { accountAbstraction, client, nftpNftsEd1Contract } from "../constants";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!);
 
 export default function PurchasePage() {
   const smartAccount = useActiveAccount();
@@ -20,7 +20,7 @@ export default function PurchasePage() {
       const response = await fetch("/api/stripe-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ buyerWalletAddress: smartAccount?.address }),
+        body: JSON.stringify({ buyerWalletAddress: smartAccount?.address, nftContract: nftpNftsEd1Contract?.address }),
       });
       if (!response.ok) {
         throw new Error("Erreur lors de la création du client secret");

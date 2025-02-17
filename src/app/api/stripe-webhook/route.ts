@@ -1,8 +1,10 @@
 // src/app/api/stripe-webhook/route.ts
 
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { claimTo } from "thirdweb/extensions/erc721";
 
 export async function POST(req: NextRequest) {
   // Validate the webhook signature
@@ -17,7 +19,7 @@ export async function POST(req: NextRequest) {
     return;
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE as string, {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST as string, {
     apiVersion: "2025-01-27.acacia",
   });
 
@@ -29,13 +31,23 @@ export async function POST(req: NextRequest) {
     );
     
     if (event.type === "charge.succeeded") {
-      const paymentIntent = event.data.object;
+      const paymentIntent = event.data.object as any;
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       console.log("buyerWalletAddress:", buyerWalletAddress);
-      console.log("Mint in progress ...");
-    }
+      
+      const nftContractAddress = paymentIntent.metadata.nftContractAddress;
+      console.log("nftContractAddress:", nftContractAddress);
 
-    
+      const sdk = new ThirdwebSDK("mainnet"); // Remplacez "mainnet" par votre réseau si besoin
+      const contractInstance = await sdk.getContract(nftContractAddress);
+
+      console.log("Mint in progress ...");
+
+      // Utilisez la méthode claimTo directement sur l'instance du contrat
+      const transaction = await contractInstance.erc721.claimTo(buyerWalletAddress, 1n);
+      console.log("Transaction:", transaction);
+
+    }   
     
     return NextResponse.json({ message: "OK" });
   } catch (error) {
