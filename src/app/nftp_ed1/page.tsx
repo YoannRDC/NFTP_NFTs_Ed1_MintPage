@@ -11,7 +11,6 @@ import {
   client,
   nftpNftsEd1Contract,
 } from "../constants";
-import { claimTo } from "thirdweb/extensions/erc721";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
@@ -21,6 +20,7 @@ import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { readContract } from "thirdweb";
 import PurchasePage from "../components/PurchasePage";
+import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
 const TOTAL_SUPPLY = 100;
@@ -30,7 +30,6 @@ const NFTPed1: React.FC = () => {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
-  const [mintedCount, setMintedCount] = useState<number>(0);
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -43,24 +42,6 @@ const NFTPed1: React.FC = () => {
     const interval = setInterval(fetchPrice, 60000); // Met à jour toutes les 60s
 
     return () => clearInterval(interval);
-  }, []);
-
-  // Get number of minted NFTs
-  useEffect(() => {
-    const fetchTotalMinted = async () => {
-      try {
-        const totalMinted = await readContract({
-          contract: nftpNftsEd1Contract,
-          method: "function totalMinted() view returns (uint256)",
-          params: [],
-        });
-        setMintedCount(Number(totalMinted)); // ✅ Stocker le résultat dans l'état
-      } catch (error) {
-        console.error("Erreur lors de la récupération du total minted :", error);
-      }
-    };
-
-    fetchTotalMinted();
   }, []);
 
   // Get user NFTs
@@ -86,17 +67,6 @@ const NFTPed1: React.FC = () => {
     fetchNFTs();
   }, [smartAccount?.address]);
 
-  const wallets = [
-    inAppWallet({
-      auth: { options: ["google", "email", "passkey", "phone"] },
-    }),
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("io.rabby"),
-    createWallet("io.zerion.wallet"),
-  ];
-
   return (
     <div className="flex flex-col items-center">
 
@@ -113,7 +83,7 @@ const NFTPed1: React.FC = () => {
           title="NFT Propulsion Edition 1"
           href="/nftp_ed1"
           description="First NFT collection of NFT Propulsion."
-          imageSrc="./logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+          imageSrc="/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
         />
       </div>
       
@@ -146,58 +116,8 @@ const NFTPed1: React.FC = () => {
         -- NFTs à vendre --
       </div>
 
-      {/* NFT preview */}
-      <MediaRenderer
-        client={client}
-        src="/preview.gif"
-        style={{ width: "50%", height: "auto", borderRadius: "10px" }}
-      />
-
-      <div className="text-gray-500 mt-2">
-        {mintedCount}/{TOTAL_SUPPLY} NFTs vendus
-        (couleur aléatoire)
-      </div>
-
-      <div className="text-center">
-        <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
-      </div>
-
-      {/* Mint section */}
-      <div className="flex flex-col m-10">
-        {smartAccount ? (
-          <div className="text-center">
-            <TransactionButton
-              transaction={() =>
-                claimTo({
-                  contract: nftpNftsEd1Contract,
-                  to: smartAccount.address,
-                  quantity: 1n,
-                })
-              }
-              onError={(error) => {
-                alert(`Erreur: ${error.message}`);
-              }}
-              onTransactionConfirmed={async () => {
-                alert("Achat réussi !");
-              }}
-            >
-              {/* Acheter le NFT: {NFT_PRICE_POL} POL ➝ {priceInEur !== null ? `${priceInEur.toFixed(2)} EUR` : "Chargement..."} */}
-              Acheter le NFT
-            </TransactionButton>
-            <p className="mb-10">{NFT_PRICE_POL} POL</p>
-            <PurchasePage />
-            <p>15 Euros</p>
-            <p>{priceInEur}</p>
-          </div>
-        ) : (
-          <div style={{ textAlign: "center"}}>
-            <p style={{ textAlign: "center", width: "100%", marginTop: "10px" }}>
-              Connectez-vous pour acheter le NFT (euros ou crypto).
-            </p>
-          </div>
-        )}
-      </div>      
-
+      <ItemERC721 TOTAL_SUPPLY={TOTAL_SUPPLY} NFT_PRICE_POL={NFT_PRICE_POL} priceInEur={null} nftpContract={nftpNftsEd1Contract} />
+      
       <div className="decorative-title">
         -- Mes NFTs --
       </div>
