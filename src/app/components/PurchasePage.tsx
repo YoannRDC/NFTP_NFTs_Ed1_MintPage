@@ -37,7 +37,7 @@ export default function PurchasePage() {
     <div>  
       {!clientSecret ? (
         <button onClick={handleOnClick} className="px-4 py-2 bg-blue-500 text-white rounded">
-          Buy with credit card
+          Acheter en Euros
         </button>
       ) : (
          <Elements stripe={stripePromise} options={{ clientSecret }}>

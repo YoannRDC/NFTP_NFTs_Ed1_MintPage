@@ -13,7 +13,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
 
-// Définition de l'interface pour les props, incluant une quantité par défaut
+// Définition de l'interface pour les props
 interface ItemERC721Props {
   totalSupply: number;
   priceInPol: number | string | null;
@@ -29,8 +29,23 @@ export default function ItemERC721({
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
-  // State pour la quantité sélectionnée, initialisée à partir des props
+  // State pour la quantité sélectionnée, initialisée à 1
   const [selectedQuantity, setSelectedQuantity] = useState<bigint>(1n);
+
+  // Calcul des prix totaux en fonction de la quantité sélectionnée
+  const totalPricePol =
+    (priceInPol !== null && priceInPol !== undefined
+      ? typeof priceInPol === "number"
+        ? priceInPol
+        : parseFloat(priceInPol)
+      : 0) * Number(selectedQuantity);
+
+  const totalPriceEur =
+    (priceInEur !== null && priceInEur !== undefined
+      ? typeof priceInEur === "number"
+        ? priceInEur
+        : parseFloat(priceInEur)
+      : 0) * Number(selectedQuantity);
 
   const wallets = [
     inAppWallet({
@@ -77,7 +92,7 @@ export default function ItemERC721({
         />
       </div>
 
-      <div className="text-gray-500 mt-2">
+      <div className="text-gray-500 mt-2 flex justify-center">
         {mintedCount}/{totalSupply} NFTs vendus (couleur aléatoire)
       </div>
 
@@ -95,7 +110,7 @@ export default function ItemERC721({
         {smartAccount ? (
           <div className="text-center">
             {/* Sélecteur de quantité */}
-            <div className="mb-4">
+            <div className="mb-4 hidden">
               <label htmlFor="quantity" className="mr-2">
                 Quantity:
               </label>
@@ -135,9 +150,9 @@ export default function ItemERC721({
             >
               Acheter en Crypto
             </TransactionButton>
-            <p className="mb-2">{priceInPol} POL</p>
+            <p className="mb-2">{totalPricePol} POL</p>
             <PurchasePage />
-            <p>{priceInEur} Euros</p>
+            <p>{totalPriceEur} Euros</p>
           </div>
         ) : (
           <div style={{ textAlign: "center" }}>
