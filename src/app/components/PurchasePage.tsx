@@ -20,7 +20,7 @@ export default function PurchasePage() {
       const response = await fetch("/api/stripe-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: smartAccount?.address }),
+        body: JSON.stringify({ buyerWalletAddress: smartAccount?.address }),
       });
       if (!response.ok) {
         throw new Error("Erreur lors de la création du client secret");

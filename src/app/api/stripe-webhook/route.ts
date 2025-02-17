@@ -28,11 +28,14 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
     
-    if (event.type === "charge.succeeded") {
-      const { buyerWalletAddress } = event.data.object.metadata;
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object;
+      const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       console.log("buyerWalletAddress:", buyerWalletAddress);
       console.log("Mint in progress ...");
     }
+
+
     
     return NextResponse.json({ message: "OK" });
   } catch (error) {
