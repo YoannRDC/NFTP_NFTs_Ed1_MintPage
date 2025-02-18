@@ -1,3 +1,5 @@
+//src/app/components/ItemERC721.tsx
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -155,8 +157,8 @@ export default function ItemERC721({
             <p>{totalPriceEur} Euros</p>
           </div>
         ) : (
-          <div style={{ textAlign: "center" }}>
-            <p style={{ textAlign: "center", width: "100%" }}>
+          <div className="text-center">
+            <p className="w-full">
               Connectez-vous pour acheter le NFT (euros ou crypto).
             </p>
           </div>

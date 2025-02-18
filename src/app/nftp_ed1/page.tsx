@@ -106,7 +106,7 @@ const NFTPed1: React.FC = () => {
 
       </div>
 
-      <div className="flex flex-col items-center mb-10 w-full md:w-[60%] h-[300px] rounded-[10px]">
+      <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
         <VideoPresentation />
       </div>
 
@@ -114,12 +114,12 @@ const NFTPed1: React.FC = () => {
         Visit NFTpropulsion.fr
       </Link>
 
-      <div className="decorative-title mb-10">
+      <div className="decorative-title">
         -- NFTs à vendre --
       </div>
 
-      <div className="flex flex-col items-center mb-10 w-full md:w-[100%] h-[300px] rounded-[10px]">
-      <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
+      <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
+        <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
       </div>
       
       <div className="decorative-title">
