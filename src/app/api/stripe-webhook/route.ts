@@ -1,20 +1,18 @@
 // src/app/api/stripe-webhook/route.ts
-
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { ethers } from "ethers";
 
 export async function POST(req: NextRequest) {
-  // Validate the webhook signature
-  // Source: https://stripe.com/docs/webhooks#secure-webhook
   const body = await req.text();
-  const strip_signature = req.headers.get("stripe-signature");
-  
+  const stripeSignature = req.headers.get("stripe-signature");
+
   console.log("Webhook called");
 
-  if (!strip_signature) {
+  if (!stripeSignature) {
     console.log("invalid stripe-signature");
-    return;
+    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST as string, {
@@ -24,39 +22,33 @@ export async function POST(req: NextRequest) {
   try {
     const event = stripe.webhooks.constructEvent(
       body,
-      strip_signature!,
+      stripeSignature,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
-    
+
     if (event.type === "charge.succeeded") {
       const paymentIntent = event.data.object as any;
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       console.log("buyerWalletAddress:", buyerWalletAddress);
-      
+
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      // Initialize Thirdweb SDK for Polygon Mainnet using your API key.
-      const sdk = new ThirdwebSDK("polygon", {
-        // This API key is assumed to be set as an environment variable
-        clientId: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID,
-      });
+      const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.THIRDWEB_API_KEY}`;
+      const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC_URL);
+      const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
 
-      // Get the NFT contract instance
+      // Initialiser le SDK avec le signer pour permettre de signer la transaction
+      const sdk = new ThirdwebSDK(signer);
+
       const contract = await sdk.getContract(nftContractAddress);
-
-      // Claim the NFT by sending the transaction to claim 1 token to the buyer's wallet.
-      // Depending on your contract setup, you might use either `claim` or `claimTo`.
-      // Here we use `claimTo` for clarity.
       const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
       console.log("NFT claimed successfully:", tx);
+    }
 
-    }   
-    
     return NextResponse.json({ message: "OK" });
   } catch (error) {
     console.error("Erreur lors de la construction de l'événement:", error);
     return NextResponse.json({ error: "Webhook error" }, { status: 400 });
   }
-  
 }
