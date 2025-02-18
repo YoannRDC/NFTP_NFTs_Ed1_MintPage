@@ -47,6 +47,24 @@ export async function POST(req: NextRequest) {
       );      
 
       const contract = await sdk.getContract(nftContractAddress);
+
+      /* TEST */
+      const rawContract = new ethers.Contract(
+        nftContractAddress,
+        // @ts-expect-error: Accessing the ABI from the contract instance; adjust if necessary.
+        contractInstance.abi,
+        // Use the same signer you used for the SDK or create one as needed.
+        new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`))
+      );
+      // Use ethers' callStatic to simulate the transaction without sending it.
+      try {
+        const result = await rawContract.callStatic.claimTo(buyerWalletAddress, 1);
+        console.log("Static call result:", result);
+      } catch (staticError) {
+        console.error("Static call error:", staticError);
+      }
+      /* TEST END */
+
       const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
       console.log("NFT claimed successfully:", tx);
     }
