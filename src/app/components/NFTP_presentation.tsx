@@ -1,6 +1,6 @@
 export default function VideoPresentation() {
     return (
-      <div style={{ position: 'relative', textAlign: 'center', width: '50%', height: '300px' }}>
+      <div className="w-full md:max-w-3xl lg:max-w-4xl mx-auto">
         <iframe
           src="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0"
           loading="lazy"
