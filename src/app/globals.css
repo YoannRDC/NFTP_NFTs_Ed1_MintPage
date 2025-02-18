@@ -77,7 +77,6 @@
 .flex {
   padding-left: 1rem;
   padding-right: 1rem;
-  max-width: 100%;
 }
 
 /* 4. Rendre les médias (images, iframes, vidéos, MediaRenderer) responsives */

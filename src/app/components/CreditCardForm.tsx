@@ -47,7 +47,7 @@ const CreditCardForm = () => {
   };
 
   return (
-    <div className="bg-white p-5 rounded">
+    <div className="bg-white p-5 rounded mx-auto" style={{ maxWidth: "400px" }}>
       <PaymentElement
         options={
           {
@@ -65,7 +65,7 @@ const CreditCardForm = () => {
       <button
         onClick={handlePayment}
         disabled={!stripe || isProcessing}
-        className="px-6 py-3 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+        className="px-6 py-3 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition mt-5"
       >
         {isProcessing ? "Traitement en cours..." : "Payer maintenant"}
       </button>
