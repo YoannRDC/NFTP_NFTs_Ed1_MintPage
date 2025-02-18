@@ -39,24 +39,30 @@ export async function POST(req: NextRequest) {
       const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC_URL);
       const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
 
-      // Initialiser le SDK avec le signer pour permettre de signer la transaction
+      // Initialize the SDK with the signer to allow transaction signing
       const sdk = ThirdwebSDK.fromPrivateKey(
         process.env.PRIVATE_KEY_MINTER as string,
         "polygon",
         { secretKey: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID }
-      );      
+      );
 
       const contract = await sdk.getContract(nftContractAddress);
 
-      /* TEST */
+      /* TEST: Create an ethers.Contract instance for a static call */
       const rawContract = new ethers.Contract(
         nftContractAddress,
-        // @ts-expect-error: Accessing the ABI from the contract instance; adjust if necessary.
-        contractInstance.abi,
-        // Use the same signer you used for the SDK or create one as needed.
-        new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`))
+        // Replace 'contractInstance.abi' with 'contract.abi'
+        // If contract.abi is unavailable, supply the ABI manually.
+        contract.abi,
+        // Use the same signer or a new one as needed.
+        new ethers.Wallet(
+          process.env.PRIVATE_KEY_MINTER as string,
+          new ethers.providers.JsonRpcProvider(
+            `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`
+          )
+        )
       );
-      // Use ethers' callStatic to simulate the transaction without sending it.
+
       try {
         const result = await rawContract.callStatic.claimTo(buyerWalletAddress, 1);
         console.log("Static call result:", result);
