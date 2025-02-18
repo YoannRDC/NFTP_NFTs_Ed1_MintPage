@@ -39,38 +39,14 @@ export async function POST(req: NextRequest) {
       const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC_URL);
       const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
 
-      // Initialize the SDK with the signer to allow transaction signing
+      // Initialiser le SDK avec le signer pour permettre de signer la transaction
       const sdk = ThirdwebSDK.fromPrivateKey(
         process.env.PRIVATE_KEY_MINTER as string,
         "polygon",
         { secretKey: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID }
-      );
+      );      
 
       const contract = await sdk.getContract(nftContractAddress);
-
-      /* TEST: Create an ethers.Contract instance for a static call */
-      const rawContract = new ethers.Contract(
-        nftContractAddress,
-        // Replace 'contractInstance.abi' with 'contract.abi'
-        // If contract.abi is unavailable, supply the ABI manually.
-        contract.abi,
-        // Use the same signer or a new one as needed.
-        new ethers.Wallet(
-          process.env.PRIVATE_KEY_MINTER as string,
-          new ethers.providers.JsonRpcProvider(
-            `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`
-          )
-        )
-      );
-
-      try {
-        const result = await rawContract.callStatic.claimTo(buyerWalletAddress, 1);
-        console.log("Static call result:", result);
-      } catch (staticError) {
-        console.error("Static call error:", staticError);
-      }
-      /* TEST END */
-
       const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
       console.log("NFT claimed successfully:", tx);
     }
