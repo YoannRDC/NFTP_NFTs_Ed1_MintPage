@@ -106,8 +106,9 @@ const NFTPed1: React.FC = () => {
 
       </div>
 
-      {/* Artist preview */}
-      <VideoPresentation/>
+      <div className="flex flex-col items-center mb-10 w-full md:w-[60%] h-[300px] rounded-[10px]">
+        <VideoPresentation />
+      </div>
 
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
         Visit NFTpropulsion.fr
