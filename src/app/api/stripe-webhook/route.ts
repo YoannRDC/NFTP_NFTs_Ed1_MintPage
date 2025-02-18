@@ -40,7 +40,11 @@ export async function POST(req: NextRequest) {
       const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
 
       // Initialiser le SDK avec le signer pour permettre de signer la transaction
-      const sdk = new ThirdwebSDK(signer);
+      const sdk = ThirdwebSDK.fromPrivateKey(
+        process.env.PRIVATE_KEY_MINTER as string,
+        "polygon",
+        { secretKey: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID }
+      );      
 
       const contract = await sdk.getContract(nftContractAddress);
       const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
