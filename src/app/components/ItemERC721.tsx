@@ -88,7 +88,7 @@ export default function ItemERC721({
         <MediaRenderer
           client={client}
           src="/preview.gif"
-          style={{ width: "50%", height: "auto", borderRadius: "10px" }}
+          style={{ height: "auto", borderRadius: "10px" }}
         />
       </div>
 
