@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.THIRDWEB_API_KEY}`;
+      const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`;
+      console.log("POLYGON_RPC_URL:", POLYGON_RPC_URL);
       const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC_URL);
       const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
 
