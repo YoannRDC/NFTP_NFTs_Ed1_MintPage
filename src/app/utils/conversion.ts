@@ -5,6 +5,8 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
       `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`
     );
 
+console.log("yo TEST", `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`);
+
     // Vérifie si la réponse est correcte
     if (!response.ok) {
       console.error("Erreur de réponse API:", response.status, response.statusText);
