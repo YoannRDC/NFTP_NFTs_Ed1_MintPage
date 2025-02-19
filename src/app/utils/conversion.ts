@@ -11,8 +11,12 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
       { headers }
     );
 
+    console.log("response", response);
+
     const data = await response.json();
     const maticPrice = data?.polygon?.eur;
+    
+    console.log("maticPrice", maticPrice);
 
     if (!maticPrice) return null;
 
