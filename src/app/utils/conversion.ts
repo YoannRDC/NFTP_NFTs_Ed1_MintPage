@@ -1,10 +1,10 @@
 export async function convertPolToEur(maticAmount: number): Promise<number | null> {
   try {
-    // Vérifie si la clé API est définie
+/*     // Vérifie si la clé API est définie
     if (!process.env.COINGECKO_API_KEY) {
       console.error("La clé API CoinGecko n'est pas définie.");
       return null;
-    }
+    } */
 
     // Utilise l'endpoint de CoinGecko avec la clé API dans l'URL
     const response = await fetch(
