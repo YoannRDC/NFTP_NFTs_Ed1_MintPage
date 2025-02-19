@@ -8,7 +8,7 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
 
     // Utilise l'endpoint de CoinGecko avec la clé API dans l'URL
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=CG-DBzoUuXdkJuPsj5CTqacbVdU`
     );
 
     console.log("yo TEST", `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`);
