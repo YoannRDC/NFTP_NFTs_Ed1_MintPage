@@ -33,13 +33,11 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      //const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`;
-
       // Initialiser le SDK avec le signer pour permettre de signer la transaction
       const sdk = ThirdwebSDK.fromPrivateKey(
         process.env.PRIVATE_KEY_MINTER as string,
         "polygon",
-        { secretKey: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID }
+        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
       );      
 
       const contract = await sdk.getContract(nftContractAddress);
