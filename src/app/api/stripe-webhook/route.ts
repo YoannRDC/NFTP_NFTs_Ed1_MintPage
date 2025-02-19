@@ -2,7 +2,6 @@
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { ethers } from "ethers";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -34,10 +33,7 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`;
-      console.log("POLYGON_RPC_URL:", POLYGON_RPC_URL);
-      const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC_URL);
-      const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER as string, provider);
+      //const POLYGON_RPC_URL = `https://137.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}`;
 
       // Initialiser le SDK avec le signer pour permettre de signer la transaction
       const sdk = ThirdwebSDK.fromPrivateKey(
