@@ -1,12 +1,14 @@
 export async function convertPolToEur(maticAmount: number): Promise<number | null> {
   try {
+    const headers: HeadersInit = {}; // Déclare un objet HeadersInit
+
+    if (process.env.COINGECKO_API_KEY) {
+      headers["x-cg-demo-api-key"] = process.env.COINGECKO_API_KEY;
+    }
+
     const response = await fetch(
-      "https://pro-api.coingecko.com/api/v3/simple/price?ids=polygon&vs_currencies=eur",
-      {
-        headers: {
-          "x_cg_pro_api_key": "CG-DBzoUuXdkJuPsj5CTqacbVdU",
-        },
-      }
+      "https://api.coingecko.com/api/v3/simple/price?ids=polygon&vs_currencies=eur",
+      { headers }
     );
 
     const data = await response.json();
