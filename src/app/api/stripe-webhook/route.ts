@@ -1,5 +1,4 @@
 // src/app/api/stripe-webhook/route.ts
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { ethers } from "ethers";
@@ -21,22 +20,20 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-
-     const event = stripe.webhooks.constructEvent(
+    const event = stripe.webhooks.constructEvent(
       body,
       stripeSignature,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
-    
-    if (event.type === "charge.succeeded") {
 
+    if (event.type === "charge.succeeded") {
       const paymentIntent = event.data.object as any;
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       console.log("buyerWalletAddress:", buyerWalletAddress);
 
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
-      
+
       console.log(" > charge.succeeded");
 
       if (!process.env.PRIVATE_KEY_MINTER) {
@@ -48,7 +45,7 @@ export async function POST(req: NextRequest) {
 
       // Connexion au réseau Polygon via un RPC provider (ex: Infura, Alchemy)
       const provider = new ethers.providers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
-      console.log(" > provider -> ", provider.resolveName);
+      console.log(" > provider -> ", provider);
       // Création d'un wallet à partir de votre clé privée, avec le provider
       const wallet = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER, provider);
       console.log(" > wallet -> ", wallet.address);
@@ -58,39 +55,32 @@ export async function POST(req: NextRequest) {
       console.log(" > contract -> ", contract.address);
 
       try {
-        // Appel de la fonction claimTo du smart contract en lui passant l'adresse du wallet
-        const tx = await contract.claimTo(buyerWalletAddress);
-        console.log(" > tx -> ", tx.address);
+        // Remplacez l'appel à claimTo par l'appel à claim.
+        // La fonction "claim" attend les paramètres suivants :
+        // _receiver, _quantity, _currency, _pricePerToken, _allowlistProof, _data.
+        // Ici, on suppose une réclamation d'1 NFT gratuitement.
+        const tx = await contract.claim(
+          buyerWalletAddress,                      // _receiver
+          1,                                       // _quantity (1 NFT)
+          ethers.constants.AddressZero,            // _currency (token natif, ex: MATIC)
+          0,                                       // _pricePerToken (0 si gratuit)
+          {                                        // _allowlistProof (aucune preuve nécessaire)
+            proof: [],
+            quantityLimitPerWallet: 1,
+            pricePerToken: 0,
+            currency: ethers.constants.AddressZero,
+          },
+          "0x"                                     // _data (données supplémentaires vides)
+        );
+        console.log(" > tx sent, waiting confirmation. Tx hash:", tx.hash);
         // Attente de la confirmation de la transaction
         await tx.wait();
         console.log("Claim réussi, tx hash:", tx.hash);
       } catch (error) {
         console.error("Erreur lors du claim:", error);
-        return NextResponse.json({ message: "Erreur lors de l'exécution du claimTo" });
+        return NextResponse.json({ message: "Erreur lors de l'exécution du claim" }, { status: 500 });
       }
-
     }
-
-    /*
-    if (event.type === "charge.succeeded") {
-      const paymentIntent = event.data.object as any;
-      const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
-      console.log("buyerWalletAddress:", buyerWalletAddress);
-
-      const nftContractAddress = paymentIntent.metadata.nftContractAddress;
-      console.log("nftContractAddress:", nftContractAddress);
-
-      // Initialiser le SDK avec le signer pour permettre de signer la transaction
-      const sdk = ThirdwebSDK.fromPrivateKey(
-        process.env.PRIVATE_KEY_MINTER as string,
-        "polygon",
-        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
-      );      
-
-      const contract = await sdk.getContract(nftContractAddress);
-      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
-      console.log("NFT claimed successfully:", tx);
-    } */
 
     return NextResponse.json({ message: "OK" });
   } catch (error) {
