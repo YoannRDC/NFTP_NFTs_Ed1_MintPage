@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       console.log(" > PRIVATE_KEY_MINTER -> OK");
 
       // Connexion au réseau Polygon via un RPC provider (ex: Infura, Alchemy)
-      const provider = new ethers.providers.JsonRpcProvider(process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.INFURA_POLYGON_MAINNET_RPC_URL);
       console.log(" > provider -> ", provider);
       // Création d'un wallet à partir de votre clé privée, avec le provider
       const wallet = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER, provider);
