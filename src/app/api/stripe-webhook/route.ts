@@ -46,8 +46,11 @@ export async function POST(req: NextRequest) {
 
       try {
 
-        // instantiate the SDK based on your private key, with the desired chain to connect to
-        const sdk = ThirdwebSDK.fromPrivateKey(process.env.PRIVATE_KEY_MINTER, "polygon");
+      const sdk = ThirdwebSDK.fromPrivateKey(
+        process.env.PRIVATE_KEY_MINTER as string,
+        "polygon",
+        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
+      );
 
         // Récupérer l'instance du contrat NFT Drop via le SDK
         const nftDrop = sdk.getContract(nftContractAddress, "nft-drop");
