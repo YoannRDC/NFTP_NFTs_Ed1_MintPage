@@ -3,9 +3,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { ethers } from "ethers";
-import { nftpNftsEd1Address } from "@/app/constants";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
-import { useActiveAccount } from "thirdweb/react";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -31,6 +29,13 @@ export async function POST(req: NextRequest) {
     );
     
     if (event.type === "charge.succeeded") {
+
+      const paymentIntent = event.data.object as any;
+      const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
+      console.log("buyerWalletAddress:", buyerWalletAddress);
+
+      const nftContractAddress = paymentIntent.metadata.nftContractAddress;
+      console.log("nftContractAddress:", nftContractAddress);
       
       console.log(" > charge.succeeded");
 
@@ -48,13 +53,13 @@ export async function POST(req: NextRequest) {
       const wallet = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER, provider);
       console.log(" > wallet -> ", wallet.address);
 
-      const account = useActiveAccount();
-      const contract = new ethers.Contract(nftpNftsEd1Address, contractABI, wallet);
+      console.log(" > contractABI -> ", contractABI);
+      const contract = new ethers.Contract(nftContractAddress, contractABI, wallet);
       console.log(" > contract -> ", contract.address);
 
       try {
         // Appel de la fonction claimTo du smart contract en lui passant l'adresse du wallet
-        const tx = await contract.claimTo(account?.address);
+        const tx = await contract.claimTo(buyerWalletAddress);
         console.log(" > tx -> ", tx.address);
         // Attente de la confirmation de la transaction
         await tx.wait();
