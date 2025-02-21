@@ -2,6 +2,10 @@
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { ethers } from "ethers";
+import { nftpNftsEd1Address } from "@/app/constants";
+import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
+import { useActiveAccount } from "thirdweb/react";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -19,12 +23,50 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    const event = stripe.webhooks.constructEvent(
+
+     const event = stripe.webhooks.constructEvent(
       body,
       stripeSignature,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
+    
+    if (event.type === "charge.succeeded") {
+      
+      console.log(" > charge.succeeded");
 
+      if (!process.env.PRIVATE_KEY_MINTER) {
+        console.log("missing PRIVATE_KEY_MINTER");
+        return NextResponse.json({ error: "missing PRIVATE_KEY_MINTER" }, { status: 400 });
+      }
+
+      console.log(" > PRIVATE_KEY_MINTER -> OK");
+
+      // Connexion au réseau Polygon via un RPC provider (ex: Infura, Alchemy)
+      const provider = new ethers.providers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
+      console.log(" > provider -> ", provider.resolveName);
+      // Création d'un wallet à partir de votre clé privée, avec le provider
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY_MINTER, provider);
+      console.log(" > wallet -> ", wallet.address);
+
+      const account = useActiveAccount();
+      const contract = new ethers.Contract(nftpNftsEd1Address, contractABI, wallet);
+      console.log(" > contract -> ", contract.address);
+
+      try {
+        // Appel de la fonction claimTo du smart contract en lui passant l'adresse du wallet
+        const tx = await contract.claimTo(account?.address);
+        console.log(" > tx -> ", tx.address);
+        // Attente de la confirmation de la transaction
+        await tx.wait();
+        console.log("Claim réussi, tx hash:", tx.hash);
+      } catch (error) {
+        console.error("Erreur lors du claim:", error);
+        return NextResponse.json({ message: "Erreur lors de l'exécution du claimTo" });
+      }
+
+    }
+
+    /*
     if (event.type === "charge.succeeded") {
       const paymentIntent = event.data.object as any;
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
@@ -43,7 +85,7 @@ export async function POST(req: NextRequest) {
       const contract = await sdk.getContract(nftContractAddress);
       const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
       console.log("NFT claimed successfully:", tx);
-    }
+    } */
 
     return NextResponse.json({ message: "OK" });
   } catch (error) {
