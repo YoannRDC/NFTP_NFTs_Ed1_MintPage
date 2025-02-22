@@ -122,6 +122,10 @@ const NFTPed1: React.FC = () => {
         <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
       </div>
 
+      <div style={{ color: 'red', fontSize: 'xx-large' }}>
+      -- Site en développement ! Ne pas interagir SVP --
+      </div>
+
       YR debug: The price in euros: {priceInEur} --
       
       <div className="decorative-title">

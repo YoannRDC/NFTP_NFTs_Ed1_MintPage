@@ -1,9 +1,10 @@
 // src/app/api/stripe-webhook/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { ethers } from "ethers";
-import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
+import { claimTo } from "thirdweb/extensions/erc721";
+import { useSendTransaction } from "thirdweb/react";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -45,21 +46,35 @@ export async function POST(req: NextRequest) {
       console.log(" > PRIVATE_KEY_MINTER -> OK");
 
       try {
+        const sdk = ThirdwebSDK.fromPrivateKey(
+          process.env.PRIVATE_KEY_MINTER as string,
+          "polygon",
+          { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
+        );
 
-      const sdk = ThirdwebSDK.fromPrivateKey(
-        process.env.PRIVATE_KEY_MINTER as string,
-        "polygon",
-        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
-      );
+        // Utiliser l'ABI pour récupérer le contrat en mode "custom"
+        const nftContract = await sdk.getContract(nftContractAddress, contractABI);
+        console.log("Instance du contrat récupérée:", nftContract);
 
-        // Récupérer l'instance du contrat NFT Drop via le SDK
-        const nftDrop = sdk.getContract(nftContractAddress, "nft-drop");
-        console.log("Instance du contrat récupérée:", nftDrop);
+        // Paramètres pour la fonction claim
+        const receiver = buyerWalletAddress;
+        const quantity = 1n;
+        const currency = "0x0000000000000000000000000000000000000000"; // adresse de la monnaie native
+        const pricePerToken = 0; // paiement déjà effectué via Stripe
+        const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
+        const data = "0x"; // données vides
 
-        // Appeler la fonction claimTo pour réclamer 1 NFT au portefeuille de l'acheteur
-        const tx = await (await nftDrop).claimTo(buyerWalletAddress, 1);
-        console.log("Claim réussi. Transaction :", tx);
-      
+        const { mutate: sendTransaction } = useSendTransaction();
+
+        // Appeler la fonction claim avec les 7 paramètres requis
+        const transaction = claimTo({
+          contract: nftContractAddress,
+          to: buyerWalletAddress,
+          quantity,
+        });
+        sendTransaction(transaction);
+        console.log("Claim réussi. Transaction :", transaction);
+
       } catch (error) {
         console.error("Erreur lors du claim:", error);
         return NextResponse.json({ message: "Erreur lors de l'exécution du claim" }, { status: 500 });
