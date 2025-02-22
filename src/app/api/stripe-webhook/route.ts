@@ -5,6 +5,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
 import { claimTo } from "thirdweb/extensions/erc721";
 import { useSendTransaction } from "thirdweb/react";
+import { sendTransaction } from "thirdweb";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -64,16 +65,7 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
-        const { mutate: sendTransaction } = useSendTransaction();
-
-        // Appeler la fonction claim avec les 7 paramètres requis
-        const transaction = claimTo({
-          contract: nftContractAddress,
-          to: buyerWalletAddress,
-          quantity,
-        });
-        sendTransaction(transaction);
-        console.log("Claim réussi. Transaction :", transaction);
+        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
 
       } catch (error) {
         console.error("Erreur lors du claim:", error);
