@@ -3,6 +3,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
+import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -41,12 +42,23 @@ export async function POST(req: NextRequest) {
         { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
       );      
 
+
+
+
       const contract = await sdk.getContract(nftContractAddress, contractABI);
       console.log("metadata:", contract.metadata);
       console.log("owner:", contract.owner);
-      console.log("owner:", contract.chainId);
+      console.log("chainId:", contract.chainId);
 
-      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
+      const dropContract = await sdk.getContract(nftContractAddress, "nft-drop");
+      const activeClaimCondition = await dropContract.claimConditions.getActive();
+
+      const claimToOptions = {
+        pricePerToken: activeClaimCondition.price.toString(),
+        currencyAddress: activeClaimCondition.currencyAddress
+      };
+
+      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1, claimToOptions);
       console.log("NFT claimed successfully:", tx);
     }
 
