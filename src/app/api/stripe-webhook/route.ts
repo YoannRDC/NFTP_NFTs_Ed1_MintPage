@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
-import { claimTo } from "thirdweb/extensions/erc721";
-import { useSendTransaction } from "thirdweb/react";
-import { sendTransaction } from "thirdweb";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -65,7 +62,8 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
-        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
+        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1, "0x6debf5C015f0Edd3050cc919A600Fb78281696B9" );
+        console.error("tx:", tx);
 
       } catch (error) {
         console.error("Erreur lors du claim:", error);

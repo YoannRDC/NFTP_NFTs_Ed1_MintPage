@@ -76,77 +76,103 @@ export default function ClaimConditionForm({ initialOverrides = [] }: { initialO
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white mt-6">
       <h2 className="text-xl font-semibold mb-4">Définir les conditions de Claim</h2>
 
-      <input
-        type="text"
-        placeholder="Max Claimable Supply"
-        value={maxClaimableSupply}
-        onChange={(e) => setMaxClaimableSupply(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-2"
-      />
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-300">Max Claimable Supply</label>
+        <input
+          type="text"
+          placeholder="Max Claimable Supply"
+          value={maxClaimableSupply}
+          onChange={(e) => setMaxClaimableSupply(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Max Claimable Per Wallet"
-        value={maxClaimablePerWallet}
-        onChange={(e) => setMaxClaimablePerWallet(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-2"
-      />
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-300">Max Claimable Per Wallet</label>
+        <input
+          type="text"
+          placeholder="Max Claimable Per Wallet"
+          value={maxClaimablePerWallet}
+          onChange={(e) => setMaxClaimablePerWallet(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Currency Address"
-        value={currencyAddress}
-        onChange={(e) => setCurrencyAddress(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-2"
-      />
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-300">Currency Address</label>
+        <input
+          type="text"
+          placeholder="Currency Address"
+          value={currencyAddress}
+          onChange={(e) => setCurrencyAddress(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Price (en ETH/MATIC)"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-2"
-      />
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-300">Price (en ETH/MATIC)</label>
+        <input
+          type="text"
+          placeholder="Price (en ETH/MATIC)"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
-      <input
-        type="datetime-local"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-2"
-      />
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-300">Start Date</label>
+        <input
+          type="datetime-local"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Metadata URI"
-        value={metadata}
-        onChange={(e) => setMetadata(e.target.value)}
-        className="w-full p-2 bg-gray-800 rounded text-white mb-4"
-      />
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-300">Metadata URI</label>
+        <input
+          type="text"
+          placeholder="Metadata URI"
+          value={metadata}
+          onChange={(e) => setMetadata(e.target.value)}
+          className="w-full p-2 bg-gray-800 rounded text-white"
+        />
+      </div>
 
       {overrideList.map((entry, index) => (
         <div key={index} className="flex flex-col gap-2 mb-4 bg-gray-800 p-3 rounded-lg">
-          <input
-            type="text"
-            placeholder="Adresse"
-            value={entry.address}
-            onChange={(e) => handleChange(index, "address", e.target.value)}
-            className="p-2 bg-gray-700 rounded text-white"
-          />
-          <input
-            type="text"
-            placeholder="Max Claimable"
-            value={entry.maxClaimable}
-            onChange={(e) => handleChange(index, "maxClaimable", e.target.value)}
-            className="p-2 bg-gray-700 rounded text-white"
-          />
-          <input
-            type="text"
-            placeholder="Prix (en ETH/MATIC)"
-            value={entry.price}
-            onChange={(e) => handleChange(index, "price", e.target.value)}
-            className="p-2 bg-gray-700 rounded text-white"
-          />
-
+          <div>
+            <label className="block text-sm font-medium text-gray-300">Adresse</label>
+            <input
+              type="text"
+              placeholder="Adresse"
+              value={entry.address}
+              onChange={(e) => handleChange(index, "address", e.target.value)}
+              className="p-2 bg-gray-700 rounded text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300">Max Claimable</label>
+            <input
+              type="text"
+              placeholder="Max Claimable"
+              value={entry.maxClaimable}
+              onChange={(e) => handleChange(index, "maxClaimable", e.target.value)}
+              className="p-2 bg-gray-700 rounded text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300">Prix (en ETH/MATIC)</label>
+            <input
+              type="text"
+              placeholder="Prix (en ETH/MATIC)"
+              value={entry.price}
+              onChange={(e) => handleChange(index, "price", e.target.value)}
+              className="p-2 bg-gray-700 rounded text-white"
+            />
+          </div>
           <button
             onClick={() => removeAddress(index)}
             className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
