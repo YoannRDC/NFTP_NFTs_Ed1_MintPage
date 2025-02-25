@@ -66,9 +66,8 @@ export async function POST(req: NextRequest) {
   
         console.log("nftDropContract.getAddress()", await nftContract.getAddress());
         console.log("nftDropContract.chainId", await nftContract.chainId);
-        console.log("nftDropContract.getAddress()", await nftContract.owner);
-        console.log("nftDropContract.getAddress()", await nftContract.metadata);
-        console.log("nftDropContract.getAddress()", await nftContract.);
+        console.log("nftDropContract.owner", await nftContract.owner);
+        console.log("nftDropContract.metadata", await nftContract.metadata);
 /* 
         const claimToOptions = {
           pricePerToken: activeClaimCondition.price.toString(),
