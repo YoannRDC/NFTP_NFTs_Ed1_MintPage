@@ -63,28 +63,20 @@ export async function POST(req: NextRequest) {
         const pricePerToken = 0; // paiement déjà effectué via Stripe
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
-
-        console.log("bef getActiveClaimCondition");
-        console.log("nftContractAddress", nftContractAddress);
-
-        const nftDropContract = sdk.getContract(nftContractAddress, "nft-drop");
-        
-        console.log("nftDropContract.getAddress()", (await nftDropContract).getAddress());
-        console.log("nftDropContract.totalClaimedSupply", (await nftDropContract).totalClaimedSupply);
-        console.log("nftDropContract.chainId", (await nftDropContract).chainId);
-        console.log("nftDropContract..ownerOf(1)", (await nftDropContract).ownerOf(1));
-        console.log("nftDropContract.owner", (await nftDropContract).balanceOf("0x7b471306691dee8FC1322775a997E1a6CA29Eee1"));
-        const activeClaimCondition = await (await nftDropContract).claimConditions.getActive();
-        
-        console.log("activeClaimCondition:", activeClaimCondition);
-
+  
+        console.log("nftDropContract.getAddress()", await nftContract.getAddress());
+        console.log("nftDropContract.chainId", await nftContract.chainId);
+        console.log("nftDropContract.getAddress()", await nftContract.owner);
+        console.log("nftDropContract.getAddress()", await nftContract.metadata);
+        console.log("nftDropContract.getAddress()", await nftContract.);
+/* 
         const claimToOptions = {
           pricePerToken: activeClaimCondition.price.toString(),
           currencyAddress: activeClaimCondition.currencyAddress
-        };
+        }; */
 
-        console.log("claimToOptions:", claimToOptions);
-        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1, claimToOptions);
+        // console.log("claimToOptions:", claimToOptions);
+        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
         console.error("tx:", tx);
 
       } catch (error) {
