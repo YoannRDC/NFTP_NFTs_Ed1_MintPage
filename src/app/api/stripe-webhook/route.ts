@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
+import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
+import { nftpNftsEd1Contract } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -62,7 +64,16 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
-        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
+        
+        const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
+
+        const claimToOptions = {
+          pricePerToken: activeClaimCondition.pricePerToken.toString(),
+          currencyAddress: activeClaimCondition.currency,
+        };
+
+        console.log("claimToOptions:", claimToOptions);
+        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1, claimToOptions);
         console.error("tx:", tx);
 
       } catch (error) {
