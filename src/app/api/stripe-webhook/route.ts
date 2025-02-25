@@ -1,10 +1,8 @@
 // src/app/api/stripe-webhook/route.ts
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
-import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
-import { nftpNftsEd1Contract } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -36,52 +34,20 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       console.log("nftContractAddress:", nftContractAddress);
 
-      console.log(" > charge.succeeded");
+      // Initialiser le SDK avec le signer pour permettre de signer la transaction
+      const sdk = ThirdwebSDK.fromPrivateKey(
+        process.env.PRIVATE_KEY_MINTER as string,
+        "polygon",
+        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
+      );      
 
-      if (!process.env.PRIVATE_KEY_MINTER) {
-        console.log("missing PRIVATE_KEY_MINTER");
-        return NextResponse.json({ error: "missing PRIVATE_KEY_MINTER" }, { status: 400 });
-      }
+      const contract = await sdk.getContract(nftContractAddress, contractABI);
+      console.log("metadata:", contract.metadata);
+      console.log("owner:", contract.owner);
+      console.log("owner:", contract.chainId);
 
-      console.log(" > PRIVATE_KEY_MINTER -> OK");
-
-      try {
-        const sdk = ThirdwebSDK.fromPrivateKey(
-          process.env.PRIVATE_KEY_MINTER as string,
-          "polygon",
-          { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
-        );
-
-        // Utiliser l'ABI pour récupérer le contrat en mode "custom"
-        const nftContract = await sdk.getContract(nftContractAddress, contractABI);
-        // console.log("Instance du contrat récupérée:", nftContract);
-
-        // Paramètres pour la fonction claim
-        const receiver = buyerWalletAddress;
-        const quantity = 1n;
-        const currency = "0x0000000000000000000000000000000000000000"; // adresse de la monnaie native
-        const pricePerToken = 0; // paiement déjà effectué via Stripe
-        const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
-        const data = "0x"; // données vides
-  
-        console.log("nftDropContract.getAddress()", await nftContract.getAddress());
-        console.log("nftDropContract.chainId", await nftContract.chainId);
-        console.log("nftDropContract.owner", await nftContract.owner);
-        console.log("nftDropContract.metadata", await nftContract.metadata);
-/* 
-        const claimToOptions = {
-          pricePerToken: activeClaimCondition.price.toString(),
-          currencyAddress: activeClaimCondition.currencyAddress
-        }; */
-
-        // console.log("claimToOptions:", claimToOptions);
-        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
-        console.error("tx:", tx);
-
-      } catch (error) {
-        console.error("Erreur lors du claim:", error);
-        return NextResponse.json({ message: "Erreur lors de l'exécution du claim" }, { status: 500 });
-      }
+      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1);
+      console.log("NFT claimed successfully:", tx);
     }
 
     return NextResponse.json({ message: "OK" });
