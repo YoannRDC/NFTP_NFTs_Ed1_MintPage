@@ -65,8 +65,12 @@ export async function POST(req: NextRequest) {
         const data = "0x"; // données vides
 
         console.log("bef getActiveClaimCondition");
+        console.log("nftContractAddress", nftContractAddress);
 
         const nftDropContract = sdk.getContract(nftContractAddress, "nft-drop");
+        
+        console.log("nftDropContract.getAddress()", (await nftDropContract).getAddress());
+        console.log("nftDropContract.totalClaimedSupply", (await nftDropContract).totalClaimedSupply);
         const activeClaimCondition = await (await nftDropContract).claimConditions.getActive();
 
         console.log("activeClaimCondition:", activeClaimCondition);
