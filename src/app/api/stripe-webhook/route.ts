@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
 
         // Utiliser l'ABI pour récupérer le contrat en mode "custom"
         const nftContract = await sdk.getContract(nftContractAddress, contractABI);
+        // console.log("Instance du contrat récupérée:", nftContract);
+
         console.log("Instance du contrat récupérée:", nftContract);
 
         // Paramètres pour la fonction claim
@@ -64,8 +66,8 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
+        console.log("bef getActiveClaimCondition");
 
-        
         const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
 
         console.log("activeClaimCondition:", activeClaimCondition);
