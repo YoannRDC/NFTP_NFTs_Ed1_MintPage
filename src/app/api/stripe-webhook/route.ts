@@ -72,10 +72,10 @@ export async function POST(req: NextRequest) {
         console.log("nftDropContract.getAddress()", (await nftDropContract).getAddress());
         console.log("nftDropContract.totalClaimedSupply", (await nftDropContract).totalClaimedSupply);
         console.log("nftDropContract.chainId", (await nftDropContract).chainId);
-        console.log("nftDropContract.getOwned", (await nftDropContract).getOwned());
+        console.log("nftDropContract.owner", (await nftDropContract).owner);
         console.log("nftDropContract.getAllClaimed", (await nftDropContract).getAllClaimed());
         const activeClaimCondition = await (await nftDropContract).claimConditions.getActive();
-
+        
         console.log("activeClaimCondition:", activeClaimCondition);
 
         const claimToOptions = {
