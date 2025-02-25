@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
-        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1, "0x6debf5C015f0Edd3050cc919A600Fb78281696B9" );
+        const tx = await nftContract.erc721.claimTo(buyerWalletAddress, 1);
         console.error("tx:", tx);
 
       } catch (error) {
