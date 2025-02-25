@@ -64,8 +64,11 @@ export async function POST(req: NextRequest) {
         const allowlistProof = { proof: [], maxQuantityInAllowlist: 0 }; // paramètres vides si non utilisés
         const data = "0x"; // données vides
 
+
         
         const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
+
+        console.log("activeClaimCondition:", activeClaimCondition);
 
         const claimToOptions = {
           pricePerToken: activeClaimCondition.pricePerToken.toString(),
