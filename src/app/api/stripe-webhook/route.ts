@@ -1,10 +1,12 @@
 // src/app/api/stripe-webhook/route.ts
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { Account, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
 import { claimTo, getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { ContractOptions } from "thirdweb/contract";
+import { sendTransaction } from "thirdweb";
+import { Wallet } from "thirdweb/wallets";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -55,6 +57,14 @@ export async function POST(req: NextRequest) {
         from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // address of the one claiming
       });
       console.log("NFT claimed successfully:", transaction);
+
+      const signer = sdk.getSigner();
+      if (!signer) {
+        throw new Error("Signer introuvable");
+      }
+      //const wallet = signer as unknown as Wallet;
+
+      await sendTransaction({ transaction, account: signer as any });
 
       console.log("Another way");
 
