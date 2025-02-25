@@ -56,8 +56,6 @@ export async function POST(req: NextRequest) {
         const nftContract = await sdk.getContract(nftContractAddress, contractABI);
         // console.log("Instance du contrat récupérée:", nftContract);
 
-        console.log("Instance du contrat récupérée:", nftContract);
-
         // Paramètres pour la fonction claim
         const receiver = buyerWalletAddress;
         const quantity = 1n;
@@ -68,13 +66,14 @@ export async function POST(req: NextRequest) {
 
         console.log("bef getActiveClaimCondition");
 
-        const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
+        const nftDropContract = sdk.getContract(nftContractAddress, "nft-drop");
+        const activeClaimCondition = await (await nftDropContract).claimConditions.getActive();
 
         console.log("activeClaimCondition:", activeClaimCondition);
 
         const claimToOptions = {
-          pricePerToken: activeClaimCondition.pricePerToken.toString(),
-          currencyAddress: activeClaimCondition.currency,
+          pricePerToken: activeClaimCondition.price.toString(),
+          currencyAddress: activeClaimCondition.currencyAddress
         };
 
         console.log("claimToOptions:", claimToOptions);
