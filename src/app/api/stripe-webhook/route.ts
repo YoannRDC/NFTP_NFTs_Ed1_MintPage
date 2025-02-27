@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
         console.log("missing PRIVATE_KEY_MINTER");
         return NextResponse.json({ error: "missing THIRDWEB_API_SECRET_KEY" }, { status: 400 });
       }
+      console.log("valid process.env");
 
       const account = privateKeyToAccount({
         client,
