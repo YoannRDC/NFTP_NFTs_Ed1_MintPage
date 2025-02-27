@@ -1,5 +1,4 @@
 // src/app/api/stripe-webhook/route.ts
-import { Account, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
@@ -36,37 +35,19 @@ export async function POST(req: NextRequest) {
       console.log("buyerWalletAddress:", buyerWalletAddress);
 
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
-      console.log("nftContractAddress:", nftContractAddress);
-
-      // Initialiser le SDK avec le signer pour permettre de signer la transaction
-      const sdk = ThirdwebSDK.fromPrivateKey(
-        process.env.PRIVATE_KEY_MINTER as string,
-        "polygon",
-        { secretKey: process.env.THIRDWEB_API_SECRET_KEY }
-      );      
-
-      const contract = await sdk.getContract(nftContractAddress, contractABI);
-      console.log("metadata:", contract.metadata);
-      console.log("owner:", contract.owner);
-      console.log("chainId:", contract.chainId);
+      console.log("nftContractAddress:", nftContractAddress);    
 
       const transaction = claimTo({
-        contract: contract as unknown as Readonly<ContractOptions<any, `0x${string}`>>,
+        contract: nftContractAddress,
         to: buyerWalletAddress,
         quantity: 1n,
         from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // address of the one claiming
       });
       console.log("NFT claimed successfully:", transaction);
 
-      const signer = sdk.getSigner();
-      if (!signer) {
-        throw new Error("Signer introuvable");
-      }
-      //const wallet = signer as unknown as Wallet;
+      const txRes = sendTx({ transaction });
 
-      await sendTransaction({ transaction, account: signer as any });
-
-      console.log("Another way");
+      console.log("txRes:", txRes); 
 
 
 /*       const dropContract = await sdk.getContract(nftContractAddress, "nft-drop");
@@ -86,4 +67,8 @@ export async function POST(req: NextRequest) {
     console.error("Erreur lors de la construction de l'événement:", error);
     return NextResponse.json({ error: "Webhook error" }, { status: 400 });
   }
+}
+
+function sendTx(arg0: { transaction: import("thirdweb").PreparedTransaction<any, import("abitype").AbiFunction, import("thirdweb").PrepareTransactionOptions>; }) {
+  throw new Error("Function not implemented.");
 }
