@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
 import { claimTo, getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { ContractOptions } from "thirdweb/contract";
-import { createThirdwebClient, sendTransaction } from "thirdweb";
+import { createThirdwebClient, defineChain, getContract, sendTransaction } from "thirdweb";
 import { privateKeyToAccount, Wallet } from "thirdweb/wallets";
 
 export async function POST(req: NextRequest) {
@@ -35,26 +35,32 @@ export async function POST(req: NextRequest) {
       console.log("buyerWalletAddress:", buyerWalletAddress);
 
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
-      console.log("nftContractAddress:", nftContractAddress);    
-
-      const transaction = claimTo({
-        contract: nftContractAddress,
-        to: buyerWalletAddress,
-        quantity: 1n,
-        from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // address of the one claiming
-      });
-      console.log("transaction:", transaction);
-
+      console.log("nftContractAddress:", nftContractAddress);  
+      
       if (!process.env.THIRDWEB_API_SECRET_KEY) {
         console.log("missing THIRDWEB_API_SECRET_KEY");
         return NextResponse.json({ error: "missing THIRDWEB_API_SECRET_KEY" }, { status: 400 });
       }
-
+      
       const client = createThirdwebClient({
         // use `secretKey` for server side or script usage
         secretKey: process.env.THIRDWEB_API_SECRET_KEY,
       });
       console.log("client.clientId:", client.clientId);
+
+      const nftContract = getContract({
+        client,
+        chain: defineChain(137),
+        address: nftContractAddress,
+        });
+
+      const transaction = claimTo({
+        contract: nftContract,
+        to: buyerWalletAddress,
+        quantity: 1n,
+        from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // address of the one claiming
+      });
+      console.log("transaction:", transaction);
 
       if (!process.env.PRIVATE_KEY_MINTER) {
         console.log("missing PRIVATE_KEY_MINTER");
