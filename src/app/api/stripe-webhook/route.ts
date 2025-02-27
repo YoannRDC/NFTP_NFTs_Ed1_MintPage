@@ -4,8 +4,8 @@ import Stripe from "stripe";
 import contractABI from "../../../../contracts/contract_NFTP_ed1_ABI.json";
 import { claimTo, getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { ContractOptions } from "thirdweb/contract";
-import { sendTransaction } from "thirdweb";
-import { Wallet } from "thirdweb/wallets";
+import { createThirdwebClient, sendTransaction } from "thirdweb";
+import { privateKeyToAccount, Wallet } from "thirdweb/wallets";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -43,23 +43,34 @@ export async function POST(req: NextRequest) {
         quantity: 1n,
         from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // address of the one claiming
       });
-      console.log("NFT claimed successfully:", transaction);
+      console.log("transaction:", transaction);
 
-      const txRes = sendTx({ transaction });
+      if (!process.env.THIRDWEB_API_SECRET_KEY) {
+        console.log("missing THIRDWEB_API_SECRET_KEY");
+        return NextResponse.json({ error: "missing THIRDWEB_API_SECRET_KEY" }, { status: 400 });
+      }
 
-      console.log("txRes:", txRes); 
+      const client = createThirdwebClient({
+        // use `secretKey` for server side or script usage
+        secretKey: process.env.THIRDWEB_API_SECRET_KEY,
+      });
 
+      if (!process.env.PRIVATE_KEY_MINTER) {
+        console.log("missing PRIVATE_KEY_MINTER");
+        return NextResponse.json({ error: "missing THIRDWEB_API_SECRET_KEY" }, { status: 400 });
+      }
 
-/*       const dropContract = await sdk.getContract(nftContractAddress, "nft-drop");
-      const activeClaimCondition = await dropContract.claimConditions.getActive();
+      const account = privateKeyToAccount({
+        client,
+        privateKey: process.env.PRIVATE_KEY_MINTER,
+      });
 
-      const claimToOptions = {
-        pricePerToken: activeClaimCondition.price.toString(),
-        currencyAddress: activeClaimCondition.currencyAddress
-      };
+      const result = await sendTransaction({
+        transaction,
+        account,
+      });
 
-      const tx = await contract.erc721.claimTo(buyerWalletAddress, 1, claimToOptions);
-      console.log("NFT claimed successfully:", tx); */
+      console.log("result:", result); 
     }
 
     return NextResponse.json({ message: "OK" });
@@ -67,8 +78,4 @@ export async function POST(req: NextRequest) {
     console.error("Erreur lors de la construction de l'événement:", error);
     return NextResponse.json({ error: "Webhook error" }, { status: 400 });
   }
-}
-
-function sendTx(arg0: { transaction: import("thirdweb").PreparedTransaction<any, import("abitype").AbiFunction, import("thirdweb").PrepareTransactionOptions>; }) {
-  throw new Error("Function not implemented.");
 }
