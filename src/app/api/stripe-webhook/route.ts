@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
         // use `secretKey` for server side or script usage
         secretKey: process.env.THIRDWEB_API_SECRET_KEY,
       });
+      console.log("client.clientId:", client.clientId);
 
       if (!process.env.PRIVATE_KEY_MINTER) {
         console.log("missing PRIVATE_KEY_MINTER");
@@ -64,12 +65,12 @@ export async function POST(req: NextRequest) {
         client,
         privateKey: process.env.PRIVATE_KEY_MINTER,
       });
+      console.log("account.address:", account.address);
 
       const result = await sendTransaction({
         transaction,
         account,
       });
-
       console.log("result:", result); 
     }
 
