@@ -2,6 +2,12 @@
 import pino from "pino";
 import { Logtail } from "@logtail/node";
 
+if (process.env.LOGTAIL_SOURCE_TOKEN_API) {
+    console.log("Missing LOGTAIL_SOURCE_TOKEN_API");
+} else {
+    console.log("OK: LOGTAIL_SOURCE_TOKEN_API");
+}
+
 // Remplacez "YOUR_LOGTAIL_SOURCE_TOKEN" par votre token de source Logtail
 const logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN_API!);
 

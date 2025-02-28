@@ -3,7 +3,6 @@
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState, useEffect } from "react";
 import type { PaymentIntent } from "@stripe/stripe-js";
-import logger from "../utils/logger";
 
 const CreditCardForm = () => {
   const stripe = useStripe();
@@ -13,7 +12,7 @@ const CreditCardForm = () => {
 
   const handlePayment = async () => {
     if (!stripe || !elements) {
-      logger.error("Stripe is not configured.");
+      console.error("Stripe is not configured.");
       return;
     }
 
@@ -34,7 +33,7 @@ const CreditCardForm = () => {
         if (paymentIntent.status === "succeeded") {
           alert("Paiement réussi ! Votre NFT sera bientôt livré à votre wallet.");
         } else {
-          logger.error("Paiement en attente ou incomplet :", paymentIntent.status);
+          console.error("Paiement en attente ou incomplet :", paymentIntent.status);
         }
       } else if (result.error) {
         console.error("Erreur de paiement :", result.error);

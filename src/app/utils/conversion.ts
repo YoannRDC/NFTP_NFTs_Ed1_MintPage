@@ -20,12 +20,12 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
     }
 
     const data = await response.json();
-    logger.info("API Response Data:", data); // 🔍 Vérifie la structure de la réponse
+    console.log("API Response Data:", data); // 🔍 Vérifie la structure de la réponse
 
     // Vérifie comment est structuré l'objet retourné
     const maticPrice = data[0]?.current_price; // Utilise le prix actuel
 
-    logger.info("Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
+    console.log("Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
 
     if (!maticPrice) return null;
 

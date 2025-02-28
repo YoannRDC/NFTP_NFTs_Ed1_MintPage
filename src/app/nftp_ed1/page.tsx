@@ -27,8 +27,6 @@ const NFTPed1: React.FC = () => {
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
 
-  logger.info("New visitor on nft_ed1");
-
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
     async function fetchPrice() {

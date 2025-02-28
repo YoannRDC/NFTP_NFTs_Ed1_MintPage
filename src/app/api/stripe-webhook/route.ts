@@ -1,3 +1,4 @@
+// Server side.
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo } from "thirdweb/extensions/erc721";
