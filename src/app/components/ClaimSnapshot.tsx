@@ -5,7 +5,6 @@ import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { download } from "thirdweb/storage";
 import { client, nftpNftsEd1Contract } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
-import { sendClientLog } from "../utils/logger";
 
 export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched: (snapshot: any) => void }) {
   const [snapshot, setSnapshot] = useState<any>(null);
@@ -23,9 +22,9 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
         const replacer = (_key: any, value: { toString: () => any; }) => (typeof value === "bigint" ? value.toString() : value);
 
         // ✅ Affichage des données dans la console
-        sendClientLog('info', "Contract Metadata:", JSON.stringify(metadata, replacer, 2));
-        sendClientLog('info',"Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
-        sendClientLog('info',"Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
+        console.log('info', "Contract Metadata:", JSON.stringify(metadata, replacer, 2));
+        console.log('info',"Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
+        console.log('info',"Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
 
         setSnapshot(fetchedSnapshot);
         onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à ClaimConditionForm

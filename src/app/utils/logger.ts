@@ -51,7 +51,7 @@ logger.error = ((...args: Parameters<typeof originalError>): void => {
   originalError(...args);
 }) as typeof originalError;
 
-// lib/clientLogger.ts
+// lib/clientLogger.ts (TODO: Not working.)
 export async function sendClientLog(level: 'info' | 'error', message: string, extra?: any) {
     try {
         await fetch('/api/logs', {

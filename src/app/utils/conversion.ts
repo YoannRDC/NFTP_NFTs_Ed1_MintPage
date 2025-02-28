@@ -1,4 +1,3 @@
-import logger, { sendClientLog } from "./logger";
 
 export async function convertPolToEur(maticAmount: number): Promise<number | null> {
   try {
@@ -20,12 +19,12 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
     }
 
     const data = await response.json();
-    sendClientLog('info',"API Response Data:", data); // 🔍 Vérifie la structure de la réponse
+    console.log('info',"API Response Data:", data); // 🔍 Vérifie la structure de la réponse
 
     // Vérifie comment est structuré l'objet retourné
     const maticPrice = data[0]?.current_price; // Utilise le prix actuel
 
-    sendClientLog('info',"Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
+    console.log('info',"Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
 
     if (!maticPrice) return null;
 
