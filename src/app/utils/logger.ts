@@ -3,9 +3,7 @@ import pino from "pino";
 import { Logtail } from "@logtail/node";
 
 if (process.env.LOGTAIL_SOURCE_TOKEN_API) {
-    console.log("Missing LOGTAIL_SOURCE_TOKEN_API");
-} else {
-    console.log("OK: LOGTAIL_SOURCE_TOKEN_API");
+    sendClientLog('error',"Missing LOGTAIL_SOURCE_TOKEN_API");
 }
 
 // Remplacez "YOUR_LOGTAIL_SOURCE_TOKEN" par votre token de source Logtail
@@ -56,5 +54,21 @@ logger.error = ((...args: Parameters<typeof originalError>): void => {
   });
   originalError(...args);
 }) as typeof originalError;
+
+// lib/clientLogger.ts
+export async function sendClientLog(level: 'info' | 'error', message: string, extra?: any) {
+    try {
+        await fetch('/api/logs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ level, message, extra }),
+        });
+    } catch (err) {
+        // En cas d'erreur, on peut choisir d'afficher en console
+        console.error('Erreur lors de l\'envoi du log client:', err);
+    }
+}
 
 export default logger;
