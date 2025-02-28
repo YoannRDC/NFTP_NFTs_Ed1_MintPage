@@ -1,25 +1,19 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  ConnectButton,
   MediaRenderer,
-  TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
 import {
-  accountAbstraction,
   client,
   nftpNftsEd1Contract,
 } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
-import { createWallet, inAppWallet } from "thirdweb/wallets";
 import MenuItem from "../components/MenuItem";
 import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import { readContract } from "thirdweb";
-import PurchasePage from "../components/PurchasePage";
 import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL

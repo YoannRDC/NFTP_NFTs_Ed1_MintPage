@@ -32,7 +32,7 @@ export default function ItemERC721({
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
   // State pour la quantité sélectionnée, initialisée à 1
-  const [selectedQuantity, setSelectedQuantity] = useState<bigint>(1n);
+  const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
   // Calcul des prix totaux en fonction de la quantité sélectionnée
   const totalPricePol =
@@ -40,14 +40,14 @@ export default function ItemERC721({
       ? typeof priceInPol === "number"
         ? priceInPol
         : parseFloat(priceInPol)
-      : 0) * Number(selectedQuantity);
+      : 0) * Number(requestedQuantity);
 
   const totalPriceEur =
     (priceInEur !== null && priceInEur !== undefined
       ? typeof priceInEur === "number"
         ? priceInEur
         : parseFloat(priceInEur)
-      : 0) * Number(selectedQuantity);
+      : 0) * Number(requestedQuantity);
 
   const wallets = [
     inAppWallet({
@@ -80,7 +80,7 @@ export default function ItemERC721({
 
   // Handler pour mettre à jour la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedQuantity(BigInt(e.target.value));
+    setrequestedQuantity(BigInt(e.target.value));
   };
 
   return (
@@ -118,7 +118,7 @@ export default function ItemERC721({
               </label>
               <select
                 id="quantity"
-                value={selectedQuantity.toString()}
+                value={requestedQuantity.toString()}
                 onChange={handleQuantityChange}
                 className="border rounded px-2 py-1 text-black"
               >
@@ -140,7 +140,7 @@ export default function ItemERC721({
                 claimTo({
                   contract: nftpContract,
                   to: smartAccount.address,
-                  quantity: selectedQuantity,
+                  quantity: requestedQuantity,
                 })
               }
               onError={(error: Error) => {
@@ -153,7 +153,7 @@ export default function ItemERC721({
               Acheter en Crypto
             </TransactionButton>
             <p className="mb-2">{totalPricePol} POL</p>
-            <PurchasePage />
+            <PurchasePage requestedQuantity={requestedQuantity} />
             <p>{totalPriceEur} Euros</p>
           </div>
         ) : (
