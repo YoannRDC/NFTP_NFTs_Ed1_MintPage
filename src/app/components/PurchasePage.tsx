@@ -9,6 +9,7 @@ import { useActiveAccount } from "thirdweb/react";
 import { nftpNftsEd1Contract } from "../constants";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
+import logger from "../utils/logger";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!);
 
@@ -39,7 +40,6 @@ export default function PurchasePage({ requestedQuantity }: PurchasePageProps) {
         throw new Error("Erreur lors de la création du client secret");
       }
       const data = await response.json();
-      console.log("clientSecret:", clientSecret);
       setClientSecret(data.clientSecret);
     } catch (error) {
       console.error("Erreur lors de la récupération du client secret :", error);

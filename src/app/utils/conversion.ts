@@ -1,3 +1,5 @@
+import logger from "./logger";
+
 export async function convertPolToEur(maticAmount: number): Promise<number | null> {
   try {
 /*     // Vérifie si la clé API est définie
@@ -11,8 +13,6 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
       `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=CG-DBzoUuXdkJuPsj5CTqacbVdU`
     );
 
-    console.log("yo TEST", `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=${process.env.COINGECKO_API_KEY}`);
-
     // Vérifie si la réponse est correcte
     if (!response.ok) {
       console.error("Erreur de réponse API:", response.status, response.statusText);
@@ -20,12 +20,12 @@ export async function convertPolToEur(maticAmount: number): Promise<number | nul
     }
 
     const data = await response.json();
-    console.log("API Response Data:", data); // 🔍 Vérifie la structure de la réponse
+    logger.info("API Response Data:", data); // 🔍 Vérifie la structure de la réponse
 
     // Vérifie comment est structuré l'objet retourné
     const maticPrice = data[0]?.current_price; // Utilise le prix actuel
 
-    console.log("Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
+    logger.info("Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
 
     if (!maticPrice) return null;
 

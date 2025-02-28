@@ -8,6 +8,7 @@ import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
 import MenuItem from "./components/MenuItem";
 import { useState } from "react";
+import logger from "./utils/logger";
 
 export default function Home() {
 	
@@ -15,6 +16,8 @@ export default function Home() {
 	const account = useActiveAccount();
 	const adminAddress = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
 	const isAdmin = account?.address?.toLowerCase() === adminAddress.toLowerCase();
+	
+	logger.info("New visitor on main page.");
 
 	return (
 		<div className="py-20">

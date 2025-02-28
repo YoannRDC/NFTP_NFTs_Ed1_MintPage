@@ -21,6 +21,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import { readContract } from "thirdweb";
 import PurchasePage from "../components/PurchasePage";
 import ItemERC721 from "../components/ItemERC721";
+import logger from "../utils/logger";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
 const NFT_PRICE_EUR = 15; // Prix du NFT en POL
@@ -31,6 +32,8 @@ const NFTPed1: React.FC = () => {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
+  
+  logger.info("New visitor on nicole_mathieu_ed1");
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {

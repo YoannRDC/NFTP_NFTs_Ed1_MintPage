@@ -6,10 +6,13 @@ import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
+import logger from "../utils/logger";
 
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
+  
+  logger.info("New visitor on admin_page");
 
   const adminAddress = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1"; // ✅ Adresse de l'administrateur
   const isAdmin = account?.address?.toLowerCase() === adminAddress.toLowerCase(); // ✅ Vérifie si l'utilisateur est l'administrateur
