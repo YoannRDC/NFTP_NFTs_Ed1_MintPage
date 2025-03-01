@@ -108,7 +108,8 @@ const NFTPed1: React.FC = () => {
         />
       </div>
       
-      YR debug: The price in euros: {priceInEur} --
+      {/* No working */}
+      {/* The price in euros: {priceInEur} -- */}
       
       <div className="decorative-title">
         -- Mes NFTs --

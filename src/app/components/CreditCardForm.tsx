@@ -1,7 +1,7 @@
 "use client";
 
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { PaymentIntent } from "@stripe/stripe-js";
 
 const CreditCardForm = () => {
