@@ -43,7 +43,7 @@ export default function PurchasePage({
         body: JSON.stringify({
           buyerWalletAddress: smartAccount?.address,
           nftContractAddress: nftpNftsEd1Contract?.address,
-          blockchainId: nftpNftsEd1Contract.chain.toString(),
+          blockchainId: nftpNftsEd1Contract.chain.id.toString(),
           requestedQuantity: requestedQuantity.toString(),
           amount: amount.toString(),
           stripeMode: stripeMode.toString(),
