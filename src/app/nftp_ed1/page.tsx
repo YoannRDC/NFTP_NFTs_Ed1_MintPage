@@ -121,7 +121,7 @@ function NFTPed1Content() {
       <div className="mb-4">
         {/* Affichage du prix converti en POL et de la datetime */}
         Prix en POL (calculé depuis {NFT_PRICE_EUR} €) :{" "}
-        {conversionResult ? conversionResult.amount.toFixed(4) : "Chargement..."}
+        {conversionResult ? Math.ceil(conversionResult.amount) : "Chargement..."}
         <br />
         Dernière mise à jour :{" "}
         {conversionResult ? new Date(conversionResult.datetime).toLocaleString() : "Chargement..."}
@@ -130,7 +130,7 @@ function NFTPed1Content() {
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC721 
           totalSupply={TOTAL_SUPPLY} 
-          priceInPol={conversionResult ? conversionResult.amount : DEFAULT_NFT_PRICE_POL}
+          priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
           nftpContract={nftpNftsEd1Contract}
           stripeMode={stripeMode}
