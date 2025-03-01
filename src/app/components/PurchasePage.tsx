@@ -9,7 +9,6 @@ import { useActiveAccount } from "thirdweb/react";
 import { nftpNftsEd1Contract } from "../constants";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
-import logger from "../utils/logger";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!);
 

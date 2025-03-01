@@ -8,7 +8,6 @@ import { accountAbstraction, client } from "./constants";
 import Link from "next/link";
 import MenuItem from "./components/MenuItem";
 import { useState } from "react";
-import logger from "./utils/logger";
 
 export default function Home() {
 	

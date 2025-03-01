@@ -9,12 +9,9 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"@logtail/node": "^0.5.2",
-		"@logtail/pino": "^0.5.2",
 		"@stripe/react-stripe-js": "^3.1.1",
 		"@stripe/stripe-js": "^5.6.0",
 		"next": "14.1.0",
-		"pino": "^9.6.0",
 		"react": "^18",
 		"react-dom": "^18",
 		"sharp": "^0.33.5",

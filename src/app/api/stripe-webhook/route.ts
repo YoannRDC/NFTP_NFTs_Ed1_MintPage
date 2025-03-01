@@ -5,7 +5,6 @@ import { claimTo } from "thirdweb/extensions/erc721";
 import { createThirdwebClient, defineChain, getContract, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { minterAddress } from "@/app/constants";
-import logger from "@/app/utils/logger";
 
 // -----------------------------------------------------------------------------
 // TODO: BDD Needed: Idempotence (exemple en mémoire – à remplacer par une solution persistante en prod)
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const stripeSignature = req.headers.get("stripe-signature");
 
-  logger.info("Webhook called");
+  console.log("Webhook called");
 
   if (!stripeSignature) {
     console.error("Missing stripe-signature");
@@ -62,23 +61,23 @@ export async function POST(req: NextRequest) {
 
     // Vérification d'idempotence
     if (hasEventBeenProcessed(event.id)) {
-      logger.warn(`Event ${event.id} has already been processed.`);
+      console.warn(`Event ${event.id} has already been processed.`);
       return NextResponse.json({ message: "Event already processed" });
     }
 
     if (event.type === "charge.succeeded") {
-      logger.info("###############");
-      logger.info("New Customer");
+      console.log("###############");
+      console.log("New Customer");
       const paymentIntent = event.data.object as any;
 
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       const blockchainId = paymentIntent.metadata.blockchainId;
       const requestedQuantity = paymentIntent.metadata.requestedQuantity;
-      logger.info("buyerWalletAddress:", buyerWalletAddress);
-      logger.info("nftContractAddress:", nftContractAddress);
-      logger.info("blockchainId:", blockchainId);
-      logger.info("requestedQuantity:", requestedQuantity);
+      console.log("buyerWalletAddress:", buyerWalletAddress);
+      console.log("nftContractAddress:", nftContractAddress);
+      console.log("blockchainId:", blockchainId);
+      console.log("requestedQuantity:", requestedQuantity);
 
       // Validation des adresses Ethereum
       if (!isValidEthereumAddress(buyerWalletAddress)) {
@@ -98,14 +97,14 @@ export async function POST(req: NextRequest) {
       const client = createThirdwebClient({
         secretKey: process.env.THIRDWEB_API_SECRET_KEY,
       });
-      logger.info("client.clientId:", client.clientId);
+      console.log("client.clientId:", client.clientId);
 
       const nftContract = getContract({
         client,
         chain: defineChain(Number(blockchainId)),
         address: nftContractAddress,
       });
-      logger.info("nftContract.address:", nftContract.address);
+      console.log("nftContract.address:", nftContract.address);
 
       const transaction = claimTo({
         contract: nftContract,
@@ -113,19 +112,19 @@ export async function POST(req: NextRequest) {
         quantity: BigInt(requestedQuantity),
         from: minterAddress, // adresse de celui qui effectue la réclamation
       });
-      logger.info("transaction:", transaction);
+      console.log("transaction:", transaction);
 
       if (!process.env.PRIVATE_KEY_MINTER) {
         console.error("Missing PRIVATE_KEY_MINTER");
         return NextResponse.json({ error: "Missing PRIVATE_KEY_MINTER" }, { status: 400 });
       }
-      logger.info("Valid environment variables");
+      console.log("Valid environment variables");
 
       const account = privateKeyToAccount({
         client,
         privateKey: process.env.PRIVATE_KEY_MINTER,
       });
-      logger.info("account.address:", account.address);
+      console.log("account.address:", account.address);
 
       const result = await sendTransaction({
         transaction,
@@ -140,7 +139,7 @@ export async function POST(req: NextRequest) {
           secretKey: maskSecretKey(result.client.secretKey!)
         }
       };
-      logger.info("Transaction result:", safeResult);
+      console.log("Transaction result:", safeResult);
     }
 
     // Marquer l'événement comme traité pour éviter les traitements multiples
