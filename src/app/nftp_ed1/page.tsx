@@ -11,7 +11,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
-const NFT_PRICE_EUR = 15; // Prix du NFT en Euros
+const NFT_PRICE_EUR = 6; // Prix du NFT en Euros
 const TOTAL_SUPPLY = 100;
 
 const NFTPed1: React.FC = () => {
