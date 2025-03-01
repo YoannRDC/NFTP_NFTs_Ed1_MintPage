@@ -97,14 +97,13 @@ export async function POST(req: NextRequest) {
       const client = createThirdwebClient({
         secretKey: process.env.THIRDWEB_API_SECRET_KEY,
       });
-      console.log("client.clientId:", client.clientId);
+      console.log("Minter (AuthentArt):", client.clientId);
 
       const nftContract = getContract({
         client,
         chain: defineChain(Number(blockchainId)),
         address: nftContractAddress,
       });
-      console.log("nftContract.address:", nftContract.address);
 
       const transaction = claimTo({
         contract: nftContract,
@@ -112,7 +111,6 @@ export async function POST(req: NextRequest) {
         quantity: BigInt(requestedQuantity),
         from: minterAddress, // adresse de celui qui effectue la réclamation
       });
-      console.log("transaction:", transaction);
 
       if (!process.env.PRIVATE_KEY_MINTER) {
         console.error("Missing PRIVATE_KEY_MINTER");

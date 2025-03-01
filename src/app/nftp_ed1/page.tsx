@@ -10,9 +10,9 @@ import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
-const NFT_PRICE_POL = 49; // Prix du NFT en POL
+const NFT_PRICE_POL = 49; // Prix du NFT en POL => A modifier aussi dans ThirdWeb/(Contract)/ClaimCondition 
 const NFT_PRICE_EUR = 6; // Prix du NFT en Euros
-const TOTAL_SUPPLY = 100;
+const TOTAL_SUPPLY = 100; // Informatif (displays x/TOTAL_SUPPLY)
 
 const NFTPed1: React.FC = () => {
   const smartAccount = useActiveAccount();
@@ -21,7 +21,7 @@ const NFTPed1: React.FC = () => {
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -106,10 +106,6 @@ const NFTPed1: React.FC = () => {
           nftpContract={nftpNftsEd1Contract}
           stripeMode={stripeMode}
         />
-      </div>
-      
-      <div style={{ color: 'red', fontSize: 'xx-large' }}>
-        -- Site en développement ! Ne pas interagir SVP --
       </div>
       
       YR debug: The price in euros: {priceInEur} --
