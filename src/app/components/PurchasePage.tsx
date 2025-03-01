@@ -43,10 +43,10 @@ export default function PurchasePage({
         body: JSON.stringify({
           buyerWalletAddress: smartAccount?.address,
           nftContractAddress: nftpNftsEd1Contract?.address,
-          blockchainId: nftpNftsEd1Contract.chain,
+          blockchainId: nftpNftsEd1Contract.chain.toString(),
           requestedQuantity: requestedQuantity.toString(),
-          amount: amount,
-          stripeMode: stripeMode,
+          amount: amount.toString(),
+          stripeMode: stripeMode.toString(),
         }),
       });
       if (!response.ok) {
