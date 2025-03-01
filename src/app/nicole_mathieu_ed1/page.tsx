@@ -28,6 +28,9 @@ const NFTPed1: React.FC = () => {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInEur, setPriceInEur] = useState<number | null>(null);
+
+    // Définir le mode Stripe ici : "test" ou "live"
+    const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
   
   // Récupérer le prix en EUR au chargement et toutes les 60 secondes
   useEffect(() => {
@@ -124,7 +127,13 @@ const NFTPed1: React.FC = () => {
       </div>
 
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC721 totalSupply={TOTAL_SUPPLY} priceInPol={NFT_PRICE_POL} priceInEur={NFT_PRICE_EUR} nftpContract={nftpNftsEd1Contract} />
+        <ItemERC721 
+          totalSupply={TOTAL_SUPPLY} 
+          priceInPol={NFT_PRICE_POL} 
+          priceInEur={NFT_PRICE_EUR} 
+          nftpContract={nftpNftsEd1Contract}
+          stripeMode={stripeMode}
+        />
       </div>
 
       <div style={{ color: 'red', fontSize: 'xx-large' }}>
