@@ -1,5 +1,3 @@
-//src/app/components/ItemERC721.tsx
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -21,6 +19,7 @@ interface ItemERC721Props {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   nftpContract: any;
+  stripeMode: "test" | "live";
 }
 
 export default function ItemERC721({
@@ -28,13 +27,14 @@ export default function ItemERC721({
   priceInPol,
   priceInEur,
   nftpContract,
+  stripeMode,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
-  // State pour la quantité sélectionnée, initialisée à 1
+  // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
-  // Calcul des prix totaux en fonction de la quantité sélectionnée
+  // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
     (priceInPol !== null && priceInPol !== undefined
       ? typeof priceInPol === "number"
@@ -48,6 +48,9 @@ export default function ItemERC721({
         ? priceInEur
         : parseFloat(priceInEur)
       : 0) * Number(requestedQuantity);
+
+  // Conversion du prix total en Euros en centimes pour Stripe
+  const totalPriceEurCents = Math.round(totalPriceEur * 100);
 
   const wallets = [
     inAppWallet({
@@ -74,18 +77,17 @@ export default function ItemERC721({
         console.error("Erreur lors de la récupération du total minted :", error);
       }
     };
-
     fetchTotalMinted();
   }, []);
 
-  // Handler pour mettre à jour la quantité sélectionnée
+  // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setrequestedQuantity(BigInt(e.target.value));
   };
 
   return (
     <div>
-      {/* Aperçu NFT */}
+      {/* Aperçu du NFT */}
       <div className="mt-10 flex justify-center">
         <MediaRenderer
           client={client}
@@ -111,7 +113,7 @@ export default function ItemERC721({
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
-            {/* Sélecteur de quantité */}
+            {/* Sélecteur de quantité (actuellement masqué) */}
             <div className="mb-4 hidden">
               <label htmlFor="quantity" className="mr-2">
                 Quantity:
@@ -153,7 +155,11 @@ export default function ItemERC721({
               Acheter en Crypto
             </TransactionButton>
             <p className="mb-2">{totalPricePol} POL</p>
-            <PurchasePage requestedQuantity={requestedQuantity} />
+            <PurchasePage
+              requestedQuantity={requestedQuantity}
+              amount={totalPriceEurCents}
+              stripeMode={stripeMode}
+            />
             <p>{totalPriceEur} Euros</p>
           </div>
         ) : (

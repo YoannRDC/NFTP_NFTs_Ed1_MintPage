@@ -10,18 +10,31 @@ import { nftpNftsEd1Contract } from "../constants";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!);
-
 // Définition des props attendues par PurchasePage
 interface PurchasePageProps {
   requestedQuantity: bigint;
+  amount: number; // montant en centimes
+  stripeMode: "test" | "live";
 }
 
-export default function PurchasePage({ requestedQuantity }: PurchasePageProps) {
+export default function PurchasePage({
+  requestedQuantity,
+  amount,
+  stripeMode,
+}: PurchasePageProps) {
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
 
-  // Fonction pour récupérer le clientSecret depuis l'API Stripe.
+  // Choix de la clé publishable en fonction du mode
+  const stripePublishableKey =
+    stripeMode === "live"
+      ? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE!
+      : process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!;
+
+  // Chargement de Stripe avec la clé correspondante
+  const stripePromise = loadStripe(stripePublishableKey);
+
+  // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {
     try {
       const response = await fetch("/api/stripe-intent", {
@@ -31,8 +44,9 @@ export default function PurchasePage({ requestedQuantity }: PurchasePageProps) {
           buyerWalletAddress: smartAccount?.address,
           nftContractAddress: nftpNftsEd1Contract?.address,
           blockchainId: nftpNftsEd1Contract.chain,
-          // Conversion du bigint en string pour la sérialisation JSON
           requestedQuantity: requestedQuantity.toString(),
+          amount: amount,
+          stripeMode: stripeMode,
         }),
       });
       if (!response.ok) {
