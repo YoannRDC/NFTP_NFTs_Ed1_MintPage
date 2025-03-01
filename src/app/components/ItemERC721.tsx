@@ -146,14 +146,16 @@ export default function ItemERC721({
                 })
               }
               onError={(error: Error) => {
-                alert(`Erreur: ${error.message}`);
+                console.error(error);
+                window.location.href = "/nftp_ed1?paymentResult=error";
               }}
               onTransactionConfirmed={async () => {
-                alert("Achat réussi !");
+                window.location.href = "/nftp_ed1?paymentResult=success";
               }}
             >
               Acheter en Crypto
             </TransactionButton>
+
             <p className="mb-2">{totalPricePol} POL</p>
             <PurchasePage
               requestedQuantity={requestedQuantity}

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
 import { client, nftpNftsEd1Contract } from "../constants";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
@@ -15,6 +16,8 @@ const NFT_PRICE_EUR = 6; // Prix du NFT en Euros
 const TOTAL_SUPPLY = 100; // Informatif (displays x/TOTAL_SUPPLY)
 
 const NFTPed1: React.FC = () => {
+  const searchParams = useSearchParams();
+  const paymentResult = searchParams.get("paymentResult"); 
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
@@ -57,6 +60,16 @@ const NFTPed1: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
+      {paymentResult === "success" && (
+        <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
+          Paiement réussi ! Merci pour votre achat.
+        </div>
+      )}
+      {paymentResult === "error" && (
+        <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
+          Échec du paiement. Veuillez réessayer ou contacter le support.
+        </div>
+      )}
       <div className="decorative-title">
         -- Présentation de la collection --
       </div>

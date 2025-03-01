@@ -8,11 +8,12 @@ const CreditCardForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const returnUrl = "https://www.authentart.com/api/stripe-webhook";
+  // On définit l'URL de retour sur votre page front-end où le message sera affiché.
+  const returnUrl = "/nftp_ed1";
 
   const handlePayment = async () => {
     if (!stripe || !elements) {
-      console.error("Stripe is not configured.");
+      console.error("Stripe n'est pas configuré.");
       return;
     }
 
@@ -31,16 +32,19 @@ const CreditCardForm = () => {
         const paymentIntent: PaymentIntent = result.paymentIntent;
 
         if (paymentIntent.status === "succeeded") {
-          alert("Paiement réussi ! Votre NFT sera bientôt livré à votre wallet.");
+          // Redirige vers la page avec le paramètre indiquant le succès
+          window.location.href = `${returnUrl}?paymentResult=success`;
         } else {
           console.error("Paiement en attente ou incomplet :", paymentIntent.status);
+          window.location.href = `${returnUrl}?paymentResult=error`;
         }
       } else if (result.error) {
         console.error("Erreur de paiement :", result.error);
-        alert(`Erreur de paiement : ${result.error.message}`);
+        window.location.href = `${returnUrl}?paymentResult=error`;
       }
     } catch (err) {
       console.error("Erreur inattendue :", err);
+      window.location.href = `${returnUrl}?paymentResult=error`;
     } finally {
       setIsProcessing(false);
     }
