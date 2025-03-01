@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
       });
       console.log("account.address:", account.address);
 
-/*       const result = await sendTransaction({
+       const result = await sendTransaction({
         transaction,
         account,
       });
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
           secretKey: maskSecretKey(result.client.secretKey!)
         }
       };
-      console.log("Transaction result:", safeResult); */
+      console.log("Transaction result:", safeResult);
     }
 
     // Marquer l'événement comme traité pour éviter les traitements multiples
