@@ -25,6 +25,10 @@ export default function PurchasePage({
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
 
+  console.log("requestedQuantity:", requestedQuantity);
+  console.log("amount:", amount);
+  console.log("stripeMode:", stripeMode);
+
   // Choix de la clé publishable en fonction du mode
   const stripePublishableKey =
     stripeMode === "live"
