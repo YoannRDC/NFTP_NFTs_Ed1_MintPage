@@ -32,7 +32,7 @@ const maskSecretKey = (secretKey: string): string => {
 };
 
 export async function POST(req: NextRequest) {
-  const body = await req.text();
+  const rawBody = await req.text();
   const stripeSignature = req.headers.get("stripe-signature");
 
   console.log("Webhook called");
@@ -53,8 +53,9 @@ export async function POST(req: NextRequest) {
   });
 
   try {
+    const buf = Buffer.from(rawBody, "utf8");
     const event = stripe.webhooks.constructEvent(
-      body,
+      buf,
       stripeSignature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
       });
       console.log("account.address:", account.address);
 
-       const result = await sendTransaction({
+/*        const result = await sendTransaction({
         transaction,
         account,
       });
@@ -136,8 +137,8 @@ export async function POST(req: NextRequest) {
           ...result.client,
           secretKey: maskSecretKey(result.client.secretKey!)
         }
-      };
-      console.log("Transaction result:", safeResult);
+      }; 
+      console.log("Transaction result:", safeResult); */
     }
 
     // Marquer l'événement comme traité pour éviter les traitements multiples

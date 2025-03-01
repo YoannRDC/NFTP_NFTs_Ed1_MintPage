@@ -28,7 +28,7 @@ function NFTPed1Content() {
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
 
   useEffect(() => {
     async function fetchConversion() {
@@ -70,7 +70,7 @@ function NFTPed1Content() {
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat.
+          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
         </div>
       )}
       {paymentResult === "error" && (
