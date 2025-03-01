@@ -9,7 +9,7 @@ const CreditCardForm = () => {
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   // On définit l'URL de retour sur votre page front-end où le message sera affiché.
-  const returnUrl = "/nftp_ed1";
+  const returnUrl = "https://www.authentart.com/nftp_ed1";
 
   const handlePayment = async () => {
     if (!stripe || !elements) {
