@@ -24,24 +24,23 @@ function NFTPed1Content() {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  // Stocke le prix en POL calculé à partir du prix fixe en euros
-  const [priceInPolCalculated, setPriceInPolCalculated] = useState<number | null>(null);
+  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
-  // Récupérer le prix en POL (calculé) à partir du prix en euros au chargement et toutes les 60 secondes
   useEffect(() => {
-    async function fetchPrice() {
+    async function fetchConversion() {
       try {
-        const polValue = await convertEurToPOL(NFT_PRICE_EUR);
-        setPriceInPolCalculated(polValue);
+        // Par exemple, convertir 6 €
+        const result = await convertEurToPOL(6);
+        setConversionResult(result);
       } catch (error) {
-        console.error("Erreur lors de la conversion EUR => POL", error);
+        console.error("Erreur lors de la conversion EUR vers POL :", error);
       }
     }
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 60000);
+    fetchConversion();
+    const interval = setInterval(fetchConversion, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -65,6 +64,10 @@ function NFTPed1Content() {
     };
     fetchNFTs();
   }, [smartAccount?.address]);
+
+  function convertTimestampToDate(lastUpdateTimestamp: any): React.ReactNode {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -120,9 +123,12 @@ function NFTPed1Content() {
       </div>
 
       <div className="mb-4">
-        {/* Affichage du prix recalculé en POL */}
+        {/* Affichage du prix converti en POL et de la datetime */}
         Prix en POL (calculé depuis {NFT_PRICE_EUR} €) :{" "}
-        {priceInPolCalculated !== null ? priceInPolCalculated.toFixed(4) : "Chargement..."}
+        {conversionResult ? conversionResult.amount.toFixed(4) : "Chargement..."}
+        <br />
+        Dernière mise à jour :{" "}
+        {conversionResult ? new Date(conversionResult.datetime).toLocaleString() : "Chargement..."}
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
