@@ -1,36 +1,28 @@
+import ccxt from "ccxt";
 
-export async function convertPolToEur(maticAmount: number): Promise<number | null> {
+/**
+ * Convertit un montant en EUR en POL (MATIC) en utilisant le ticker MATIC/EUR de Binance.
+ * @param eur Montant en euros à convertir
+ * @returns Le montant équivalent en POL
+ */
+export async function convertEurToPOL(eur: number): Promise<number> {
+  const exchange = new ccxt.binance();
+
   try {
-/*     // Vérifie si la clé API est définie
-    if (!process.env.COINGECKO_API_KEY) {
-      console.error("La clé API CoinGecko n'est pas définie.");
-      return null;
-    } */
+    // Récupération des données du ticker pour le pair MATIC/EUR
+    const ticker = await exchange.fetchTicker("MATIC/EUR");
+    const priceInEur = ticker.last;
 
-    // Utilise l'endpoint de CoinGecko avec la clé API dans l'URL
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=polygon&x_cg_demo_api_key=CG-DBzoUuXdkJuPsj5CTqacbVdU`
-    );
-
-    // Vérifie si la réponse est correcte
-    if (!response.ok) {
-      console.error("Erreur de réponse API:", response.status, response.statusText);
-      return null;
+    // Vérifier que ticker.last est bien un nombre
+    if (priceInEur === undefined || typeof priceInEur !== "number") {
+      throw new Error("Le prix n'est pas disponible.");
     }
 
-    const data = await response.json();
-    console.log('info',"API Response Data:", data); // 🔍 Vérifie la structure de la réponse
-
-    // Vérifie comment est structuré l'objet retourné
-    const maticPrice = data[0]?.current_price; // Utilise le prix actuel
-
-    console.log('info',"Extracted MATIC Price:", maticPrice); // 🔍 Vérifie si la valeur est bien extraite
-
-    if (!maticPrice) return null;
-
-    return maticAmount * maticPrice;
+    // Calcul : combien de POL pour le montant donné en EUR
+    const amountInPOL = eur / priceInEur;
+    return amountInPOL;
   } catch (error) {
-    console.error("Erreur lors de la conversion POL ➝ EUR", error);
-    return null;
+    console.error("Erreur lors de la conversion EUR vers POL:", error);
+    throw error;
   }
 }

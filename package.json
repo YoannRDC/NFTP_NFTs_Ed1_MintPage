@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@stripe/react-stripe-js": "^3.1.1",
 		"@stripe/stripe-js": "^5.6.0",
+		"ccxt": "^4.4.64",
 		"next": "14.1.0",
 		"react": "^18",
 		"react-dom": "^18",

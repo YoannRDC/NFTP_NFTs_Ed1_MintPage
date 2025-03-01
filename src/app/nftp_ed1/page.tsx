@@ -1,36 +1,44 @@
 "use client";
-import React, { useEffect, useState } from "react";
+export const dynamic = "force-dynamic";
+
+import React, { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
 import { client, nftpNftsEd1Contract } from "../constants";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-import { convertPolToEur } from "../utils/conversion";
+// Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
+import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
-const NFT_PRICE_POL = 49; // Prix du NFT en POL => A modifier aussi dans ThirdWeb/(Contract)/ClaimCondition 
-const NFT_PRICE_EUR = 6; // Prix du NFT en Euros
-const TOTAL_SUPPLY = 100; // Informatif (displays x/TOTAL_SUPPLY)
+const NFT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
+const NFT_PRICE_EUR = 6; // Prix fixe en Euros
+const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 
-const NFTPed1: React.FC = () => {
+function NFTPed1Content() {
   const searchParams = useSearchParams();
-  const paymentResult = searchParams.get("paymentResult"); 
+  const paymentResult = searchParams.get("paymentResult");
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  const [priceInEur, setPriceInEur] = useState<number | null>(null);
+  // Stocke le prix en POL calculé à partir du prix fixe en euros
+  const [priceInPolCalculated, setPriceInPolCalculated] = useState<number | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
-  // Récupérer le prix en EUR au chargement et toutes les 60 secondes
+  // Récupérer le prix en POL (calculé) à partir du prix en euros au chargement et toutes les 60 secondes
   useEffect(() => {
     async function fetchPrice() {
-      const eurValue = await convertPolToEur(NFT_PRICE_POL);
-      setPriceInEur(eurValue);
+      try {
+        const polValue = await convertEurToPOL(NFT_PRICE_EUR);
+        setPriceInPolCalculated(polValue);
+      } catch (error) {
+        console.error("Erreur lors de la conversion EUR => POL", error);
+      }
     }
     fetchPrice();
     const interval = setInterval(fetchPrice, 60000);
@@ -110,6 +118,12 @@ const NFTPed1: React.FC = () => {
       <div className="decorative-title">
         -- NFTs à vendre --
       </div>
+
+      <div className="mb-4">
+        {/* Affichage du prix recalculé en POL */}
+        Prix en POL (calculé depuis {NFT_PRICE_EUR} €) :{" "}
+        {priceInPolCalculated !== null ? priceInPolCalculated.toFixed(4) : "Chargement..."}
+      </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC721 
@@ -120,9 +134,6 @@ const NFTPed1: React.FC = () => {
           stripeMode={stripeMode}
         />
       </div>
-      
-      {/* No working */}
-      {/* The price in euros: {priceInEur} -- */}
       
       <div className="decorative-title">
         -- Mes NFTs --
@@ -167,6 +178,13 @@ const NFTPed1: React.FC = () => {
       </Link>
     </div>
   );
-};
+}
 
-export default NFTPed1;
+// Wrap the content in a Suspense boundary to satisfy Next.js requirements
+export default function NFTPed1() {
+  return (
+    <Suspense fallback={<div>Chargement de la page...</div>}>
+      <NFTPed1Content />
+    </Suspense>
+  );
+}

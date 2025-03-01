@@ -15,7 +15,6 @@ import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-import { convertPolToEur } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
@@ -31,19 +30,7 @@ const NFTPed1: React.FC = () => {
 
     // Définir le mode Stripe ici : "test" ou "live"
     const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
-  
-  // Récupérer le prix en EUR au chargement et toutes les 60 secondes
-  useEffect(() => {
-    async function fetchPrice() {
-      const eurValue = await convertPolToEur(NFT_PRICE_POL);
-      setPriceInEur(eurValue);
-    }
 
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 60000); // Met à jour toutes les 60s
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Get user NFTs
   useEffect(() => {
