@@ -35,6 +35,7 @@ function NFTPed1Content() {
       try {
         const result = await convertEurToPOL(NFT_PRICE_EUR);
         setConversionResult(result);
+        console.log("Last upadte EUR->POL price:", new Date(result.datetime).toLocaleString());
       } catch (error) {
         console.error("Erreur lors de la conversion EUR vers POL :", error);
       }
@@ -116,15 +117,6 @@ function NFTPed1Content() {
       
       <div className="decorative-title">
         -- NFTs à vendre --
-      </div>
-
-      <div className="mb-4">
-        {/* Affichage du prix converti en POL et de la datetime */}
-        Prix en POL (calculé depuis {NFT_PRICE_EUR} €) :{" "}
-        {conversionResult ? Math.ceil(conversionResult.amount) : "Chargement..."}
-        <br />
-        Dernière mise à jour :{" "}
-        {conversionResult ? new Date(conversionResult.datetime).toLocaleString() : "Chargement..."}
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
