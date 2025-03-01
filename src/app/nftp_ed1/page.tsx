@@ -14,9 +14,10 @@ import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
-const NFT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
+//const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
 const NFT_PRICE_EUR = 6; // Prix fixe en Euros
 const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
+const DEFAULT_NFT_PRICE_POL = 49;
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -32,8 +33,7 @@ function NFTPed1Content() {
   useEffect(() => {
     async function fetchConversion() {
       try {
-        // Par exemple, convertir 6 €
-        const result = await convertEurToPOL(6);
+        const result = await convertEurToPOL(NFT_PRICE_EUR);
         setConversionResult(result);
       } catch (error) {
         console.error("Erreur lors de la conversion EUR vers POL :", error);
@@ -64,10 +64,6 @@ function NFTPed1Content() {
     };
     fetchNFTs();
   }, [smartAccount?.address]);
-
-  function convertTimestampToDate(lastUpdateTimestamp: any): React.ReactNode {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <div className="flex flex-col items-center">
@@ -134,7 +130,7 @@ function NFTPed1Content() {
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC721 
           totalSupply={TOTAL_SUPPLY} 
-          priceInPol={NFT_PRICE_POL} 
+          priceInPol={conversionResult ? conversionResult.amount : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
           nftpContract={nftpNftsEd1Contract}
           stripeMode={stripeMode}
