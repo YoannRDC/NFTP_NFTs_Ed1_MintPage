@@ -10,6 +10,7 @@ import { defineChain, getContract } from "thirdweb";
 
 // NFTP contracts
 const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+const nftpNftsEd1MetadataURI= "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0";
 
 // connect to your contract
 const nftpNftsEd1Contract = getContract({
@@ -48,7 +49,7 @@ const AdminPage: React.FC = () => {
       {isAdmin && ( // ✅ Affiche uniquement si l'utilisateur est l'administrateur
         <>
           <ClaimSnapshot onSnapshotFetched={setSnapshotData} contract={nftpNftsEd1Contract} />
-          <ClaimConditionForm initialOverrides={snapshotData} contract={nftpNftsEd1Contract} />
+          <ClaimConditionForm initialOverrides={snapshotData} contract={nftpNftsEd1Contract} metadata={nftpNftsEd1MetadataURI} />
         </>
       )}
 
