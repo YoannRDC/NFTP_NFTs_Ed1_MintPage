@@ -32,6 +32,12 @@ const nftpNftsEd1Contract = getContract({
 
 const videoPresentationLink="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle="Présentation NFT Propulsion";
+const collectionName="NFT Propulsion Edition 1";
+const collectionPageRef="/nftp_ed1";
+const collectionIamgeSrc="/logo_seul_11.png";
+const collectionShortDescription="First NFT collection of NFT Propulsion.";
+const artistProjectWebsite="https://nftpropulsion.fr";
+const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -100,10 +106,10 @@ function NFTPed1Content() {
       </div>
       <div className="mb-10">
         <MenuItem
-          title="NFT Propulsion Edition 1"
-          href="/nftp_ed1"
-          description="First NFT collection of NFT Propulsion."
-          imageSrc="/logo_seul_11.png"
+          title={collectionName}
+          href={collectionPageRef}
+          description={collectionShortDescription}
+          imageSrc={collectionIamgeSrc}
         />
       </div>
       
@@ -128,8 +134,8 @@ function NFTPed1Content() {
         />
       </div>
       
-      <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
-        Visit NFTpropulsion.fr
+      <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
+        Visit {artistProjectWebsitePrettyPrint}
       </Link>
       
       <div className="decorative-title">

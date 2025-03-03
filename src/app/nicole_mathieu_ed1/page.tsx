@@ -32,6 +32,12 @@ const nicoleMathieuEd1Contract = getContract({
 
 const videoPresentationLink="https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle="Présentation Nicole Mathieu";
+const collectionName="Fragments Chromatiques Edition 1";
+const collectionPageRef="/nicole_mathieu_ed1";
+const collectionIamgeSrc="/Nicole_Mathieu.png";
+const collectionShortDescription="First NFT collection of Nicole Mathieu.";
+const artistProjectWebsite="https://www.nmmathieu.com/";
+const artistProjectWebsitePrettyPrint="NMMathieu.com";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -42,7 +48,7 @@ function NFTPed1Content() {
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
 
   useEffect(() => {
     async function fetchConversion() {
@@ -96,14 +102,14 @@ function NFTPed1Content() {
         -- Présentation de la collection --
       </div>
       <div className="decorative-subtitle">
-        NFT Propulsion Edition 1
+        {collectionName}
       </div>
       <div className="mb-10">
         <MenuItem
-          title="NFT Propulsion Edition 1"
-          href="/nftp_ed1"
-          description="First NFT collection of NFT Propulsion."
-          imageSrc="/logo_seul_11.png"
+          title={collectionName}
+          href={collectionPageRef}
+          description={collectionShortDescription}
+          imageSrc={collectionIamgeSrc}
         />
       </div>
       
@@ -130,7 +136,6 @@ function NFTPed1Content() {
         <div className="decorative-description">
           Nicole Mathieu.
         </div>
-
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
@@ -140,8 +145,8 @@ function NFTPed1Content() {
         />
       </div>
       
-      <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
-        Visit NFTpropulsion.fr
+      <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
+        Visit {artistProjectWebsitePrettyPrint}
       </Link>
       
       <div className="decorative-title">
