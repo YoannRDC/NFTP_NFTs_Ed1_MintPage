@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
@@ -40,6 +42,8 @@ export default function ItemERC1155({
   const [soldCount, setSoldCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
+  
+  const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
   // Adresse qui détient initialement tous les NFT (pré-mint)
   const sellerAddress = nftpPubKey;
@@ -105,7 +109,7 @@ export default function ItemERC1155({
       }
     };
     fetchSupplyAndSold();
-  }, [contract, tokenId]);
+  }, [contract, tokenId, sellerAddress]);
 
   // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -134,11 +138,15 @@ export default function ItemERC1155({
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
           onClick={toggleModal}
         >
-          <img
-            src={previewImage}
-            alt="NFT agrandi"
-            className="max-w-full max-h-full rounded-lg"
-          />
+          <div className="relative w-full h-full max-w-3xl max-h-full">
+            <NextImage
+              src={previewImage}
+              alt="NFT agrandi"
+              fill
+              style={{ objectFit: "contain" }}
+              className="rounded-lg"
+            />
+          </div>
         </div>
       )}
 

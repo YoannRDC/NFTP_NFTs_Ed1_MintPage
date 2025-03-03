@@ -40,6 +40,9 @@ const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
 const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc721drop";
 
+// useless in this context:
+const tokenId= 0n;
+
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -153,6 +156,7 @@ function NFTPed1Content() {
           previewImage={`${collectionPageRef}/preview.gif`}
           redirectPage={collectionPageRef}
           contractType={contractType}
+          tokenId={tokenId}
         />
       </div>
       

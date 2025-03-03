@@ -23,6 +23,7 @@ interface ItemERC721Props {
   previewImage: string; // Nouvelle prop pour l'image de preview
   redirectPage: string; // Nouvelle prop pour la page de redirection
   contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
+  tokenId: bigint;
 }
 
 export default function ItemERC721({
@@ -34,6 +35,7 @@ export default function ItemERC721({
   previewImage,
   redirectPage,
   contractType,
+  tokenId
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
@@ -169,6 +171,8 @@ export default function ItemERC721({
               stripeMode={stripeMode}
               contract={contract}
               contractType={contractType}
+              redirectPage={redirectPage}
+              tokenId={tokenId}
             />
             <p>{totalPriceEur} Euros</p>
           </div>
