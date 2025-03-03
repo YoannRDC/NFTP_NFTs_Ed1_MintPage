@@ -13,9 +13,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { convertPriceInPolToWei } from "../utils/conversion";
-import { constants } from "buffer";
 
-// Définition de l'interface pour les props
 interface ItemERC721Props {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
@@ -36,7 +34,6 @@ export default function ItemERC1155({
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
-  // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
   // Adresse qui détient initialement tous les NFT (pré-mint)
@@ -75,7 +72,6 @@ export default function ItemERC1155({
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
       try {
-        // Récupère le total supply pour tokenId = 1
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
@@ -84,17 +80,13 @@ export default function ItemERC1155({
         const total = Number(totalMinted);
         setTotalSupply(total);
 
-        // Récupère le solde de l'adresse pré-mint pour tokenId = 1
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
           params: [sellerAddress, 1n],
         });
         const sellerBal = Number(sellerBalance);
-
-        // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
-        const sold = total - sellerBal;
-        setSoldCount(sold);
+        setSoldCount(total - sellerBal);
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des informations sur la supply et le nombre vendu :",
@@ -110,16 +102,35 @@ export default function ItemERC1155({
     setrequestedQuantity(BigInt(e.target.value));
   };
 
+  // État pour contrôler l'affichage de l'image en grand (modal)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
   return (
     <div className="border p-4 rounded-lg shadow-lg text-center">
       {/* Aperçu du NFT */}
       <div className="mt-10 flex justify-center">
-        <MediaRenderer
-          client={client}
-          src={previewImage} // Utilisation de l'image passée en prop
-          style={{ height: "auto", borderRadius: "10px" }}
-        />
+        <div onClick={toggleModal} style={{ cursor: "pointer" }}>
+          <MediaRenderer
+            client={client}
+            src={previewImage} // Image de preview passée en prop
+            style={{ height: "auto", borderRadius: "10px" }}
+          />
+        </div>
       </div>
+      {/* Modal pour l'affichage en grand de l'image */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+          onClick={toggleModal}
+        >
+          <img
+            src={previewImage}
+            alt="NFT agrandi"
+            className="max-w-full max-h-full rounded-lg"
+          />
+        </div>
+      )}
 
       {/* Affichage du nombre vendu / total supply */}
       <div className="text-gray-500 mt-2 flex justify-center">
@@ -167,11 +178,11 @@ export default function ItemERC1155({
               transaction={() =>
                 safeTransferFrom({
                   contract: contract,
-                  from: sellerAddress, // Adresse qui détient les tokens pré-mintés
+                  from: sellerAddress, // Adresse détentrice des NFT pré-mintés
                   to: smartAccount.address, // Adresse de l'acheteur
                   tokenId: 1n, // Identifiant du token à transférer
-                  value: requestedQuantity, // Quantité de token à transférer (souvent 1 exemplaire)
-                  data: "0x", // Données supplémentaires (souvent vide)
+                  value: requestedQuantity, // Quantité de token à transférer
+                  data: "0x", // Données supplémentaires
                   overrides: {
                     // Définir le prix du NFT en wei
                     value: convertPriceInPolToWei(totalPricePol),
