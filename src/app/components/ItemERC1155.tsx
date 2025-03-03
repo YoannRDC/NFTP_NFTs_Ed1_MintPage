@@ -74,8 +74,8 @@ export default function ItemERC721({
       try {
         const totalMinted = await readContract({
           contract: contract,
-          method: "function totalSupply() view returns (uint256)",
-          params: [],
+          method: "function totalSupply(uint256 tokenId) view returns (uint256)",
+          params: [1n],
         });
         setMintedCount(Number(totalMinted));
       } catch (error) {

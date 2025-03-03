@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   }
 
   const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2025-01-27.acacia",
+    apiVersion: "2025-02-24.acacia",
   });
 
   const paymentIntent = await stripe.paymentIntents.create({
