@@ -7,13 +7,14 @@ import { useActiveAccount } from "thirdweb/react";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
 
-// Définition des props attendues par PurchasePage, incluant le contrat
+// Définition des props attendues par PurchasePage, incluant le contrat et la page de retour
 interface PurchasePageProps {
   requestedQuantity: bigint;
   amount: number; // montant en centimes
   stripeMode: "test" | "live";
   contract: any;
   contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
+  returnPage: string; // chemin de la page de retour (ex: "/nftp_ed1")
 }
 
 export default function PurchasePage({
@@ -21,7 +22,8 @@ export default function PurchasePage({
   amount,
   stripeMode,
   contract,
-  contractType
+  contractType,
+  returnPage,
 }: PurchasePageProps) {
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -48,7 +50,8 @@ export default function PurchasePage({
           requestedQuantity: requestedQuantity.toString(),
           amount: amount.toString(),
           stripeMode: stripeMode.toString(),
-          contractType: contractType.toString()
+          contractType: contractType.toString(),
+          returnPage, // Transmet le chemin de retour
         }),
       });
       if (!response.ok) {
@@ -69,7 +72,7 @@ export default function PurchasePage({
         </button>
       ) : (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <CreditCardForm />
+          <CreditCardForm returnPage={returnPage} />
         </Elements>
       )}
     </div>

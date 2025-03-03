@@ -1,15 +1,18 @@
 "use client";
-
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import type { PaymentIntent } from "@stripe/stripe-js";
 
-const CreditCardForm = () => {
+interface CreditCardFormProps {
+  returnPage: string; // par exemple "/nftp_ed1"
+}
+
+const CreditCardForm = ({ returnPage }: CreditCardFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  // On définit l'URL de retour sur votre page front-end où le message sera affiché.
-  const returnUrl = "https://www.authentart.com/nftp_ed1";
+  // Construit l'URL de retour à partir du domaine et du chemin passé en prop
+  const returnUrl = `https://www.authentart.com${returnPage}`;
 
   const handlePayment = async () => {
     if (!stripe || !elements) {
@@ -28,9 +31,8 @@ const CreditCardForm = () => {
         redirect: "if_required",
       });
 
-      if ('paymentIntent' in result && result.paymentIntent) {
+      if ("paymentIntent" in result && result.paymentIntent) {
         const paymentIntent: PaymentIntent = result.paymentIntent;
-
         if (paymentIntent.status === "succeeded") {
           // Redirige vers la page avec le paramètre indiquant le succès
           window.location.href = `${returnUrl}?paymentResult=success`;
@@ -53,17 +55,15 @@ const CreditCardForm = () => {
   return (
     <div className="bg-white p-5 rounded mx-auto" style={{ maxWidth: "400px" }}>
       <PaymentElement
-        options={
-          {
-            appearance: {
-              theme: "flat",
-              variables: {
-                colorBackground: "#ffffff",
-                fontFamily: "Arial, sans-serif",
-              },
+        options={{
+          appearance: {
+            theme: "flat",
+            variables: {
+              colorBackground: "#ffffff",
+              fontFamily: "Arial, sans-serif",
             },
-          } as any
-        }
+          },
+        } as any}
       />
 
       <button
