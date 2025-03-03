@@ -8,11 +8,12 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
-import { client } from "../constants";
+import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { convertPriceInPolToWei } from "../utils/conversion";
+import { constants } from "buffer";
 
 // Définition de l'interface pour les props
 interface ItemERC721Props {
@@ -39,7 +40,7 @@ export default function ItemERC1155({
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
   // Adresse qui détient initialement tous les NFT (pré-mint)
-  const sellerAddress = "0x6debf5C015f0Edd3050cc919A600Fb78281696B9";
+  const sellerAddress = nftpPubKey;
 
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
