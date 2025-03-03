@@ -53,7 +53,7 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
       const end = BigInt(batch.endTokenIdInclusive);
       if (tokenId >= start && tokenId <= end) {
         // Construction de l'URL : on suppose que le JSON est accessible via baseURI + tokenId + ".json"
-        const metadataUrl = `${batch.baseURI}${tokenId.toString()}.json`;
+        const metadataUrl = `${batch.baseURI}${(tokenId - 1n).toString()}.json`;
         const response = await fetch(metadataUrl);
         if (!response.ok) {
           throw new Error(`Erreur lors du chargement des métadonnées depuis ${metadataUrl}`);
@@ -227,7 +227,7 @@ function NFTPed1Content() {
             >
               <MediaRenderer
                 client={client}
-                src={token.metadata?.image || "/preview.gif"}
+                src={token.metadata?.image}
                 style={{ width: "100%", height: "auto", borderRadius: "10px" }}
               />
               <p className="font-semibold mt-2">
