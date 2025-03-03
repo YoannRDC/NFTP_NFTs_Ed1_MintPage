@@ -28,12 +28,12 @@ export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnap
         const replacer = (_key: any, value: { toString: () => any; }) =>
           typeof value === "bigint" ? value.toString() : value;
 
-        console.log("info", "Contract Metadata:", JSON.stringify(metadata, replacer, 2));
-        console.log("info", "Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
-        console.log("info", "Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
+        console.log("Contract Metadata:", JSON.stringify(metadata, replacer, 2));
+        console.log("Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
+        console.log("Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
 
         setSnapshot(fetchedSnapshot);
-        onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à un composant parent
+        onSnapshotFetched(fetchedSnapshot);
       } catch (err) {
         console.error("Error fetching snapshot:", err);
         setError("Échec du chargement du snapshot.");

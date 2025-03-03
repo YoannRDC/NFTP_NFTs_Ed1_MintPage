@@ -46,9 +46,9 @@ export default function ClaimConditionForm({ contract, initialOverrides = [] }: 
   };
 
   const handleSubmit = async () => {
+    console.log("smartAccount.address.toLowerCase():", smartAccount!.address.toLowerCase());
+    console.log("nftpPubKey.toLowerCase():", nftpPubKey.toLowerCase());
     if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
-      console.log("smartAccount.address.toLowerCase():", smartAccount!.address.toLowerCase())
-      console.log("nftpPubKey.toLowerCase():", nftpPubKey.toLowerCase())
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
