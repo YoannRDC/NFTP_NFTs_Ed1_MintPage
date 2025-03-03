@@ -78,7 +78,7 @@ export default function ItemERC721({
       }
     };
     fetchTotalMinted();
-  }, []);
+  }, [contract]);
 
   // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

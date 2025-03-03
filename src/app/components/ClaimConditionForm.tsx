@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { setClaimConditions } from "thirdweb/extensions/erc721";
-import { sendTransaction } from "thirdweb";
+import { ContractOptions, sendTransaction } from "thirdweb";
 import { useActiveAccount } from "thirdweb/react";
 import { nftpPubKey } from "../constants";
 
 interface ClaimConditionFormProps {
-  contract: any;
+  contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
 }
 

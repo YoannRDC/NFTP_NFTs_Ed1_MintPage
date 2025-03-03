@@ -6,7 +6,6 @@ import {
 } from "thirdweb/react";
 import {
   client,
-  nftpNftsEd1Contract,
 } from "../constants";
 import Link from "next/link";
 
@@ -14,10 +13,21 @@ import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
+import { defineChain, getContract } from "thirdweb";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
 const NFT_PRICE_EUR = 5; // Prix du NFT en POL
 const TOTAL_SUPPLY = 100;
+
+// NFTP contracts TODO: Modify contract address !
+const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+
+// connect to your contract
+const contract = getContract({
+  client,
+  chain: defineChain(137),
+  address: nftpNftsEd1Address,
+});
 
 const NFTPed1: React.FC = () => {
   const smartAccount = useActiveAccount();
@@ -37,7 +47,7 @@ const NFTPed1: React.FC = () => {
       setIsLoadingNfts(true);
       try {
         const fetchedNfts = await getOwnedERC721s({
-          contract: nftpNftsEd1Contract,
+          contract: contract,
           owner: smartAccount.address,
           requestPerSec: 99,
         });
@@ -115,7 +125,7 @@ const NFTPed1: React.FC = () => {
           totalSupply={TOTAL_SUPPLY} 
           priceInPol={NFT_PRICE_POL} 
           priceInEur={NFT_PRICE_EUR} 
-          nftpContract={nftpNftsEd1Contract}
+          contract={contract}
           stripeMode={stripeMode}
         />
       </div>
@@ -139,7 +149,7 @@ const NFTPed1: React.FC = () => {
                 className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
                 onClick={() =>
                   window.open(
-                    `https://polygon.nftscan.com/${nftpNftsEd1Contract.address}/${nft.metadata?.id || nft.id}`,
+                    `https://polygon.nftscan.com/${contract.address}/${nft.metadata?.id || nft.id}`,
                     "_blank" // ✅ Ouvre dans un nouvel onglet
                   )
                 }

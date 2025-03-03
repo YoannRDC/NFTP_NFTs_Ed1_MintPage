@@ -5,9 +5,10 @@ import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { download } from "thirdweb/storage";
 import { client } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
+import { ContractOptions } from "thirdweb";
 
 interface ClaimSnapshotProps {
-  contract: any;
+  contract: ContractOptions<[], `0x${string}`>;
   onSnapshotFetched: (snapshot: any) => void;
 }
 
