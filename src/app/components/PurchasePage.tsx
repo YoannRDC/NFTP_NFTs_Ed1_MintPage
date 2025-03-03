@@ -1,26 +1,25 @@
-// src/app/components/PurchasePage.tsx
-
 "use client";
 export const dynamic = "force-dynamic";
 
 import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
-import { nftpNftsEd1Contract } from "../constants";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
 
-// Définition des props attendues par PurchasePage
+// Définition des props attendues par PurchasePage, incluant le contrat
 interface PurchasePageProps {
   requestedQuantity: bigint;
   amount: number; // montant en centimes
   stripeMode: "test" | "live";
+  contract: any;
 }
 
 export default function PurchasePage({
   requestedQuantity,
   amount,
   stripeMode,
+  contract,
 }: PurchasePageProps) {
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -42,8 +41,8 @@ export default function PurchasePage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           buyerWalletAddress: smartAccount?.address,
-          nftContractAddress: nftpNftsEd1Contract?.address,
-          blockchainId: nftpNftsEd1Contract.chain.id.toString(),
+          nftContractAddress: contract?.address,
+          blockchainId: contract.chain.id.toString(),
           requestedQuantity: requestedQuantity.toString(),
           amount: amount.toString(),
           stripeMode: stripeMode.toString(),

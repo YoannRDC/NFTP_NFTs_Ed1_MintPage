@@ -4,11 +4,14 @@ import React, { useState, useEffect } from "react";
 import { setClaimConditions } from "thirdweb/extensions/erc721";
 import { sendTransaction } from "thirdweb";
 import { useActiveAccount } from "thirdweb/react";
-import { nftpNftsEd1Contract } from "../constants";
+import { nftpPubKey } from "../constants";
 
-const ADMIN_ADDRESS = "0x7b471306691dee8fc1322775a997e1a6ca29eee1".toLowerCase();
+interface ClaimConditionFormProps {
+  contract: any;
+  initialOverrides?: any[];
+}
 
-export default function ClaimConditionForm({ initialOverrides = [] }: { initialOverrides?: any[] }) {
+export default function ClaimConditionForm({ contract, initialOverrides = [] }: ClaimConditionFormProps) {
   const smartAccount = useActiveAccount();
   const [overrideList, setOverrideList] = useState<{ address: string; maxClaimable: string; price: string }[]>([]);
 
@@ -43,14 +46,14 @@ export default function ClaimConditionForm({ initialOverrides = [] }: { initialO
   };
 
   const handleSubmit = async () => {
-    if (!smartAccount || smartAccount.address.toLowerCase() !== ADMIN_ADDRESS) {
+    if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
 
     try {
       const transaction = setClaimConditions({
-        contract: nftpNftsEd1Contract,
+        contract: contract, // Utilisation du contrat passé en prop
         phases: [
           {
             maxClaimableSupply: BigInt(maxClaimableSupply),

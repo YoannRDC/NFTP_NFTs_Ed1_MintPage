@@ -1,13 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  ConnectButton,
   MediaRenderer,
-  TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
 import {
-  accountAbstraction,
   client,
   nftpNftsEd1Contract,
 } from "../constants";
@@ -19,7 +16,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 
 const NFT_PRICE_POL = 49; // Prix du NFT en POL
-const NFT_PRICE_EUR = 15; // Prix du NFT en POL
+const NFT_PRICE_EUR = 5; // Prix du NFT en POL
 const TOTAL_SUPPLY = 100;
 
 const NFTPed1: React.FC = () => {

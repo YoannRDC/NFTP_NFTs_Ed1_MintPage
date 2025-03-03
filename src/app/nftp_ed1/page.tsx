@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, nftpNftsEd1Contract } from "../constants";
+import { client } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
@@ -13,11 +13,22 @@ import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
+import { defineChain, getContract } from "thirdweb";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
-const NFT_PRICE_EUR = 6; // Prix fixe en Euros
+const NFT_PRICE_EUR = 15; // Prix fixe en Euros
 const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 const DEFAULT_NFT_PRICE_POL = 49;
+
+// NFTP contracts
+const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+
+// connect to your contract
+export const nftpNftsEd1Contract = getContract({
+  client,
+  chain: defineChain(137),
+  address: nftpNftsEd1Address,
+});
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -28,7 +39,7 @@ function NFTPed1Content() {
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
 
   useEffect(() => {
     async function fetchConversion() {
@@ -124,7 +135,7 @@ function NFTPed1Content() {
           totalSupply={TOTAL_SUPPLY} 
           priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
-          nftpContract={nftpNftsEd1Contract}
+          contract={nftpNftsEd1Contract}
           stripeMode={stripeMode}
         />
       </div>

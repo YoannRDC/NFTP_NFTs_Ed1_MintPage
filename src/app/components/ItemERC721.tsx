@@ -8,7 +8,7 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
-import { client, nftpNftsEd1Contract } from "../constants";
+import { client } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
@@ -18,7 +18,7 @@ interface ItemERC721Props {
   totalSupply: number;
   priceInPol: number | string | null;
   priceInEur: number | string | null;
-  nftpContract: any;
+  contract: any;
   stripeMode: "test" | "live";
 }
 
@@ -26,7 +26,7 @@ export default function ItemERC721({
   totalSupply,
   priceInPol,
   priceInEur,
-  nftpContract,
+  contract,
   stripeMode,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
@@ -68,7 +68,7 @@ export default function ItemERC721({
     const fetchTotalMinted = async () => {
       try {
         const totalMinted = await readContract({
-          contract: nftpNftsEd1Contract,
+          contract: contract,
           method: "function totalMinted() view returns (uint256)",
           params: [],
         });
@@ -140,7 +140,7 @@ export default function ItemERC721({
             <TransactionButton
               transaction={() =>
                 claimTo({
-                  contract: nftpContract,
+                  contract: contract,
                   to: smartAccount.address,
                   quantity: requestedQuantity,
                 })
@@ -161,6 +161,7 @@ export default function ItemERC721({
               requestedQuantity={requestedQuantity}
               amount={totalPriceEurCents}
               stripeMode={stripeMode}
+              contract={contract}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

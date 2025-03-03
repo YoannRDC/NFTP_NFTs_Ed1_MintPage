@@ -3,10 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
 import { download } from "thirdweb/storage";
-import { client, nftpNftsEd1Contract } from "../constants";
+import { client } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
 
-export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched: (snapshot: any) => void }) {
+interface ClaimSnapshotProps {
+  contract: any;
+  onSnapshotFetched: (snapshot: any) => void;
+}
+
+export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnapshotProps) {
   const [snapshot, setSnapshot] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,20 +19,20 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
   useEffect(() => {
     async function fetchData() {
       try {
-        const metadata = await getContractMetadata({ contract: nftpNftsEd1Contract });
-        const activeClaimCondition = await getActiveClaimCondition({ contract: nftpNftsEd1Contract });
+        const metadata = await getContractMetadata({ contract });
+        const activeClaimCondition = await getActiveClaimCondition({ contract });
         const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
         // ✅ Fonction de conversion BigInt → String
-        const replacer = (_key: any, value: { toString: () => any; }) => (typeof value === "bigint" ? value.toString() : value);
+        const replacer = (_key: any, value: { toString: () => any; }) =>
+          typeof value === "bigint" ? value.toString() : value;
 
-        // ✅ Affichage des données dans la console
-        console.log('info', "Contract Metadata:", JSON.stringify(metadata, replacer, 2));
-        console.log('info',"Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
-        console.log('info',"Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
+        console.log("info", "Contract Metadata:", JSON.stringify(metadata, replacer, 2));
+        console.log("info", "Active Claim Condition:", JSON.stringify(activeClaimCondition, replacer, 2));
+        console.log("info", "Fetched Snapshot:", JSON.stringify(fetchedSnapshot, replacer, 2));
 
         setSnapshot(fetchedSnapshot);
-        onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à ClaimConditionForm
+        onSnapshotFetched(fetchedSnapshot); // ✅ Envoie le snapshot à un composant parent
       } catch (err) {
         console.error("Error fetching snapshot:", err);
         setError("Échec du chargement du snapshot.");
@@ -37,7 +42,7 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
     }
 
     fetchData();
-  }, [onSnapshotFetched]);
+  }, [contract, onSnapshotFetched]);
 
   return (
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white">
@@ -58,7 +63,11 @@ export default function ClaimSnapshot({ onSnapshotFetched }: { onSnapshotFetched
   );
 }
 
-async function fetchSnapshot(merkleRoot: string, merkleMetadata: Record<string, string> | undefined, client: any) {
+async function fetchSnapshot(
+  merkleRoot: string,
+  merkleMetadata: Record<string, string> | undefined,
+  client: any
+) {
   if (!merkleMetadata) return null;
 
   try {

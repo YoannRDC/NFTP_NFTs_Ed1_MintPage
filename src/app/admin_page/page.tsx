@@ -6,6 +6,17 @@ import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
+import { defineChain, getContract } from "thirdweb";
+
+// NFTP contracts
+const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+
+// connect to your contract
+export const nftpNftsEd1Contract = getContract({
+  client,
+  chain: defineChain(137),
+  address: nftpNftsEd1Address,
+});
 
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
@@ -38,8 +49,8 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && ( // ✅ Affiche uniquement si l'utilisateur est l'administrateur
         <>
-          <ClaimSnapshot onSnapshotFetched={setSnapshotData} />
-          <ClaimConditionForm initialOverrides={snapshotData} />
+          <ClaimSnapshot onSnapshotFetched={setSnapshotData} contract={nftpNftsEd1Contract} />
+          <ClaimConditionForm initialOverrides={snapshotData} contract={nftpNftsEd1Contract} />
         </>
       )}
 
