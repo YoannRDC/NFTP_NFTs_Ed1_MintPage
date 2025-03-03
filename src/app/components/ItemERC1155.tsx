@@ -111,7 +111,7 @@ export default function ItemERC1155({
   };
 
   return (
-    <div>
+    <div className="border p-4 rounded-lg shadow-lg text-center">
       {/* Aperçu du NFT */}
       <div className="mt-10 flex justify-center">
         <MediaRenderer
