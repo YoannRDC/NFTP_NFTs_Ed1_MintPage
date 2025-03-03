@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshot from "../components/ClaimSnapshot";
 import ClaimConditionForm from "../components/ClaimConditionForm";
-import { client } from "../constants";
+import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
@@ -21,9 +21,7 @@ const nftpNftsEd1Contract = getContract({
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
-
-  const adminAddress = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1"; // ✅ Adresse de l'administrateur
-  const isAdmin = account?.address?.toLowerCase() === adminAddress.toLowerCase(); // ✅ Vérifie si l'utilisateur est l'administrateur
+  const isAdmin = account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
     const wallets = [
       inAppWallet({

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
 import youtube_logo from "@public/youtube_logo.png";
-import { accountAbstraction, client } from "./constants";
+import { accountAbstraction, client, nftpPubKey } from "./constants";
 import Link from "next/link";
 import MenuItem from "./components/MenuItem";
 import { useState } from "react";
@@ -13,8 +13,7 @@ export default function Home() {
 	
 	const [snapshotData, setSnapshotData] = useState<any[]>([]);
 	const account = useActiveAccount();
-	const adminAddress = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
-	const isAdmin = account?.address?.toLowerCase() === adminAddress.toLowerCase();
+	const isAdmin = account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 	
 	return (
 		<div className="py-20">

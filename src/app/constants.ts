@@ -1,4 +1,4 @@
-import { createThirdwebClient, defineChain, getContract } from "thirdweb";
+import { createThirdwebClient } from "thirdweb";
 import { polygon } from "thirdweb/chains";
 import { SmartWalletOptions } from "thirdweb/wallets";
 
@@ -12,25 +12,6 @@ export const client = createThirdwebClient({
 	clientId: clientId,
 });
 
-export const chain = polygon;
-
-// Demo contracts
-export const tokenDropAddress = "0xd64A548A82c190083707CBEFD26958E5e6551D18";
-export const editionDropAddress = "0x638263e3eAa3917a53630e61B1fBa685308024fa";
-export const editionDropTokenId = 0n;
-
-export const editionDropContract = getContract({
-	address: editionDropAddress,
-	chain,
-	client,
-});
-
-export const tokenDropContract = getContract({
-	address: tokenDropAddress,
-	chain,
-	client,
-});
-
 // NFTP pubKey:
 export const nftpPubKey = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
 
@@ -38,7 +19,7 @@ export const nftpPubKey = "0x7b471306691dee8FC1322775a997E1a6CA29Eee1";
 export const minterAddress = "0x6debf5C015f0Edd3050cc919A600Fb78281696B9"; 
 
 export const accountAbstraction: SmartWalletOptions = {
-	chain,
+	chain: polygon,
 	sponsorGas: true,
 };
 

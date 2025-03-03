@@ -39,7 +39,7 @@ function NFTPed1Content() {
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
   useEffect(() => {
     async function fetchConversion() {
