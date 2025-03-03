@@ -13,6 +13,7 @@ interface PurchasePageProps {
   amount: number; // montant en centimes
   stripeMode: "test" | "live";
   contract: any;
+  contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
 }
 
 export default function PurchasePage({
@@ -20,6 +21,7 @@ export default function PurchasePage({
   amount,
   stripeMode,
   contract,
+  contractType
 }: PurchasePageProps) {
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -46,6 +48,7 @@ export default function PurchasePage({
           requestedQuantity: requestedQuantity.toString(),
           amount: amount.toString(),
           stripeMode: stripeMode.toString(),
+          contractType: contractType.toString()
         }),
       });
       if (!response.ok) {

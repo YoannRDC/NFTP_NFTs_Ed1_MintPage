@@ -7,12 +7,12 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import PurchasePage from "./PurchasePage";
 import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { convertPriceInPolToWei } from "../utils/conversion";
+import PurchasePage from "./PurchasePage";
 
 interface ItemERC721Props {
   tokenId: bigint; // Nouveau paramètre pour le tokenId
@@ -22,6 +22,7 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
+  contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
 }
 
 export default function ItemERC1155({
@@ -32,6 +33,7 @@ export default function ItemERC1155({
   stripeMode,
   previewImage,
   redirectPage,
+  contractType
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
@@ -214,6 +216,7 @@ export default function ItemERC1155({
               amount={totalPriceEurCents}
               stripeMode={stripeMode}
               contract={contract}
+              contractType={contractType}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

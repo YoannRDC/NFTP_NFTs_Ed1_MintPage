@@ -1,13 +1,14 @@
-// Server side.
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo } from "thirdweb/extensions/erc721";
+import { safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { createThirdwebClient, defineChain, getContract, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { minterAddress } from "@/app/constants";
+import { minterAddress, nftpPubKey } from "@/app/constants";
 
-// -----------------------------------------------------------------------------
-// TODO: BDD Needed: Idempotence (exemple en mémoire – à remplacer par une solution persistante en prod)
+
+// ----------------------------------------------------------------------------
+// Exemple d'implémentation d'idempotence (à remplacer en prod par une solution persistante)
 const processedEvents = new Set<string>();
 
 function hasEventBeenProcessed(eventId: string): boolean {
@@ -18,13 +19,13 @@ function markEventAsProcessed(eventId: string): void {
   processedEvents.add(eventId);
 }
 
-// -----------------------------------------------------------------------------
-// Validation des adresses Ethereum (format 0x suivi de 40 caractères hexadécimaux)
+// ----------------------------------------------------------------------------
+// Validation des adresses Ethereum
 const isValidEthereumAddress = (address: string): boolean => {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 };
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Fonction de masquage de la clé secrète
 const maskSecretKey = (secretKey: string): string => {
   if (secretKey.length <= 8) return secretKey;
@@ -42,7 +43,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
   }
 
-  // Vérifier que les variables d'environnement Stripe existent
   if (!process.env.STRIPE_SECRET_KEY_TEST || !process.env.STRIPE_WEBHOOK_SECRET) {
     console.error("Missing Stripe configuration");
     return NextResponse.json({ error: "Missing Stripe configuration" }, { status: 500 });
@@ -71,14 +71,19 @@ export async function POST(req: NextRequest) {
       console.log("New Customer");
       const paymentIntent = event.data.object as any;
 
+      // Extraction des données depuis les metadata Stripe
       const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       const blockchainId = paymentIntent.metadata.blockchainId;
-      const requestedQuantity = paymentIntent.metadata.requestedQuantity;
+      const requestedQuantity = paymentIntent.metadata.requestedQuantity; // en string
+      const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition"
+      const tokenIdMetadata = paymentIntent.metadata.tokenId; 
+
       console.log("buyerWalletAddress:", buyerWalletAddress);
       console.log("nftContractAddress:", nftContractAddress);
       console.log("blockchainId:", blockchainId);
       console.log("requestedQuantity:", requestedQuantity);
+      console.log("contractType:", contractType);
 
       // Validation des adresses Ethereum
       if (!isValidEthereumAddress(buyerWalletAddress)) {
@@ -106,12 +111,33 @@ export async function POST(req: NextRequest) {
         address: nftContractAddress,
       });
 
-      const transaction = claimTo({
-        contract: nftContract,
-        to: buyerWalletAddress,
-        quantity: BigInt(requestedQuantity),
-        from: minterAddress, // adresse de celui qui effectue la réclamation
-      });
+      let transaction;
+      if (contractType === "erc1155drop" || contractType === "erc1155edition") {
+        if (!tokenIdMetadata) {
+          console.error("Missing tokenId for ERC1155 contract");
+          return NextResponse.json({ error: "Missing tokenId for ERC1155 contract" }, { status: 400 });
+        }
+        console.log("paymentIntent.metadata.tokenId:", paymentIntent.metadata.tokenId);
+        transaction = safeTransferFrom({
+          contract: nftContract,
+          from: nftpPubKey, // Adresse détentrice des NFT pré-mintés pour ERC1155
+          to: buyerWalletAddress,
+          tokenId: BigInt(tokenIdMetadata),
+          value: BigInt(requestedQuantity),
+          data: "0x",
+          // Pas d'envoi de valeur en ETH, le paiement ayant déjà eu lieu via Stripe
+        });
+      } else if (contractType === "erc721drop" || contractType === "erc721collection") {
+        transaction = claimTo({
+          contract: nftContract,
+          to: buyerWalletAddress,
+          quantity: BigInt(requestedQuantity),
+          from: minterAddress, // Adresse qui effectue la réclamation pour ERC721
+        });
+      } else {
+        console.error("Unknown contract type");
+        return NextResponse.json({ error: "Unknown contract type" }, { status: 400 });
+      }
 
       if (!process.env.PRIVATE_KEY_MINTER) {
         console.error("Missing PRIVATE_KEY_MINTER");
@@ -125,26 +151,22 @@ export async function POST(req: NextRequest) {
       });
       console.log("account.address:", account.address);
 
-         const result = await sendTransaction({
+      const result = await sendTransaction({
         transaction,
         account,
       });
 
-      // Masquer partiellement la clé secrète dans le log
       const safeResult = {
         ...result,
         client: {
           ...result.client,
-          secretKey: maskSecretKey(result.client.secretKey!)
-        }
-      }; 
-      console.log("Transaction result:", safeResult); 
+          secretKey: maskSecretKey(result.client.secretKey!),
+        },
+      };
+      console.log("Transaction result:", safeResult);
     }
 
-    // Marquer l'événement comme traité pour éviter les traitements multiples
     markEventAsProcessed(event.id);
-
-    // TODO: Transfer tous les logs VERCEL vers un serveur pour qu'ils soient sauvegardés 
 
     return NextResponse.json({ message: "OK" });
   } catch (error) {
