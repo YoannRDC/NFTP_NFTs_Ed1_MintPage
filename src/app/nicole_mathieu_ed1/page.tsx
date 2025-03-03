@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { MediaRenderer, useActiveAccount } from "thirdweb/react";
+import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import { client } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
@@ -11,16 +11,14 @@ import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC1155 from "../components/ItemERC1155";
+import { balanceOf } from "thirdweb/extensions/erc1155";
 
-//const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
+// Constantes de configuration
 const NFT_PRICE_EUR = 15; // Prix fixe en Euros
-const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 const DEFAULT_NFT_PRICE_POL = 49;
 
-// NFTP contracts
+// Adresse et connexion au contrat NFTP
 const nicoleMathieuEd1Address = "0xA107eF05dD8eE042348ca5B943d039626aC182C6";
-
-// Connect to your contract
 const nicoleMathieuEd1Contract = getContract({
   client,
   chain: defineChain(80002),
@@ -38,25 +36,67 @@ const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
 const pageAndPublicFolderURI = "nicole_mathieu_ed1";
 
+// Pour cet exemple, on suppose que la collection comporte 10 NFTs avec tokenIds de 1 à 10.
+const tokenIds: bigint[] = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
+
+/**
+ * Fonction utilitaire pour récupérer les métadonnées d'un token ERC1155.
+ * Utilise les metadata batches obtenus via le hook useReadContract.
+ * Pour chaque batch, si le tokenId se trouve dans l'intervalle,
+ * on construit l'URL des métadonnées (ici : baseURI + tokenId + ".json") et on récupère le JSON.
+ */
+async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | null> {
+  if (!batches) return null;
+  try {
+    for (const batch of batches) {
+      const start = BigInt(batch.startTokenIdInclusive);
+      const end = BigInt(batch.endTokenIdInclusive);
+      if (tokenId >= start && tokenId <= end) {
+        // Construction de l'URL : on suppose que le JSON est accessible via baseURI + tokenId + ".json"
+        const metadataUrl = `${batch.baseURI}${tokenId.toString()}.json`;
+        const response = await fetch(metadataUrl);
+        if (!response.ok) {
+          throw new Error(`Erreur lors du chargement des métadonnées depuis ${metadataUrl}`);
+        }
+        const metadata = await response.json();
+        return metadata;
+      }
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des métadonnées pour le token", tokenId, error);
+  }
+  return null;
+}
+
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const smartAccount = useActiveAccount();
-  const [nfts, setNfts] = useState<any[]>([]);
+  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(
-    null
-  );
+  // ownedTokens contiendra pour chaque token possédé : tokenId, balance, metadata
+  const [ownedTokens, setOwnedTokens] = useState<
+    { tokenId: bigint; balance: bigint; metadata?: any }[]
+  >([]);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "test";
 
+  // Récupération des metadata batches via useReadContract (selon la doc)
+  const { data: allBatches, isPending: isBatchesLoading } = useReadContract({
+    contract: nicoleMathieuEd1Contract,
+    method:
+      "function getAllMetadataBatches() view returns ((uint256 startTokenIdInclusive, uint256 endTokenIdInclusive, string baseURI)[])",
+    params: [],
+  });
+
+  // Actualiser périodiquement la conversion EUR -> POL
   useEffect(() => {
     async function fetchConversion() {
       try {
         const result = await convertEurToPOL(NFT_PRICE_EUR);
         setConversionResult(result);
-        console.log("Last upadte EUR->POL price:", new Date(result.datetime).toLocaleString());
+        console.log("Dernière mise à jour EUR -> POL :", new Date(result.datetime).toLocaleString());
       } catch (error) {
         console.error("Erreur lors de la conversion EUR vers POL :", error);
       }
@@ -66,29 +106,43 @@ function NFTPed1Content() {
     return () => clearInterval(interval);
   }, []);
 
-  // Récupérer les tokens ERC1155 détenus par l'utilisateur
+  // Récupérer les tokens ERC1155 possédés par l'utilisateur pour chacun des tokenIds
   useEffect(() => {
-    const fetchNFTs = async () => {
+    const fetchOwnedTokens = async () => {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
-        // Utilisation de la méthode getOwned pour un contrat ERC1155
-        const fetchedTokens = await nicoleMathieuEd1Contract.erc1155.getOwned(smartAccount.address);
-        setNfts(fetchedTokens || []);
+        const tokens: { tokenId: bigint; balance: bigint; metadata?: any }[] = [];
+        for (const tokenId of tokenIds) {
+          const tokenBalance = await balanceOf({
+            contract: nicoleMathieuEd1Contract,
+            owner: smartAccount.address,
+            tokenId,
+          });
+          if (tokenBalance > 0n) {
+            // Utilisation des metadata batches obtenus via useReadContract pour récupérer les métadonnées
+            const metadata = await fetchTokenMetadata(tokenId, allBatches);
+            tokens.push({ tokenId, balance: tokenBalance, metadata });
+          }
+        }
+        setOwnedTokens(tokens);
       } catch (error) {
-        console.error("Error fetching ERC1155 tokens:", error);
+        console.error("Erreur lors de la récupération des tokens ERC1155 :", error);
       } finally {
         setIsLoadingNfts(false);
       }
     };
-    fetchNFTs();
-  }, [smartAccount?.address]);
+    // Attendre que le smartAccount soit défini et que les batches soient chargés
+    if (smartAccount?.address && allBatches) {
+      fetchOwnedTokens();
+    }
+  }, [smartAccount?.address, allBatches]);
 
   return (
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
         </div>
       )}
       {paymentResult === "error" && (
@@ -128,7 +182,7 @@ function NFTPed1Content() {
           Depuis 2005, la peinture à l’huile s’impose comme un nouveau terrain d’expérimentation, où le
           couteau et le pinceau me permettent de superposer les couleurs et de jouer avec la texture.
           Chaque toile est une construction progressive, où la lumière transparaît à travers les strates
-          de matière. Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de
+          de matière. Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de
           mes œuvres physiques, capturant leur énergie et leur intensité, disponibles en édition
           numérique sur cette page.
         </div>
@@ -144,7 +198,6 @@ function NFTPed1Content() {
       </Link>
 
       <div className="decorative-title">-- NFTs à vendre --</div>
-
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC1155
           priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
@@ -157,38 +210,38 @@ function NFTPed1Content() {
       </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>
-
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
-      ) : (
+      ) : ownedTokens.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nfts.length > 0 ? (
-            nfts.map((nft, index) => (
-              <div
-                key={index}
-                className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
-                onClick={() =>
-                  window.open(
-                    `https://polygon.nftscan.com/${nicoleMathieuEd1Contract.address}/${nft.metadata?.id || nft.id}`,
-                    "_blank"
-                  )
-                }
-              >
-                <MediaRenderer
-                  client={client}
-                  src={nft.metadata?.image || "/preview.gif"}
-                  style={{ width: "100%", height: "auto", borderRadius: "10px" }}
-                />
-                <p className="font-semibold mt-2">{nft.metadata?.name || "NFT"}</p>
-              </div>
-            ))
-          ) : (
-            <div className="flex justify-center m-10">
-              <p className="text-center text-gray-400">
-                Vous ne possédez pas de NFTs de cette collection.
+          {ownedTokens.map((token, index) => (
+            <div
+              key={index}
+              className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
+              onClick={() =>
+                window.open(
+                  `https://polygon.nftscan.com/${nicoleMathieuEd1Contract.address}/${token.tokenId.toString()}`,
+                  "_blank"
+                )
+              }
+            >
+              <MediaRenderer
+                client={client}
+                src={token.metadata?.image || "/preview.gif"}
+                style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+              />
+              <p className="font-semibold mt-2">
+                {token.metadata?.name || `Token #${token.tokenId.toString()}`}
               </p>
+              <p>Vous en possédez {token.balance.toString()}</p>
             </div>
-          )}
+          ))}
+        </div>
+      ) : (
+        <div className="flex justify-center m-10">
+          <p className="text-center text-gray-400">
+            Vous ne possédez aucun NFT de cette collection.
+          </p>
         </div>
       )}
 
