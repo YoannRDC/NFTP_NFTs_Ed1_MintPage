@@ -136,7 +136,7 @@ export default function ItemERC1155({
       </div>
 
       {/* Section Mint / Vente */}
-      <div className="flex flex-col m-5">
+      <div className="flex flex-col m-2">
         {smartAccount ? (
           <div className="text-center">
             {/* Sélecteur de quantité (actuellement masqué) */}
@@ -200,7 +200,7 @@ export default function ItemERC1155({
           </div>
         ) : (
           <div className="text-center">
-            <p className="w-full">
+            <p className="w-full text-sm">
               Connectez-vous pour acheter le NFT (euros ou crypto).
             </p>
           </div>
