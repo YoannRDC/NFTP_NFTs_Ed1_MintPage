@@ -21,12 +21,12 @@ const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 const DEFAULT_NFT_PRICE_POL = 49;
 
 // NFTP contracts
-const nicoleMathieuEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+const nicoleMathieuEd1Address = "0xA107eF05dD8eE042348ca5B943d039626aC182C6";
 
 // connect to your contract
 const nicoleMathieuEd1Contract = getContract({
   client,
-  chain: defineChain(137),
+  chain: defineChain(80002),
   address: nicoleMathieuEd1Address,
 });
 
