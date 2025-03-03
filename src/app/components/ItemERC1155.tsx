@@ -16,17 +16,15 @@ import { convertPriceInPolToWei } from "../utils/conversion";
 
 // Définition de l'interface pour les props
 interface ItemERC721Props {
-  totalSupply: number;
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
   stripeMode: "test" | "live";
-  previewImage: string; // Nouvelle prop pour l'image de preview
-  redirectPage: string; // Nouvelle prop pour la page de redirection
+  previewImage: string; // Image de preview
+  redirectPage: string; // Page de redirection après transaction
 }
 
-export default function ItemERC721({
-  totalSupply,
+export default function ItemERC1155({
   priceInPol,
   priceInEur,
   contract,
@@ -35,9 +33,13 @@ export default function ItemERC721({
   redirectPage,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
-  const [mintedCount, setMintedCount] = useState<number>(0);
+  const [totalSupply, setTotalSupply] = useState<number>(0);
+  const [soldCount, setSoldCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
+
+  // Adresse qui détient initialement tous les NFT (pré-mint)
+  const sellerAddress = "0x6debf5C015f0Edd3050cc919A600Fb78281696B9";
 
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
@@ -68,21 +70,38 @@ export default function ItemERC721({
     createWallet("io.zerion.wallet"),
   ];
 
-  // Récupérer le nombre total de NFTs mintés
+  // Récupérer le total supply et la balance de l'adresse pré-mint pour calculer le nombre vendu
   useEffect(() => {
-    const fetchTotalMinted = async () => {
+    const fetchSupplyAndSold = async () => {
       try {
+        // Récupère le total supply pour tokenId = 1
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
           params: [1n],
         });
-        setMintedCount(Number(totalMinted));
+        const total = Number(totalMinted);
+        setTotalSupply(total);
+
+        // Récupère le solde de l'adresse pré-mint pour tokenId = 1
+        const sellerBalance = await readContract({
+          contract: contract,
+          method: "function balanceOf(address account, uint256 id) view returns (uint256)",
+          params: [sellerAddress, 1n],
+        });
+        const sellerBal = Number(sellerBalance);
+
+        // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
+        const sold = total - sellerBal;
+        setSoldCount(sold);
       } catch (error) {
-        console.error("Erreur lors de la récupération du total minted :", error);
+        console.error(
+          "Erreur lors de la récupération des informations sur la supply et le nombre vendu :",
+          error
+        );
       }
     };
-    fetchTotalMinted();
+    fetchSupplyAndSold();
   }, [contract]);
 
   // Mise à jour de la quantité sélectionnée
@@ -96,13 +115,14 @@ export default function ItemERC721({
       <div className="mt-10 flex justify-center">
         <MediaRenderer
           client={client}
-          src={previewImage}  // Utilisation de la prop passée en paramètre
+          src={previewImage} // Utilisation de l'image passée en prop
           style={{ height: "auto", borderRadius: "10px" }}
         />
       </div>
 
+      {/* Affichage du nombre vendu / total supply */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {mintedCount}/{totalSupply} NFT vendu
+        {soldCount}/{totalSupply} NFT vendu
       </div>
 
       <div className="text-center mt-10">
@@ -114,7 +134,7 @@ export default function ItemERC721({
         />
       </div>
 
-      {/* Section Mint */}
+      {/* Section Mint / Vente */}
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
@@ -146,13 +166,13 @@ export default function ItemERC721({
               transaction={() =>
                 safeTransferFrom({
                   contract: contract,
-                  from: "0x6debf5C015f0Edd3050cc919A600Fb78281696B9", // Adresse qui détient le token (par exemple, votre adresse de pré-mint)
-                  to: smartAccount.address, // Adresse de l'acheteur (connectée)
-                  tokenId: 1n, // L'identifiant du token à transférer
-                  value: requestedQuantity, // Quantité de token à transférer (par exemple, 1 exemplaire)
+                  from: sellerAddress, // Adresse qui détient les tokens pré-mintés
+                  to: smartAccount.address, // Adresse de l'acheteur
+                  tokenId: 1n, // Identifiant du token à transférer
+                  value: requestedQuantity, // Quantité de token à transférer (souvent 1 exemplaire)
                   data: "0x", // Données supplémentaires (souvent vide)
                   overrides: {
-                    // Ici, vous définissez le prix du NFT en wei (attention au format BigInt)
+                    // Définir le prix du NFT en wei
                     value: convertPriceInPolToWei(totalPricePol),
                   },
                 })

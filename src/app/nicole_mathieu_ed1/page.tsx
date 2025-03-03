@@ -156,7 +156,6 @@ function NFTPed1Content() {
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC1155
-          totalSupply={TOTAL_SUPPLY} 
           priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
           contract={nicoleMathieuEd1Contract}
