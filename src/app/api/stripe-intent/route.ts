@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     requestedQuantity,
     amount,
     stripeMode, // "test" ou "live"
+    contractType,
   } = await req.json();
 
   // Sélection de la clé Stripe en fonction du mode demandé
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
       nftContractAddress,
       blockchainId,
       requestedQuantity,
+      contractType
     },
   });
 
