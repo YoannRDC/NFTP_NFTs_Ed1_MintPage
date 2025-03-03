@@ -126,7 +126,7 @@ export default function ItemERC1155({
         {soldCount}/{totalSupply} NFT vendu
       </div>
 
-      <div className="text-center mt-10">
+      <div className="text-center mt-5">
         <ConnectButton
           client={client}
           wallets={wallets}
@@ -136,7 +136,7 @@ export default function ItemERC1155({
       </div>
 
       {/* Section Mint / Vente */}
-      <div className="flex flex-col m-10">
+      <div className="flex flex-col m-5">
         {smartAccount ? (
           <div className="text-center">
             {/* Sélecteur de quantité (actuellement masqué) */}

@@ -191,11 +191,11 @@ function NFTPed1Content() {
         <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
       </div>
 
-      <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
+      <Link className="text-sm text-gray-400" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
 
-      <div className="decorative-title">-- NFTs à vendre --</div>
+      <div className="decorative-title mb-5">-- NFTs à vendre --</div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <ItemERC1155
