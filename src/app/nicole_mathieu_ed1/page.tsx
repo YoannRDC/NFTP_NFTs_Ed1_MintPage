@@ -39,12 +39,6 @@ const pageAndPublicFolderURI = "nicole_mathieu_ed1";
 // Pour cet exemple, on suppose que la collection comporte 10 NFTs avec tokenIds de 1 à 10.
 const tokenIds: bigint[] = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
-/**
- * Fonction utilitaire pour récupérer les métadonnées d'un token ERC1155.
- * Utilise les metadata batches obtenus via le hook useReadContract.
- * Pour chaque batch, si le tokenId se trouve dans l'intervalle,
- * on construit l'URL des métadonnées (ici : baseURI + tokenId + ".json") et on récupère le JSON.
- */
 async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | null> {
   if (!batches) return null;
   try {
@@ -52,8 +46,12 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
       const start = BigInt(batch.startTokenIdInclusive);
       const end = BigInt(batch.endTokenIdInclusive);
       if (tokenId >= start && tokenId <= end) {
-        // Construction de l'URL : on suppose que le JSON est accessible via baseURI + tokenId + ".json"
-        const metadataUrl = `${batch.baseURI}${(tokenId - 1n).toString()}.json`;
+        // Conversion de la baseURI si elle commence par "ipfs://"
+        const baseURI = batch.baseURI.startsWith("ipfs://")
+          ? batch.baseURI.replace("ipfs://", "https://ipfs.io/ipfs/")
+          : batch.baseURI;
+        // Ici, on suppose que l'URL des métadonnées est construite en concaténant baseURI et (tokenId - 1).json
+        const metadataUrl = `${baseURI}${(tokenId - 1n).toString()}.json`;
         const response = await fetch(metadataUrl);
         if (!response.ok) {
           throw new Error(`Erreur lors du chargement des métadonnées depuis ${metadataUrl}`);
