@@ -22,6 +22,7 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Nouvelle prop pour l'image de preview
   redirectPage: string; // Nouvelle prop pour la page de redirection
+  contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
 }
 
 export default function ItemERC721({
@@ -32,6 +33,7 @@ export default function ItemERC721({
   stripeMode,
   previewImage,
   redirectPage,
+  contractType,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
@@ -166,6 +168,7 @@ export default function ItemERC721({
               amount={totalPriceEurCents}
               stripeMode={stripeMode}
               contract={contract}
+              contractType={contractType}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

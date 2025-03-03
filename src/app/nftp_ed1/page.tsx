@@ -38,6 +38,7 @@ const collectionImageSrc="/logo_seul_11.png";
 const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
+const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc721drop";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -151,6 +152,7 @@ function NFTPed1Content() {
           stripeMode={stripeMode}
           previewImage={`${collectionPageRef}/preview.gif`}
           redirectPage={collectionPageRef}
+          contractType={contractType}
         />
       </div>
       
