@@ -199,6 +199,7 @@ function NFTPed1Content() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <ItemERC1155
+            tokenId={1n}
             priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
@@ -209,6 +210,7 @@ function NFTPed1Content() {
         </div>
         <div>
           <ItemERC1155
+            tokenId={2n}
             priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
@@ -219,6 +221,7 @@ function NFTPed1Content() {
         </div>
         <div>
           <ItemERC1155
+            tokenId={3n}
             priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
@@ -229,6 +232,73 @@ function NFTPed1Content() {
         </div>
         <div>
           <ItemERC1155
+            tokenId={4n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={5n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={6n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={7n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={8n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={9n}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            tokenId={10n}
             priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}

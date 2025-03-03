@@ -15,6 +15,7 @@ import { safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { convertPriceInPolToWei } from "../utils/conversion";
 
 interface ItemERC721Props {
+  tokenId: bigint; // Nouveau paramètre pour le tokenId
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
@@ -24,6 +25,7 @@ interface ItemERC721Props {
 }
 
 export default function ItemERC1155({
+  tokenId,
   priceInPol,
   priceInEur,
   contract,
@@ -34,6 +36,7 @@ export default function ItemERC1155({
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
+  // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
   // Adresse qui détient initialement tous les NFT (pré-mint)
@@ -72,21 +75,26 @@ export default function ItemERC1155({
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
       try {
+        // Récupère le total supply pour le token donné
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
-          params: [1n],
+          params: [tokenId],
         });
         const total = Number(totalMinted);
         setTotalSupply(total);
 
+        // Récupère le solde de l'adresse pré-mint pour le token donné
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
-          params: [sellerAddress, 1n],
+          params: [sellerAddress, tokenId],
         });
         const sellerBal = Number(sellerBalance);
-        setSoldCount(total - sellerBal);
+
+        // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
+        const sold = total - sellerBal;
+        setSoldCount(sold);
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des informations sur la supply et le nombre vendu :",
@@ -95,7 +103,7 @@ export default function ItemERC1155({
       }
     };
     fetchSupplyAndSold();
-  }, [contract]);
+  }, [contract, tokenId]);
 
   // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -180,7 +188,7 @@ export default function ItemERC1155({
                   contract: contract,
                   from: sellerAddress, // Adresse détentrice des NFT pré-mintés
                   to: smartAccount.address, // Adresse de l'acheteur
-                  tokenId: 1n, // Identifiant du token à transférer
+                  tokenId: tokenId, // Utilisation de la prop tokenId
                   value: requestedQuantity, // Quantité de token à transférer
                   data: "0x", // Données supplémentaires
                   overrides: {
