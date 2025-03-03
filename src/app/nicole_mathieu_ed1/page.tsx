@@ -224,10 +224,10 @@ function NFTPed1Content() {
                   "_blank"
                 )
               }
-            > NMMathieu - Série Vitrail Rythmes 42.JPG
+            >
                 <MediaRenderer
                   client={client}
-                  src={token.metadata?.image || `${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG"`}
+                  src={token.metadata?.image || `${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
                   style={{ width: "100%", height: "auto", borderRadius: "10px" }}
                 />
 
