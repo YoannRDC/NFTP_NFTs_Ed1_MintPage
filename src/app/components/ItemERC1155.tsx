@@ -74,7 +74,7 @@ export default function ItemERC721({
       try {
         const totalMinted = await readContract({
           contract: contract,
-          method: "function totalMinted() view returns (uint256)",
+          method: "function totalSupply() view returns (uint256)",
           params: [],
         });
         setMintedCount(Number(totalMinted));
@@ -167,7 +167,6 @@ export default function ItemERC721({
             >
               Acheter en Crypto
             </TransactionButton>
-
 
             <p className="mb-2">{totalPricePol} POL</p>
             <PurchasePage
