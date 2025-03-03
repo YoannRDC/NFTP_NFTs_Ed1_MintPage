@@ -227,9 +227,16 @@ function NFTPed1Content() {
             >
               <MediaRenderer
                 client={client}
-                src={token.metadata?.image}
+                src={
+                  token.metadata?.image
+                    ? token.metadata.image.startsWith("ipfs://")
+                      ? token.metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
+                      : token.metadata.image
+                    : "/preview.gif"
+                }
                 style={{ width: "100%", height: "auto", borderRadius: "10px" }}
               />
+
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
               </p>
