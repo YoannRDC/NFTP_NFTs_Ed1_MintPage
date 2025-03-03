@@ -6,10 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
 import { client } from "../constants";
 import Link from "next/link";
-
-import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-// Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
@@ -23,22 +20,23 @@ const DEFAULT_NFT_PRICE_POL = 49;
 // NFTP contracts
 const nicoleMathieuEd1Address = "0xA107eF05dD8eE042348ca5B943d039626aC182C6";
 
-// connect to your contract
+// Connect to your contract
 const nicoleMathieuEd1Contract = getContract({
   client,
   chain: defineChain(80002),
   address: nicoleMathieuEd1Address,
 });
 
-const videoPresentationLink="https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
-const videoPresentationTitle="Présentation Nicole Mathieu";
-const collectionName="Fragments Chromatiques Edition 1";
-const collectionPageRef="/nicole_mathieu_ed1";
-const collectionImageSrc="/nicole_mathieu_ed1/Nicole_Mathieu.png";
-const collectionShortDescription="First NFT collection of Nicole Mathieu.";
-const artistProjectWebsite="https://www.nmmathieu.com/";
-const artistProjectWebsitePrettyPrint="NMMathieu.com";
-const pageAndPublicFolderURI="nicole_mathieu_ed1";
+const videoPresentationLink =
+  "https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
+const videoPresentationTitle = "Présentation Nicole Mathieu";
+const collectionName = "Fragments Chromatiques Edition 1";
+const collectionPageRef = "/nicole_mathieu_ed1";
+const collectionImageSrc = "/nicole_mathieu_ed1/Nicole_Mathieu.png";
+const collectionShortDescription = "First NFT collection of Nicole Mathieu.";
+const artistProjectWebsite = "https://www.nmmathieu.com/";
+const artistProjectWebsitePrettyPrint = "NMMathieu.com";
+const pageAndPublicFolderURI = "nicole_mathieu_ed1";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -46,7 +44,9 @@ function NFTPed1Content() {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
+  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(
+    null
+  );
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
@@ -66,20 +66,17 @@ function NFTPed1Content() {
     return () => clearInterval(interval);
   }, []);
 
-  // Récupérer les NFTs de l'utilisateur
+  // Récupérer les tokens ERC1155 détenus par l'utilisateur
   useEffect(() => {
     const fetchNFTs = async () => {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
-        const fetchedNfts = await getOwnedERC721s({
-          contract: nicoleMathieuEd1Contract,
-          owner: smartAccount.address,
-          requestPerSec: 99,
-        });
-        setNfts(fetchedNfts || []);
+        // Utilisation de la méthode getOwned pour un contrat ERC1155
+        const fetchedTokens = await nicoleMathieuEd1Contract.erc1155.getOwned(smartAccount.address);
+        setNfts(fetchedTokens || []);
       } catch (error) {
-        console.error("Error fetching NFTs:", error);
+        console.error("Error fetching ERC1155 tokens:", error);
       } finally {
         setIsLoadingNfts(false);
       }
@@ -99,12 +96,8 @@ function NFTPed1Content() {
           Échec du paiement. Veuillez réessayer ou contacter le support.
         </div>
       )}
-      <div className="decorative-title">
-        -- Présentation de la collection --
-      </div>
-      <div className="decorative-subtitle">
-        {collectionName}
-      </div>
+      <div className="decorative-title">-- Présentation de la collection --</div>
+      <div className="decorative-subtitle">{collectionName}</div>
       <div className="mb-10">
         <MenuItem
           title={collectionName}
@@ -113,66 +106,62 @@ function NFTPed1Content() {
           imageSrc={collectionImageSrc}
         />
       </div>
-      
+
       <div className="mb-10">
-
         <div className="decorative-description">
-        Au fil des années, ma démarche artistique évolue vers une abstraction où la couleur devient centrale, invitant chacun à une exploration personnelle et sensorielle. 
-        Loin de la simple figuration, mes œuvres cherchent à élargir le champ de l’imaginaire à travers des compositions vibrantes et immersives. 
-        Cette recherche d’expression m’a naturellement conduit à capturer l’essence même de mes créations sous forme de NFT, offrant ainsi une nouvelle dimension à mon travail.
+          Au fil des années, ma démarche artistique évolue vers une abstraction où la couleur devient
+          centrale, invitant chacun à une exploration personnelle et sensorielle. Loin de la simple
+          figuration, mes œuvres cherchent à élargir le champ de l’imaginaire à travers des
+          compositions vibrantes et immersives. Cette recherche d’expression m’a naturellement conduit à
+          capturer l’essence même de mes créations sous forme de NFT, offrant ainsi une nouvelle
+          dimension à mon travail.
         </div>
-
         <div className="decorative-description">
-        Le pastel sec, matériau que j’utilise depuis 1997, a façonné mon approche coloriste. 
-        À travers différentes séries – des Fonds géométriques structurés aux Fonds noirs inspirés du clair-obscur caravagesque, en passant par les Abstractions lyriques aux lignes fluides – j’ai exploré la lumière, la matière et le mouvement. 
-        Ma rencontre avec le portraitiste anglais Ken Paine m’a ensuite ouvert à une gestuelle plus libre, influençant profondément mes œuvres ultérieures.
+          Le pastel sec, matériau que j’utilise depuis 1997, a façonné mon approche coloriste. À travers
+          différentes séries – des Fonds géométriques structurés aux Fonds noirs inspirés du
+          clair-obscur caravagesque, en passant par les Abstractions lyriques aux lignes fluides – j’ai
+          exploré la lumière, la matière et le mouvement. Ma rencontre avec le portraitiste anglais Ken
+          Paine m’a ensuite ouvert à une gestuelle plus libre, influençant profondément mes œuvres
+          ultérieures.
         </div>
-
         <div className="decorative-description">
-        Depuis 2005, la peinture à l’huile s’impose comme un nouveau terrain d’expérimentation, où le couteau et le pinceau me permettent de superposer les couleurs et de jouer avec la texture. 
-        Chaque toile est une construction progressive, où la lumière transparaît à travers les strates de matière. 
-        Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de mes œuvres physiques, capturant leur énergie et leur intensité, disponibles en édition numérique sur cette page.
+          Depuis 2005, la peinture à l’huile s’impose comme un nouveau terrain d’expérimentation, où le
+          couteau et le pinceau me permettent de superposer les couleurs et de jouer avec la texture.
+          Chaque toile est une construction progressive, où la lumière transparaît à travers les strates
+          de matière. Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de
+          mes œuvres physiques, capturant leur énergie et leur intensité, disponibles en édition
+          numérique sur cette page.
         </div>
-        
-        <div className="decorative-description">
-          Nicole Mathieu.
-        </div>
+        <div className="decorative-description">Nicole Mathieu.</div>
       </div>
-      
+
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
-        <VideoPresentation
-          src={videoPresentationLink}
-          title={videoPresentationTitle}
-        />
+        <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
       </div>
-      
+
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
-      
-      <div className="decorative-title">
-        -- NFTs à vendre --
-      </div>
-      
+
+      <div className="decorative-title">-- NFTs à vendre --</div>
+
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC1155
           priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
-          priceInEur={NFT_PRICE_EUR} 
+          priceInEur={NFT_PRICE_EUR}
           contract={nicoleMathieuEd1Contract}
           stripeMode={stripeMode}
           previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
           redirectPage={pageAndPublicFolderURI}
         />
       </div>
-      
-      <div className="decorative-title">
-        -- Mes NFTs --
-      </div>
-      
+
+      <div className="decorative-title">-- Mes NFTs --</div>
+
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {nfts.length > 0 ? (
             nfts.map((nft, index) => (
               <div
@@ -202,7 +191,7 @@ function NFTPed1Content() {
           )}
         </div>
       )}
-      
+
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
         Retour à la page principale.
       </Link>
