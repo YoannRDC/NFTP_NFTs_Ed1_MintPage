@@ -1,53 +1,72 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import {
-  MediaRenderer,
-  useActiveAccount,
-} from "thirdweb/react";
-import {
-  client,
-} from "../constants";
+export const dynamic = "force-dynamic";
+
+import React, { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { MediaRenderer, useActiveAccount } from "thirdweb/react";
+import { client } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
+// Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
+import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721 from "../components/ItemERC721";
 import { defineChain, getContract } from "thirdweb";
 
-const NFT_PRICE_POL = 49; // Prix du NFT en POL
-const NFT_PRICE_EUR = 5; // Prix du NFT en POL
-const TOTAL_SUPPLY = 100;
+//const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
+const NFT_PRICE_EUR = 15; // Prix fixe en Euros
+const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
+const DEFAULT_NFT_PRICE_POL = 49;
 
-// NFTP contracts TODO: Modify contract address !
-const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+// NFTP contracts
+const nicoleMathieuEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
 
 // connect to your contract
-const contract = getContract({
+const nicoleMathieuEd1Contract = getContract({
   client,
   chain: defineChain(137),
-  address: nftpNftsEd1Address,
+  address: nicoleMathieuEd1Address,
 });
 
-const NFTPed1: React.FC = () => {
+const videoPresentationLink="https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
+const videoPresentationTitle="Présentation Nicole Mathieu";
+
+function NFTPed1Content() {
+  const searchParams = useSearchParams();
+  const paymentResult = searchParams.get("paymentResult");
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  const [priceInEur, setPriceInEur] = useState<number | null>(null);
+  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
-    // Définir le mode Stripe ici : "test" ou "live"
-    const stripeMode: "test" | "live" = "test"; // Changez ici selon votre besoin
+  // Définir le mode Stripe ici : "test" ou "live"
+  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
+  useEffect(() => {
+    async function fetchConversion() {
+      try {
+        const result = await convertEurToPOL(NFT_PRICE_EUR);
+        setConversionResult(result);
+        console.log("Last upadte EUR->POL price:", new Date(result.datetime).toLocaleString());
+      } catch (error) {
+        console.error("Erreur lors de la conversion EUR vers POL :", error);
+      }
+    }
+    fetchConversion();
+    const interval = setInterval(fetchConversion, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
-  // Get user NFTs
+  // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
     const fetchNFTs = async () => {
       if (!smartAccount?.address) return;
-
       setIsLoadingNfts(true);
       try {
         const fetchedNfts = await getOwnedERC721s({
-          contract: contract,
+          contract: nicoleMathieuEd1Contract,
           owner: smartAccount.address,
           requestPerSec: 99,
         });
@@ -58,27 +77,33 @@ const NFTPed1: React.FC = () => {
         setIsLoadingNfts(false);
       }
     };
-
     fetchNFTs();
   }, [smartAccount?.address]);
 
   return (
     <div className="flex flex-col items-center">
-
+      {paymentResult === "success" && (
+        <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
+          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+        </div>
+      )}
+      {paymentResult === "error" && (
+        <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
+          Échec du paiement. Veuillez réessayer ou contacter le support.
+        </div>
+      )}
       <div className="decorative-title">
         -- Présentation de la collection --
       </div>
-
       <div className="decorative-subtitle">
-        Fragments Chromatiques Edition 1
+        NFT Propulsion Edition 1
       </div>
-
       <div className="mb-10">
         <MenuItem
-          title="Nicole Mathieu"
-          href="/nicole_mathieu_ed1"
-          description="First NFT collection of Nicole Mathieu."
-          imageSrc="/Nicole_Mathieu.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+          title="NFT Propulsion Edition 1"
+          href="/nftp_ed1"
+          description="First NFT collection of NFT Propulsion."
+          imageSrc="/logo_seul_11.png"
         />
       </div>
       
@@ -107,37 +132,36 @@ const NFTPed1: React.FC = () => {
         </div>
 
       </div>
-
+      
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
-        <VideoPresentation />
+        <VideoPresentation
+          src={videoPresentationLink}
+          title={videoPresentationTitle}
+        />
       </div>
-
+      
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
         Visit NFTpropulsion.fr
       </Link>
-
+      
       <div className="decorative-title">
         -- NFTs à vendre --
       </div>
-
+      
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC721 
           totalSupply={TOTAL_SUPPLY} 
-          priceInPol={NFT_PRICE_POL} 
+          priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
-          contract={contract}
+          contract={nicoleMathieuEd1Contract}
           stripeMode={stripeMode}
         />
-      </div>
-
-      <div style={{ color: 'red', fontSize: 'xx-large' }}>
-      -- Site en développement ! Ne pas interagir SVP --
       </div>
       
       <div className="decorative-title">
         -- Mes NFTs --
       </div>
-
+      
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
       ) : (
@@ -149,8 +173,8 @@ const NFTPed1: React.FC = () => {
                 className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
                 onClick={() =>
                   window.open(
-                    `https://polygon.nftscan.com/${contract.address}/${nft.metadata?.id || nft.id}`,
-                    "_blank" // ✅ Ouvre dans un nouvel onglet
+                    `https://polygon.nftscan.com/${nicoleMathieuEd1Contract.address}/${nft.metadata?.id || nft.id}`,
+                    "_blank"
                   )
                 }
               >
@@ -164,19 +188,26 @@ const NFTPed1: React.FC = () => {
             ))
           ) : (
             <div className="flex justify-center m-10">
-              <p className="text-center text-gray-400">Vous ne possédez pas de NFTs de cette collection.</p>
+              <p className="text-center text-gray-400">
+                Vous ne possédez pas de NFTs de cette collection.
+              </p>
             </div>
           )}
         </div>
-
       )}
-
+      
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
         Retour à la page principale.
       </Link>
     </div>
   );
-};
+}
 
-export default NFTPed1;
-
+// Wrap the content in a Suspense boundary to satisfy Next.js requirements
+export default function NFTPed1() {
+  return (
+    <Suspense fallback={<div>Chargement de la page...</div>}>
+      <NFTPed1Content />
+    </Suspense>
+  );
+}

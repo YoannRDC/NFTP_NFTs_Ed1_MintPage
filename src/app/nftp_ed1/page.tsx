@@ -30,6 +30,9 @@ const nftpNftsEd1Contract = getContract({
   address: nftpNftsEd1Address,
 });
 
+const videoPresentationLink="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
+const videoPresentationTitle="Présentation NFT Propulsion";
+
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -119,7 +122,10 @@ function NFTPed1Content() {
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
-        <VideoPresentation />
+        <VideoPresentation
+          src={videoPresentationLink}
+          title={videoPresentationTitle}
+        />
       </div>
       
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href="https://nftpropulsion.fr">
