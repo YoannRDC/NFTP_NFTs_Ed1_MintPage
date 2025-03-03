@@ -85,3 +85,20 @@ export async function convertEurToPOL(eur: number): Promise<{ amount: number; da
     throw error;
   }
 }
+
+// Fonction de conversion de POL en Wei (1 POL = 10^18 Wei)
+export function convertPriceInPolToWei(priceInPol: number | string | null): bigint {
+  if (priceInPol === null) return 0n;
+  // Convertir en chaîne de caractères
+  const priceStr = typeof priceInPol === "string" ? priceInPol : priceInPol.toString();
+  const parts = priceStr.split(".");
+  const whole = parts[0];
+  let fraction = parts[1] || "";
+  // On complète la partie fractionnaire jusqu'à 18 décimales
+  if (fraction.length < 18) {
+    fraction = fraction.padEnd(18, "0");
+  } else {
+    fraction = fraction.slice(0, 18);
+  }
+  return BigInt(whole + fraction);
+}

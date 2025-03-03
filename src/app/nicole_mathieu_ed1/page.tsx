@@ -12,8 +12,8 @@ import MenuItem from "../components/MenuItem";
 // Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import ItemERC721 from "../components/ItemERC721";
 import { defineChain, getContract } from "thirdweb";
+import ItemERC1155 from "../components/ItemERC1155";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
 const NFT_PRICE_EUR = 15; // Prix fixe en Euros
@@ -155,7 +155,7 @@ function NFTPed1Content() {
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC721 
+        <ItemERC1155
           totalSupply={TOTAL_SUPPLY} 
           priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
