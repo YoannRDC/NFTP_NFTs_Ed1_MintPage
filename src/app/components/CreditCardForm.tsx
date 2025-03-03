@@ -4,15 +4,15 @@ import { useState } from "react";
 import type { PaymentIntent } from "@stripe/stripe-js";
 
 interface CreditCardFormProps {
-  returnPage: string; // par exemple "/nftp_ed1"
+  redirectPage: string; // par exemple "/nftp_ed1"
 }
 
-const CreditCardForm = ({ returnPage }: CreditCardFormProps) => {
+const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   // Construit l'URL de retour à partir du domaine et du chemin passé en prop
-  const returnUrl = `https://www.authentart.com${returnPage}`;
+  const returnUrl = `https://www.authentart.com${redirectPage}`;
 
   const handlePayment = async () => {
     if (!stripe || !elements) {

@@ -14,7 +14,8 @@ interface PurchasePageProps {
   stripeMode: "test" | "live";
   contract: any;
   contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
-  returnPage: string; // chemin de la page de retour (ex: "/nftp_ed1")
+  redirectPage: string; // chemin de la page de retour (ex: "/nftp_ed1")
+  tokenId: bigint;
 }
 
 export default function PurchasePage({
@@ -23,7 +24,8 @@ export default function PurchasePage({
   stripeMode,
   contract,
   contractType,
-  returnPage,
+  redirectPage,
+  tokenId
 }: PurchasePageProps) {
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -51,7 +53,7 @@ export default function PurchasePage({
           amount: amount.toString(),
           stripeMode: stripeMode.toString(),
           contractType: contractType.toString(),
-          returnPage, // Transmet le chemin de retour
+          tokenId: tokenId.toString(), 
         }),
       });
       if (!response.ok) {
@@ -72,7 +74,7 @@ export default function PurchasePage({
         </button>
       ) : (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <CreditCardForm returnPage={returnPage} />
+          <CreditCardForm redirectPage={redirectPage} />
         </Elements>
       )}
     </div>

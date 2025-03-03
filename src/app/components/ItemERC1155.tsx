@@ -217,6 +217,8 @@ export default function ItemERC1155({
               stripeMode={stripeMode}
               contract={contract}
               contractType={contractType}
+              redirectPage={redirectPage}
+              tokenId={tokenId}
             />
             <p>{totalPriceEur} Euros</p>
           </div>
