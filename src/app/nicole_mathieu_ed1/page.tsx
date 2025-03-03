@@ -196,15 +196,47 @@ function NFTPed1Content() {
       </Link>
 
       <div className="decorative-title">-- NFTs à vendre --</div>
-      <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC1155
-          priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
-          priceInEur={NFT_PRICE_EUR}
-          contract={nicoleMathieuEd1Contract}
-          stripeMode={stripeMode}
-          previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
-          redirectPage={pageAndPublicFolderURI}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <ItemERC1155
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 49.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 53.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
+        <div>
+          <ItemERC1155
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInEur={NFT_PRICE_EUR}
+            contract={nicoleMathieuEd1Contract}
+            stripeMode={stripeMode}
+            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            redirectPage={pageAndPublicFolderURI}
+          />
+        </div>
       </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>
