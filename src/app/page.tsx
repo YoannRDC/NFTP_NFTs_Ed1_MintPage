@@ -96,13 +96,13 @@ function Menu() {
 					title="NFT Propulsion Edition 1"
 					href="/nftp_ed1"
 					description="First NFT collection of NFT Propulsion."
-					imageSrc="/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
+					imageSrc="/nftp_ed1/logo_seul_11.png" // ✅ Ajout du `/` pour que Next.js le trouve dans `/public`
 				/>
 				<MenuItem
 					title="Nicole Mathieu"
 					href="/nicole_mathieu_ed1"
 					description="First NFT collection of Nicole Mathieu."
-					imageSrc="/Nicole_Mathieu.png"
+					imageSrc="/nicole_mathieu_ed1/Nicole_Mathieu.png"
 				/>
 			</div>
 		</div>

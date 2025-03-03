@@ -20,6 +20,8 @@ interface ItemERC721Props {
   priceInEur: number | string | null;
   contract: any;
   stripeMode: "test" | "live";
+  previewImage: string; // Nouvelle prop pour l'image de preview
+  redirectPage: string; // Nouvelle prop pour la page de redirection
 }
 
 export default function ItemERC721({
@@ -28,6 +30,8 @@ export default function ItemERC721({
   priceInEur,
   contract,
   stripeMode,
+  previewImage,
+  redirectPage,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
@@ -91,13 +95,13 @@ export default function ItemERC721({
       <div className="mt-10 flex justify-center">
         <MediaRenderer
           client={client}
-          src="/preview.gif"
+          src={previewImage}  // Utilisation de la prop passée en paramètre
           style={{ height: "auto", borderRadius: "10px" }}
         />
       </div>
 
       <div className="text-gray-500 mt-2 flex justify-center">
-        {mintedCount}/{totalSupply} NFTs vendus (couleur aléatoire)
+        {mintedCount}/{totalSupply} NFT vendu
       </div>
 
       <div className="text-center mt-10">
@@ -147,10 +151,10 @@ export default function ItemERC721({
               }
               onError={(error: Error) => {
                 console.error(error);
-                window.location.href = "/nftp_ed1?paymentResult=error";
+                window.location.href = `${redirectPage}?paymentResult=error`;
               }}
               onTransactionConfirmed={async () => {
-                window.location.href = "/nftp_ed1?paymentResult=success";
+                window.location.href = `${redirectPage}?paymentResult=success`;
               }}
             >
               Acheter en Crypto

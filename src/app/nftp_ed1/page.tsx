@@ -34,7 +34,7 @@ const videoPresentationLink="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestb
 const videoPresentationTitle="Présentation NFT Propulsion";
 const collectionName="NFT Propulsion Edition 1";
 const collectionPageRef="/nftp_ed1";
-const collectionIamgeSrc="/logo_seul_11.png";
+const collectionImageSrc="/logo_seul_11.png";
 const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
@@ -109,7 +109,7 @@ function NFTPed1Content() {
           title={collectionName}
           href={collectionPageRef}
           description={collectionShortDescription}
-          imageSrc={collectionIamgeSrc}
+          imageSrc={`${collectionPageRef}${collectionImageSrc}`}
         />
       </div>
       
@@ -149,6 +149,8 @@ function NFTPed1Content() {
           priceInEur={NFT_PRICE_EUR} 
           contract={nftpNftsEd1Contract}
           stripeMode={stripeMode}
+          previewImage={`${collectionPageRef}/preview.gif`}
+          redirectPage={collectionPageRef}
         />
       </div>
       

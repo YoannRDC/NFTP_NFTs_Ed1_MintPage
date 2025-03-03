@@ -34,10 +34,11 @@ const videoPresentationLink="https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&mod
 const videoPresentationTitle="Présentation Nicole Mathieu";
 const collectionName="Fragments Chromatiques Edition 1";
 const collectionPageRef="/nicole_mathieu_ed1";
-const collectionIamgeSrc="/Nicole_Mathieu.png";
+const collectionImageSrc="/nicole_mathieu_ed1/Nicole_Mathieu.png";
 const collectionShortDescription="First NFT collection of Nicole Mathieu.";
 const artistProjectWebsite="https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint="NMMathieu.com";
+const pageAndPublicFolderURI="nicole_mathieu_ed1";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -109,7 +110,7 @@ function NFTPed1Content() {
           title={collectionName}
           href={collectionPageRef}
           description={collectionShortDescription}
-          imageSrc={collectionIamgeSrc}
+          imageSrc={collectionImageSrc}
         />
       </div>
       
@@ -160,6 +161,8 @@ function NFTPed1Content() {
           priceInEur={NFT_PRICE_EUR} 
           contract={nicoleMathieuEd1Contract}
           stripeMode={stripeMode}
+          previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
+          redirectPage={pageAndPublicFolderURI}
         />
       </div>
       
