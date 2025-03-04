@@ -335,7 +335,7 @@ function NFTPed1Content() {
             >
                 <MediaRenderer
                   client={client}
-                  src={token.metadata?.image || `${collectionPageRef}/Vitrail_Rythmes_42.JPG`}
+                  src={token.metadata?.image}
                   style={{ width: "100%", height: "auto", borderRadius: "10px" }}
                 />
 

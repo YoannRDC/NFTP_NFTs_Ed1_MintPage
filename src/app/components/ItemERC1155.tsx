@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
@@ -209,7 +208,8 @@ export default function ItemERC1155({
               }
               onError={(error: Error) => {
                 console.error(error);
-                window.location.href = `${redirectPage}?paymentResult=error`;
+                const errorMessage = encodeURIComponent(error.message);
+                window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
               }}
               onTransactionConfirmed={async () => {
                 window.location.href = `${redirectPage}?paymentResult=success`;
