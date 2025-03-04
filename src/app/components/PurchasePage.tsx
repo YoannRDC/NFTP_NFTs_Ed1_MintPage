@@ -14,7 +14,7 @@ interface PurchasePageProps {
   stripeMode: "test" | "live";
   contract: any;
   contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
-  redirectPage: string; // chemin de la page de retour (ex: "/nftp_ed1")
+  redirectPage: string;
   tokenId: bigint;
 }
 

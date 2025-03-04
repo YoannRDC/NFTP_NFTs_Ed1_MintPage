@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { PaymentIntent } from "@stripe/stripe-js";
 
 interface CreditCardFormProps {
-  redirectPage: string; // par exemple "/nftp_ed1"
+  redirectPage: string;
 }
 
 const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {

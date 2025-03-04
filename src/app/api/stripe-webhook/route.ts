@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       console.log("blockchainId:", blockchainId);
       console.log("requestedQuantity:", requestedQuantity);
       console.log("contractType:", contractType);
+      console.log("paymentIntent.metadata:", paymentIntent.metadata);
 
       // Validation des adresses Ethereum
       if (!isValidEthereumAddress(buyerWalletAddress)) {
