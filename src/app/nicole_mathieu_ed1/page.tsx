@@ -14,7 +14,7 @@ import ItemERC1155 from "../components/ItemERC1155";
 import { balanceOf } from "thirdweb/extensions/erc1155";
 
 // Constantes de configuration
-const NFT_PRICE_EUR = 15; // Prix fixe en Euros
+const NFT_PRICE_EUR = 0.1; // Prix fixe en Euros
 const DEFAULT_NFT_PRICE_POL = 49;
 
 // Adresse et connexion au contrat NFTP
