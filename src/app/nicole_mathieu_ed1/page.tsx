@@ -34,7 +34,6 @@ const collectionImageSrc = "/nicole_mathieu_ed1/Nicole_Mathieu.png";
 const collectionShortDescription = "First NFT collection of Nicole Mathieu.";
 const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
-const pageAndPublicFolderURI = "nicole_mathieu_ed1";
 const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc1155edition";
 const stripeMode: "test" | "live" = "test";
 
@@ -204,7 +203,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_42.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -216,7 +215,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_49.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -228,7 +227,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_53.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -240,7 +239,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_76.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -252,7 +251,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_79.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -264,7 +263,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_83.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -276,7 +275,7 @@ function NFTPed1Content() {
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_95.jpg`}
-            redirectPage={pageAndPublicFolderURI}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -287,8 +286,8 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/Vitrail_Rythmes_96.JPG`}
-            redirectPage={pageAndPublicFolderURI}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_96.jpg`}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -299,8 +298,8 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/Vitrail_Rythmes_103.JPG`}
-            redirectPage={pageAndPublicFolderURI}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_103.jpg`}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>
@@ -311,8 +310,8 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.JPG`}
-            redirectPage={pageAndPublicFolderURI}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.jpg`}
+            redirectPage={collectionPageRef}
             contractType={contractType}
           />
         </div>

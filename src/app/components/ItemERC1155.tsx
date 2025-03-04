@@ -17,7 +17,6 @@ import { convertPriceInPolToWei } from "../utils/conversion";
 import PurchasePage from "./PurchasePage";
 
 interface ItemERC721Props {
-  tokenId: bigint; // Nouveau paramètre pour le tokenId
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
@@ -25,17 +24,18 @@ interface ItemERC721Props {
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
   contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
+  tokenId: bigint;
 }
 
 export default function ItemERC1155({
-  tokenId,
   priceInPol,
   priceInEur,
   contract,
   stripeMode,
   previewImage,
   redirectPage,
-  contractType
+  contractType,
+  tokenId
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
