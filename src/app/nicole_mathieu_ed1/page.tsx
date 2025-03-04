@@ -146,7 +146,7 @@ function NFTPed1Content() {
         <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
           Échec du paiement.
           {errorMessage ? (
-            <div className="mt-2">Message d'erreur : {errorMessage}</div>
+            <div className="mt-2">Message d’erreur : {errorMessage}</div>
           ) : (
             <div className="mt-2">Veuillez réessayer ou contacter le support.</div>
           )}
