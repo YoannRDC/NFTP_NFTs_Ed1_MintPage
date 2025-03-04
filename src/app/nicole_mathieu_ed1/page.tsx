@@ -203,7 +203,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_42.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -215,7 +215,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 49.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_49.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -227,7 +227,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 53.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_53.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -239,7 +239,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 76.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_76.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -251,7 +251,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 79.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_79.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -263,7 +263,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 83.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_83.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -275,7 +275,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 95.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_95.jpg`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -287,7 +287,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 96.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_96.JPG`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -299,7 +299,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 103.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_103.JPG`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -311,7 +311,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 104.JPG`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.JPG`}
             redirectPage={pageAndPublicFolderURI}
             contractType={contractType}
           />
@@ -336,7 +336,7 @@ function NFTPed1Content() {
             >
                 <MediaRenderer
                   client={client}
-                  src={token.metadata?.image || `${collectionPageRef}/NMMathieu - Série Vitrail Rythmes 42.JPG`}
+                  src={token.metadata?.image || `${collectionPageRef}/Vitrail_Rythmes_42.JPG`}
                   style={{ width: "100%", height: "auto", borderRadius: "10px" }}
                 />
 
