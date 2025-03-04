@@ -70,6 +70,7 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
+  const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
@@ -143,7 +144,12 @@ function NFTPed1Content() {
       )}
       {paymentResult === "error" && (
         <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
-          Échec du paiement. Veuillez réessayer ou contacter le support.
+          Échec du paiement.
+          {errorMessage ? (
+            <div className="mt-2">Message d'erreur : {errorMessage}</div>
+          ) : (
+            <div className="mt-2">Veuillez réessayer ou contacter le support.</div>
+          )}
         </div>
       )}
       <div className="decorative-title">-- Présentation de la collection --</div>
@@ -333,11 +339,11 @@ function NFTPed1Content() {
                 )
               }
             >
-                <MediaRenderer
-                  client={client}
-                  src={token.metadata?.image}
-                  style={{ width: "100%", height: "auto", borderRadius: "10px" }}
-                />
+              <MediaRenderer
+                client={client}
+                src={token.metadata?.image}
+                style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+              />
 
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
