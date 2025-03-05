@@ -106,6 +106,8 @@ function NFTPed1Content() {
   // Récupérer les tokens ERC1155 possédés par l'utilisateur pour chacun des tokenIds
   useEffect(() => {
     console.log("useEffect 1");
+    console.log("smartAccount:", smartAccount);
+    console.log("allBatches:", allBatches);
     const fetchOwnedTokens = async () => {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
