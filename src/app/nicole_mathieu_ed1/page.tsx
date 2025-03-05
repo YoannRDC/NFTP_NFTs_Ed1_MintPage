@@ -37,7 +37,7 @@ const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155
 const stripeMode: "test" | "live" = "test";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 1 à 10.
-const tokenIds: bigint[] = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
+const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
 async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | null> {
   if (!batches) return null;
