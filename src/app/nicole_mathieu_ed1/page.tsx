@@ -17,7 +17,6 @@ import { balanceOf } from "thirdweb/extensions/erc1155";
 const NFT_PRICE_EUR = 5; // Prix fixe en Euros
 const DEFAULT_NFT_PRICE_POL = 49;
 
-// Adresse et connexion au contrat NFTP
 const nicoleMathieuEd1Address = "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e";
 const nicoleMathieuEd1Contract = getContract({
   client,
@@ -37,7 +36,7 @@ const artistProjectWebsitePrettyPrint = "NMMathieu.com";
 const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc1155edition";
 const stripeMode: "test" | "live" = "test";
 
-// Pour cet exemple, on suppose que la collection comporte 10 NFTs avec tokenIds de 1 à 10.
+// Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 1 à 10.
 const tokenIds: bigint[] = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
 async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | null> {
@@ -51,7 +50,7 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
         const baseURI = batch.baseURI.startsWith("ipfs://")
           ? batch.baseURI.replace("ipfs://", "https://ipfs.io/ipfs/")
           : batch.baseURI;
-        // Ici, on suppose que l'URL des métadonnées est construite en concaténant baseURI et (tokenId - 1).json
+        // Construction de l'URL des métadonnées (on suppose qu'elle se termine par (tokenId - 1).json)
         const metadataUrl = `${baseURI}${(tokenId - 1n).toString()}.json`;
         const response = await fetch(metadataUrl);
         if (!response.ok) {
@@ -67,6 +66,25 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
   return null;
 }
 
+// Composant enfant qui lit le totalSupply d'un token via useReadContract
+function TokenTotalSupply({
+  tokenId,
+  contract,
+}: {
+  tokenId: bigint;
+  contract: any;
+}) {
+  const { data, isPending, error } = useReadContract({
+    contract,
+    method: "function totalSupply(uint256) view returns (uint256)",
+    params: [tokenId],
+  });
+
+  if (isPending) return <div>Chargement du totalSupply pour token {tokenId.toString()}...</div>;
+  if (error) return <div>Erreur pour token {tokenId.toString()}: {error.message}</div>;
+  return <div>Token {tokenId.toString()} - Total Supply: {data?.toString()}</div>;
+}
+
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -79,8 +97,8 @@ function NFTPed1Content() {
     { tokenId: bigint; balance: bigint; metadata?: any }[]
   >([]);
 
-  // Récupération des metadata batches via useReadContract (selon la doc)
-  const { data: allBatches, isPending: isBatchesLoading } = useReadContract({
+  // Récupération des metadata batches via useReadContract
+  const { data: allBatches } = useReadContract({
     contract: nicoleMathieuEd1Contract,
     method:
       "function getAllMetadataBatches() view returns ((uint256 startTokenIdInclusive, uint256 endTokenIdInclusive, string baseURI)[])",
@@ -105,13 +123,9 @@ function NFTPed1Content() {
 
   // Récupérer les tokens ERC1155 possédés par l'utilisateur pour chacun des tokenIds
   useEffect(() => {
-    console.log("useEffect 1");
-    console.log("smartAccount:", smartAccount);
-    console.log("allBatches:", allBatches);
-    const fetchOwnedTokens = async () => {
+    async function fetchOwnedTokens() {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
-      console.log("useEffect 2");
       try {
         const tokens: { tokenId: bigint; balance: bigint; metadata?: any }[] = [];
         for (const tokenId of tokenIds) {
@@ -120,10 +134,8 @@ function NFTPed1Content() {
             owner: smartAccount.address,
             tokenId,
           });
-          console.log("tokenId", tokenId);
-          console.log("tokenBalance", tokenBalance);
+          console.log("tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
-            // Utilisation des metadata batches obtenus via useReadContract pour récupérer les métadonnées
             const metadata = await fetchTokenMetadata(tokenId, allBatches);
             tokens.push({ tokenId, balance: tokenBalance, metadata });
           }
@@ -134,8 +146,7 @@ function NFTPed1Content() {
       } finally {
         setIsLoadingNfts(false);
       }
-    };
-    // Attendre que le smartAccount soit défini et que les batches soient chargés
+    }
     if (smartAccount?.address && allBatches) {
       fetchOwnedTokens();
     }
@@ -145,7 +156,7 @@ function NFTPed1Content() {
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
         </div>
       )}
       {paymentResult === "error" && (
@@ -168,43 +179,37 @@ function NFTPed1Content() {
           imageSrc={collectionImageSrc}
         />
       </div>
-
       <div className="mb-10">
         <div className="decorative-description">
           Au fil des années, ma démarche artistique évolue vers une abstraction où la couleur devient
           centrale, invitant chacun à une exploration personnelle et sensorielle. Loin de la simple
           figuration, mes œuvres cherchent à élargir le champ de l’imaginaire à travers des
           compositions vibrantes et immersives. Cette recherche d’expression m’a naturellement conduit à
-          capturer l’essence même de mes créations sous forme de NFT, offrant ainsi une nouvelle
-          dimension à mon travail.
+          capturer l’essence même de mes créations sous forme de NFT, offrant ainsi une nouvelle dimension à mon travail.
         </div>
         <div className="decorative-description">
           Le pastel sec, matériau que j’utilise depuis 1997, a façonné mon approche coloriste. À travers
-          différentes séries – des Fonds géométriques structurés aux Fonds noirs inspirés du
-          clair-obscur caravagesque, en passant par les Abstractions lyriques aux lignes fluides – j’ai
-          exploré la lumière, la matière et le mouvement. Ma rencontre avec le portraitiste anglais Ken
-          Paine m’a ensuite ouvert à une gestuelle plus libre, influençant profondément mes œuvres
-          ultérieures.
+          différentes séries – des Fonds géométriques structurés aux Fonds noirs inspirés du clair-obscur
+          caravagesque, en passant par les Abstractions lyriques aux lignes fluides – j’ai exploré la
+          lumière, la matière et le mouvement. Ma rencontre avec le portraitiste anglais Ken Paine m’a
+          ensuite ouvert à une gestuelle plus libre, influençant profondément mes œuvres ultérieures.
         </div>
         <div className="decorative-description">
           Depuis 2005, la peinture à l’huile s’impose comme un nouveau terrain d’expérimentation, où le
           couteau et le pinceau me permettent de superposer les couleurs et de jouer avec la texture.
           Chaque toile est une construction progressive, où la lumière transparaît à travers les strates
-          de matière. Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de
+          de matière. Aujourd’hui, cette évolution artistique se prolonge avec mes NFT : des fragments de
           mes œuvres physiques, capturant leur énergie et leur intensité, disponibles en édition
           numérique sur cette page.
         </div>
         <div className="decorative-description">Nicole Mathieu.</div>
       </div>
-
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
         <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
       </div>
-
       <Link className="text-sm text-gray-400" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
-
       <div className="decorative-title mb-5">-- NFTs à vendre --</div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
@@ -328,7 +333,6 @@ function NFTPed1Content() {
           />
         </div>
       </div>
-
       <div className="decorative-title">-- Mes NFTs --</div>
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
@@ -350,7 +354,6 @@ function NFTPed1Content() {
                 src={token.metadata?.image}
                 style={{ width: "100%", height: "auto", borderRadius: "10px" }}
               />
-
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
               </p>
@@ -366,6 +369,13 @@ function NFTPed1Content() {
         </div>
       )}
 
+      <div className="decorative-title mt-10">-- Total Supply de chaque token --</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {tokenIds.map((tokenId) => (
+          <TokenTotalSupply key={tokenId.toString()} tokenId={tokenId} contract={nicoleMathieuEd1Contract} />
+        ))}
+      </div>
+
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
         Retour à la page principale.
       </Link>
@@ -373,7 +383,6 @@ function NFTPed1Content() {
   );
 }
 
-// Wrap the content in a Suspense boundary to satisfy Next.js requirements
 export default function NFTPed1() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>

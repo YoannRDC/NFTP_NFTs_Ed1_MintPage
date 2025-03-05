@@ -78,14 +78,17 @@ export default function ItemERC1155({
 
   // Récupérer le total supply et la balance de l'adresse pré-mint pour calculer le nombre vendu
   useEffect(() => {
+    console.log("item1155 useEffect");
     const fetchSupplyAndSold = async () => {
       try {
+        console.log(" -> tokenId", tokenId);
         // Récupère le total supply pour le token donné
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
           params: [tokenId],
         });
+        console.log(" -> totalMinted", totalMinted);
         const total = Number(totalMinted);
         setTotalSupply(total);
 
@@ -95,6 +98,7 @@ export default function ItemERC1155({
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
           params: [sellerAddress, tokenId],
         });
+        console.log(" -> sellerBalance", sellerBalance);
         const sellerBal = Number(sellerBalance);
 
         // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
