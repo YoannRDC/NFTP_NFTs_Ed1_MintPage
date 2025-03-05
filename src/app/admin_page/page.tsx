@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshot from "../components/ClaimSnapshot";
 import ClaimConditionForm from "../components/ClaimConditionForm";
@@ -18,7 +18,7 @@ const contractsInfo = {
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "", // Ajouter l'URI si nécessaire
-    chainId: 8002,
+    chainId: 80002,
   },
 };
 
@@ -34,12 +34,14 @@ const AdminPage: React.FC = () => {
   // Obtenir les informations du contrat sélectionné
   const selectedContractInfo = contractsInfo[selectedContractName];
 
-  // Connecter au contrat sélectionné en utilisant chainId
-  const currentContract = getContract({
-    client,
-    chain: defineChain(selectedContractInfo.chainId),
-    address: selectedContractInfo.address,
-  });
+  // Mémoriser l'instance du contrat pour éviter les re-créations à chaque rendu
+  const currentContract = useMemo(() => {
+    return getContract({
+      client,
+      chain: defineChain(selectedContractInfo.chainId),
+      address: selectedContractInfo.address,
+    });
+  }, [selectedContractInfo]);
 
   const wallets = [
     inAppWallet({
