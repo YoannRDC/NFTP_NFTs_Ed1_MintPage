@@ -18,7 +18,7 @@ const NFT_PRICE_EUR = 5; // Prix fixe en Euros
 const DEFAULT_NFT_PRICE_POL = 49;
 
 // Adresse et connexion au contrat NFTP
-const nicoleMathieuEd1Address = "0xA107eF05dD8eE042348ca5B943d039626aC182C6";
+const nicoleMathieuEd1Address = "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e";
 const nicoleMathieuEd1Contract = getContract({
   client,
   chain: defineChain(80002),
