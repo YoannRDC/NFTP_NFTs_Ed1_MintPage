@@ -34,17 +34,23 @@ const nftpNftsEd1Contract = getContract({
   address: contractsInfo.nftpNftsEd1.address,
 });
 
-// Ce contrat est de type ERC1155
 const fragChroEd1Contract = getContract({
   client,
   chain: defineChain(contractsInfo.fragChroEd1.chainId),
   address: contractsInfo.fragChroEd1.address,
 });
 
+// Objet pour associer une clé à son contrat
+const contractObjects: { [key: string]: any } = {
+  nftpNftsEd1: nftpNftsEd1Contract,
+  fragChroEd1: fragChroEd1Contract,
+};
+
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
   const [erc1155Tokens, setErc1155Tokens] = useState<any[]>([]);
+  const [selectedContractKey, setSelectedContractKey] = useState<string>("nftpNftsEd1");
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
@@ -58,6 +64,9 @@ const AdminPage: React.FC = () => {
     createWallet("io.rabby"),
     createWallet("io.zerion.wallet"),
   ];
+
+  // Récupérer le contrat sélectionné dans la dropdown
+  const selectedContract = contractObjects[selectedContractKey];
 
   // Fonction pour récupérer les tokens ERC1155 via getAll
   const fetchERC1155Tokens = async () => {
@@ -85,20 +94,45 @@ const AdminPage: React.FC = () => {
         />
       </div>
 
+      {/* Dropdown pour sélectionner le contrat */}
       {isAdmin && (
+        <div className="my-4">
+          <label htmlFor="contract-select" className="mr-2 font-bold">
+            Choisir le contrat :
+          </label>
+          <select
+            id="contract-select"
+            value={selectedContractKey}
+            onChange={(e) => setSelectedContractKey(e.target.value)}
+            className="border p-2 rounded"
+          >
+            {Object.keys(contractsInfo).map((key) => (
+              <option key={key} value={key}>
+                {key}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {isAdmin && selectedContractKey === "nftpNftsEd1" && (
         <>
           {/* Section pour le contrat ERC721 (nftpNftsEd1) – comportement inchangé */}
           <ClaimSnapshot
             onSnapshotFetched={setSnapshotData}
-            contract={nftpNftsEd1Contract}
+            contract={selectedContract}
           />
           <ClaimConditionForm
             initialOverrides={snapshotData}
-            contract={nftpNftsEd1Contract}
+            contract={selectedContract}
             metadata={contractsInfo.nftpNftsEd1.metadataURI}
           />
+        </>
+      )}
 
-          {/* Nouvelle section pour le contrat ERC1155 (fragChroEd1) */}
+      {isAdmin && selectedContractKey === "fragChroEd1" && (
+        <>
+          {/* Section pour le contrat ERC1155 (fragChroEd1) */}
           <div className="erc1155-section mt-10">
             <h2 className="text-xl font-bold">
               Tokens ERC1155 (fragChroEd1)
