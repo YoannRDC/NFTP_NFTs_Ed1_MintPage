@@ -51,7 +51,7 @@ async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | 
           ? batch.baseURI.replace("ipfs://", "https://ipfs.io/ipfs/")
           : batch.baseURI;
         // Construction de l'URL des métadonnées (on suppose qu'elle se termine par (tokenId - 1).json)
-        const metadataUrl = `${baseURI}${(tokenId - 1n).toString()}.json`;
+        const metadataUrl = `${baseURI}${(tokenId).toString()}.json`;
         const response = await fetch(metadataUrl);
         if (!response.ok) {
           throw new Error(`Erreur lors du chargement des métadonnées depuis ${metadataUrl}`);
