@@ -327,7 +327,7 @@ function NFTPed1Content() {
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
-            previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.jpg`}
+            previewImage={`${collectionPageRef}/Vitrail_Rythmes_107.jpg`}
             redirectPage={collectionPageRef}
             contractType={contractType}
           />

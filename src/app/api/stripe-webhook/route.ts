@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { claimTo } from "thirdweb/extensions/erc721";
-import { safeTransferFrom } from "thirdweb/extensions/erc1155";
+import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
+import { claimTo as claimToERC1155, safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { createThirdwebClient, defineChain, getContract, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { minterAddress, nftpPubKey } from "@/app/constants";
-
 
 // ----------------------------------------------------------------------------
 // Exemple d'implémentation d'idempotence (à remplacer en prod par une solution persistante)
@@ -114,26 +113,20 @@ export async function POST(req: NextRequest) {
 
       let transaction;
       if (contractType === "erc1155drop" || contractType === "erc1155edition") {
-        if (!tokenIdMetadata) {
-          console.error("Missing tokenId for ERC1155 contract");
-          return NextResponse.json({ error: "Missing tokenId for ERC1155 contract" }, { status: 400 });
-        }
-        console.log("paymentIntent.metadata.tokenId:", paymentIntent.metadata.tokenId);
-        transaction = safeTransferFrom({
-          contract: nftContract,
-          from: nftpPubKey, // Adresse détentrice des NFT pré-mintés pour ERC1155
-          to: buyerWalletAddress,
-          tokenId: BigInt(tokenIdMetadata),
-          value: BigInt(requestedQuantity),
-          data: "0x",
-          // Pas d'envoi de valeur en ETH, le paiement ayant déjà eu lieu via Stripe
-        });
-      } else if (contractType === "erc721drop" || contractType === "erc721collection") {
-        transaction = claimTo({
+        // Appel de claimTo de la librairie ERC1155
+        transaction = claimToERC1155({
           contract: nftContract,
           to: buyerWalletAddress,
           quantity: BigInt(requestedQuantity),
-          from: minterAddress, // Adresse qui effectue la réclamation pour ERC721
+          from: minterAddress,
+        });
+      } else if (contractType === "erc721drop" || contractType === "erc721collection") {
+        // Appel de claimTo de la librairie ERC721
+        transaction = claimToERC721({
+          contract: nftContract,
+          to: buyerWalletAddress,
+          quantity: BigInt(requestedQuantity),
+          from: minterAddress,
         });
       } else {
         console.error("Unknown contract type");
