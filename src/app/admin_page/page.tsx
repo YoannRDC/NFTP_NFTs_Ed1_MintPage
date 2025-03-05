@@ -12,13 +12,14 @@ import { defineChain, getContract } from "thirdweb";
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
-    metadataURI: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
+    metadataURI:
+      "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "", // Ajouter l'URI si nécessaire
-    chainId: 80002,
+    chainId: 800002,
   },
 };
 
@@ -28,8 +29,10 @@ type ContractKey = keyof typeof contractsInfo;
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
-  const [selectedContractName, setSelectedContractName] = useState<ContractKey>("nftpNftsEd1");
-  const isAdmin = account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
+  const [selectedContractName, setSelectedContractName] =
+    useState<ContractKey>("nftpNftsEd1");
+  const isAdmin =
+    account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
   // Obtenir les informations du contrat sélectionné
   const selectedContractInfo = contractsInfo[selectedContractName];
@@ -56,12 +59,15 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="decorative-title">
-        -- Admin Page --
-      </div>
+      <div className="decorative-title">-- Admin Page --</div>
 
       <div className="m-10">
-        <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
+        <ConnectButton
+          client={client}
+          wallets={wallets}
+          connectModal={{ size: "compact" }}
+          locale="fr_FR"
+        />
       </div>
 
       {isAdmin && (
@@ -74,7 +80,9 @@ const AdminPage: React.FC = () => {
             <select
               id="contract-select"
               value={selectedContractName}
-              onChange={(e) => setSelectedContractName(e.target.value as ContractKey)}
+              onChange={(e) =>
+                setSelectedContractName(e.target.value as ContractKey)
+              }
               className="p-2 border rounded"
             >
               <option value="nftpNftsEd1">NFTP Nfts Ed1</option>
@@ -82,8 +90,13 @@ const AdminPage: React.FC = () => {
             </select>
           </div>
 
-          <ClaimSnapshot onSnapshotFetched={setSnapshotData} contract={currentContract} />
+          <ClaimSnapshot
+            key={selectedContractInfo.address}
+            onSnapshotFetched={setSnapshotData}
+            contract={currentContract}
+          />
           <ClaimConditionForm
+            key={selectedContractInfo.address}
             initialOverrides={snapshotData}
             contract={currentContract}
             metadata={selectedContractInfo.metadataURI}
