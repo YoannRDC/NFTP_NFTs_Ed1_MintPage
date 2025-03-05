@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshot from "../components/ClaimSnapshot";
 import ClaimConditionForm from "../components/ClaimConditionForm";
@@ -19,7 +19,7 @@ const contractsInfo = {
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "", // Ajouter l'URI si nécessaire
-    chainId: 800002,
+    chainId: 137,
   },
 };
 
@@ -34,10 +34,15 @@ const AdminPage: React.FC = () => {
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
+  // Réinitialiser les données quand le contrat change
+  useEffect(() => {
+    setSnapshotData([]);
+  }, [selectedContractName]);
+
   // Obtenir les informations du contrat sélectionné
   const selectedContractInfo = contractsInfo[selectedContractName];
 
-  // Mémoriser l'instance du contrat pour éviter les re-créations à chaque rendu
+  // Mémoriser l'instance du contrat pour éviter les re-créations inutiles
   const currentContract = useMemo(() => {
     return getContract({
       client,
@@ -90,13 +95,14 @@ const AdminPage: React.FC = () => {
             </select>
           </div>
 
+          {/* Utiliser une clé basée sur l'adresse permet de forcer le remontage */}
           <ClaimSnapshot
-            key={selectedContractInfo.address}
+            key={`snapshot-${selectedContractInfo.address}`}
             onSnapshotFetched={setSnapshotData}
             contract={currentContract}
           />
           <ClaimConditionForm
-            key={selectedContractInfo.address}
+            key={`form-${selectedContractInfo.address}`}
             initialOverrides={snapshotData}
             contract={currentContract}
             metadata={selectedContractInfo.metadataURI}

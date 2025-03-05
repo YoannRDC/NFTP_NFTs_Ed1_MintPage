@@ -30,10 +30,8 @@ export default function ClaimConditionForm({
   const [metadata, setMetadata] = useState(initialMetadata);
 
   useEffect(() => {
-    if (initialOverrides.length > 0) {
-      setOverrideList(initialOverrides);
-    }
-  }, [initialOverrides]);
+    setOverrideList(initialOverrides.length > 0 ? initialOverrides : []);
+  }, [initialOverrides, contract]);
 
   const addAddress = () => {
     setOverrideList([...overrideList, { address: "", maxClaimable: "1", price: "0" }]);
