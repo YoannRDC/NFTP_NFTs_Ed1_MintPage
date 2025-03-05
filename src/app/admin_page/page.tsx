@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+
+import React, { useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshot from "../components/ClaimSnapshot";
 import ClaimConditionForm from "../components/ClaimConditionForm";
@@ -9,7 +10,7 @@ import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
 import { getAll } from "thirdweb/extensions/thirdweb";
 
-// Informations des contrats NFTP avec chainId et contractType
+// Définition des informations de chaque contrat
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
@@ -26,67 +27,26 @@ const contractsInfo = {
   },
 };
 
-// Définir un type pour les clés des contrats
-type ContractKey = keyof typeof contractsInfo;
+// Connexion aux contrats
+const nftpNftsEd1Contract = getContract({
+  client,
+  chain: defineChain(contractsInfo.nftpNftsEd1.chainId),
+  address: contractsInfo.nftpNftsEd1.address,
+});
+
+// Ce contrat est de type ERC1155
+const fragChroEd1Contract = getContract({
+  client,
+  chain: defineChain(contractsInfo.fragChroEd1.chainId),
+  address: contractsInfo.fragChroEd1.address,
+});
 
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
-  const [selectedContractName, setSelectedContractName] =
-    useState<ContractKey>("nftpNftsEd1");
+  const [erc1155Tokens, setErc1155Tokens] = useState<any[]>([]);
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
-
-  // Réinitialiser les données quand le contrat change
-  useEffect(() => {
-    setSnapshotData([]);
-  }, [selectedContractName]);
-
-  // Obtenir les informations du contrat sélectionné
-  const selectedContractInfo = contractsInfo[selectedContractName];
-
-  // Déterminer directement si le contrat est un edition-drop (ERC1155) via le champ contractType
-  const isEditionDrop = selectedContractInfo.contractType === "erc1155drop";
-
-  // Mémoriser l'instance du contrat pour éviter les recréations inutiles
-  const currentContract = useMemo(() => {
-    return getContract({
-      client,
-      chain: defineChain(selectedContractInfo.chainId),
-      address: selectedContractInfo.address,
-    });
-  }, [selectedContractInfo]);
-
-  // États pour gérer la sélection de token (edition-drop uniquement)
-  const [availableTokens, setAvailableTokens] = useState<any[]>([]);
-  // Stocker le tokenId sélectionné sous forme de string (sera converti en bigint)
-  const [selectedTokenId, setSelectedTokenId] = useState<string>("0");
-
-  // Pour les contrats edition-drop, récupérer la liste des tokens disponibles
-  useEffect(() => {
-    async function fetchTokens() {
-      if (isEditionDrop && currentContract) {
-        try {
-          const tokens = await getAll({
-            contract: currentContract,
-            deployer: nftpPubKey, // renseigner ici l'adresse du déployeur si nécessaire
-          });
-          // Convertir le tableau readonly en tableau mutable et ajouter un tokenId basé sur l'index
-          const tokensWithId = [...tokens].map((token, index) => ({
-            ...token,
-            tokenId: BigInt(index), // On considère que le tokenId correspond à l'index (0, 1, 2, ...)
-          }));
-          setAvailableTokens(tokensWithId);
-          if (tokensWithId.length > 0) {
-            setSelectedTokenId(tokensWithId[0].tokenId.toString());
-          }
-        } catch (error) {
-          console.error("Erreur lors de la récupération des tokens :", error);
-        }
-      }
-    }
-    fetchTokens();
-  }, [isEditionDrop, currentContract]);
 
   const wallets = [
     inAppWallet({
@@ -98,6 +58,19 @@ const AdminPage: React.FC = () => {
     createWallet("io.rabby"),
     createWallet("io.zerion.wallet"),
   ];
+
+  // Fonction pour récupérer les tokens ERC1155 via getAll
+  const fetchERC1155Tokens = async () => {
+    try {
+      const tokens = await getAll({
+        contract: fragChroEd1Contract,
+        deployer: nftpPubKey, // ou "" si aucune adresse n'est nécessaire
+      });
+      setErc1155Tokens([...tokens]);
+    } catch (error) {
+      console.error("Erreur lors du chargement des tokens ERC1155", error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -114,66 +87,47 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && (
         <>
-          {/* Sélecteur de contrat */}
-          <div className="mb-6">
-            <label htmlFor="contract-select" className="mr-2 font-semibold">
-              Sélectionnez le contrat :
-            </label>
-            <select
-              id="contract-select"
-              value={selectedContractName}
-              onChange={(e) =>
-                setSelectedContractName(e.target.value as ContractKey)
-              }
-              className="p-2 border rounded"
-            >
-              <option value="nftpNftsEd1">NFTP Nfts Ed1</option>
-              <option value="fragChroEd1">Frag Chro Ed1</option>
-            </select>
-          </div>
-
-          {/* Sélecteur de token pour les contrats edition-drop */}
-          {isEditionDrop && availableTokens.length > 0 && (
-            <div className="mb-6">
-              <label htmlFor="token-select" className="mr-2 font-semibold">
-                Sélectionnez le token :
-              </label>
-              <select
-                id="token-select"
-                value={selectedTokenId}
-                onChange={(e) => setSelectedTokenId(e.target.value)}
-                className="p-2 border rounded"
-              >
-                {availableTokens.map((token) => (
-                  <option
-                    key={token.tokenId.toString()}
-                    value={token.tokenId.toString()}
-                  >
-                    {token.metadataURI || `Token ${token.tokenId}`}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Passage conditionnel du tokenId pour ClaimSnapshot */}
+          {/* Section pour le contrat ERC721 (nftpNftsEd1) – comportement inchangé */}
           <ClaimSnapshot
-            key={`snapshot-${selectedContractInfo.address}`}
             onSnapshotFetched={setSnapshotData}
-            contract={currentContract}
-            tokenId={isEditionDrop ? BigInt(selectedTokenId) : undefined}
+            contract={nftpNftsEd1Contract}
           />
           <ClaimConditionForm
-            key={`form-${selectedContractInfo.address}`}
             initialOverrides={snapshotData}
-            contract={currentContract}
-            metadata={selectedContractInfo.metadataURI}
+            contract={nftpNftsEd1Contract}
+            metadata={contractsInfo.nftpNftsEd1.metadataURI}
           />
+
+          {/* Nouvelle section pour le contrat ERC1155 (fragChroEd1) */}
+          <div className="erc1155-section mt-10">
+            <h2 className="text-xl font-bold">
+              Tokens ERC1155 (fragChroEd1)
+            </h2>
+            <button
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              onClick={fetchERC1155Tokens}
+            >
+              Charger les tokens ERC1155
+            </button>
+            <div className="mt-4">
+              {erc1155Tokens.length > 0 ? (
+                erc1155Tokens.map((token: any, index: number) => (
+                  <div key={index} className="p-2 border-b">
+                    <p>Token ID: {token.id}</p>
+                    <p>Nom: {token.name || "N/A"}</p>
+                    <p>Quantité: {token.quantity || "N/A"}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Aucun token ERC1155 chargé.</p>
+              )}
+            </div>
+          </div>
         </>
       )}
 
       <Link
-        className="px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
+        className="px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 mt-10"
         target="_blank"
         href="./"
       >
