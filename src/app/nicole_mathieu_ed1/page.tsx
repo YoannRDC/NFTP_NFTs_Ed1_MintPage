@@ -116,6 +116,8 @@ function NFTPed1Content() {
             owner: smartAccount.address,
             tokenId,
           });
+          console.log("tokenId", tokenId);
+          console.log("tokenBalance", tokenBalance);
           if (tokenBalance > 0n) {
             // Utilisation des metadata batches obtenus via useReadContract pour récupérer les métadonnées
             const metadata = await fetchTokenMetadata(tokenId, allBatches);
