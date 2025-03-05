@@ -7,21 +7,22 @@ import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
-import { getContractMetadata } from "thirdweb/extensions/common";
 import { getAll } from "thirdweb/extensions/thirdweb";
 
-// Informations des contrats NFTP avec chainId
+// Informations des contrats NFTP avec chainId et contractType
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
     metadataURI:
       "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
+    contractType: "erc721drop" as const,
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "", // Ajouter l'URI si nécessaire
     chainId: 80002,
+    contractType: "erc1155drop" as const,
   },
 };
 
@@ -44,6 +45,9 @@ const AdminPage: React.FC = () => {
   // Obtenir les informations du contrat sélectionné
   const selectedContractInfo = contractsInfo[selectedContractName];
 
+  // Déterminer directement si le contrat est un edition-drop (ERC1155) via le champ contractType
+  const isEditionDrop = selectedContractInfo.contractType === "erc1155drop";
+
   // Mémoriser l'instance du contrat pour éviter les recréations inutiles
   const currentContract = useMemo(() => {
     return getContract({
@@ -54,30 +58,11 @@ const AdminPage: React.FC = () => {
   }, [selectedContractInfo]);
 
   // États pour gérer la sélection de token (edition-drop uniquement)
-  const [isEditionDrop, setIsEditionDrop] = useState(false);
   const [availableTokens, setAvailableTokens] = useState<any[]>([]);
   // Stocker le tokenId sélectionné sous forme de string (sera converti en bigint)
   const [selectedTokenId, setSelectedTokenId] = useState<string>("0");
 
-  // Vérifier le type de contrat via les métadonnées
-  useEffect(() => {
-    async function fetchMetadata() {
-      try {
-        const metadata = await getContractMetadata({ contract: currentContract });
-        if (metadata.contractType === "edition-drop") {
-          setIsEditionDrop(true);
-        } else {
-          setIsEditionDrop(false);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des métadonnées du contrat :", error);
-        setIsEditionDrop(false);
-      }
-    }
-    fetchMetadata();
-  }, [currentContract]);
-
-  // Si contrat edition-drop, récupérer la liste des tokens disponibles
+  // Pour les contrats edition-drop, récupérer la liste des tokens disponibles
   useEffect(() => {
     async function fetchTokens() {
       if (isEditionDrop && currentContract) {
@@ -86,7 +71,7 @@ const AdminPage: React.FC = () => {
             contract: currentContract,
             deployer: nftpPubKey, // renseigner ici l'adresse du déployeur si nécessaire
           });
-          // On convertit le tableau readonly en tableau mutable et on ajoute un tokenId basé sur l'index
+          // Convertir le tableau readonly en tableau mutable et ajouter un tokenId basé sur l'index
           const tokensWithId = [...tokens].map((token, index) => ({
             ...token,
             tokenId: BigInt(index), // On considère que le tokenId correspond à l'index (0, 1, 2, ...)
