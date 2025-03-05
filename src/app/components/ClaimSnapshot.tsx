@@ -21,9 +21,7 @@ export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnap
     async function fetchData() {
       try {
         const metadata = await getContractMetadata({ contract });
-        console.log("Contract Metadata:", JSON.stringify(metadata));
         const activeClaimCondition = await getActiveClaimCondition({ contract });
-        console.log("Active Claim Condition:", JSON.stringify(activeClaimCondition));
         const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
         // ✅ Fonction de conversion BigInt → String

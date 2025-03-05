@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { setClaimConditions } from "thirdweb/extensions/erc721";
 import { ContractOptions, sendTransaction } from "thirdweb";
@@ -8,30 +9,25 @@ import { nftpPubKey } from "../constants";
 interface ClaimConditionFormProps {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
-  metadata: string; // metadata passée en paramètre
 }
 
-export default function ClaimConditionForm({
-  contract,
-  initialOverrides = [],
-  metadata: initialMetadata,
-}: ClaimConditionFormProps) {
+export default function ClaimConditionForm({ contract, initialOverrides = [] }: ClaimConditionFormProps) {
   const smartAccount = useActiveAccount();
-  const [overrideList, setOverrideList] = useState<
-    { address: string; maxClaimable: string; price: string }[]
-  >([]);
+  const [overrideList, setOverrideList] = useState<{ address: string; maxClaimable: string; price: string }[]>([]);
 
-  // Champs généraux avec des valeurs par défaut
+  // ✅ Champs généraux avec des valeurs par défaut
   const [maxClaimableSupply, setMaxClaimableSupply] = useState("10000");
   const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("10");
   const [currencyAddress, setCurrencyAddress] = useState("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
   const [price, setPrice] = useState("49");
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
-  const [metadata, setMetadata] = useState(initialMetadata);
+  const [metadata, setMetadata] = useState("ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0");
 
   useEffect(() => {
-    setOverrideList(initialOverrides.length > 0 ? initialOverrides : []);
-  }, [initialOverrides, contract]);
+    if (initialOverrides.length > 0) {
+      setOverrideList(initialOverrides);
+    }
+  }, [initialOverrides]);
 
   const addAddress = () => {
     setOverrideList([...overrideList, { address: "", maxClaimable: "1", price: "0" }]);
@@ -43,11 +39,7 @@ export default function ClaimConditionForm({
     setOverrideList(updatedList);
   };
 
-  const handleChange = (
-    index: number,
-    field: "address" | "maxClaimable" | "price",
-    value: string
-  ) => {
+  const handleChange = (index: number, field: "address" | "maxClaimable" | "price", value: string) => {
     const updatedList = [...overrideList];
     updatedList[index][field] = value;
     setOverrideList(updatedList);
@@ -72,7 +64,7 @@ export default function ClaimConditionForm({
             price: parseFloat(price),
             startTime: new Date(startDate),
             overrideList,
-            metadata, // Utilisation de metadata passé en prop (pouvant être modifié via l'input)
+            metadata,
           },
         ],
       });

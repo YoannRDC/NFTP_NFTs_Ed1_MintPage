@@ -125,7 +125,6 @@ const AdminPage: React.FC = () => {
           <ClaimConditionForm
             initialOverrides={snapshotData}
             contract={selectedContract}
-            metadata={contractsInfo.nftpNftsEd1.metadataURI}
           />
         </>
       )}
