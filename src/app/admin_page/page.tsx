@@ -8,58 +8,94 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract } from "thirdweb";
 
-// NFTP contracts
-const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
-const nftpNftsEd1MetadataURI= "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0";
+// Informations des contrats NFTP avec chainId
+const contractsInfo = {
+  nftpNftsEd1: {
+    address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
+    metadataURI: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
+    chainId: 137,
+  },
+  fragChroEd1: {
+    address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
+    metadataURI: "", // Ajouter l'URI si nécessaire
+    chainId: 8002,
+  },
+};
 
-// connect to your contract
-const nftpNftsEd1Contract = getContract({
-  client,
-  chain: defineChain(137),
-  address: nftpNftsEd1Address,
-});
+// Définir un type pour les clés des contrats
+type ContractKey = keyof typeof contractsInfo;
 
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
+  const [selectedContractName, setSelectedContractName] = useState<ContractKey>("nftpNftsEd1");
   const isAdmin = account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
-    const wallets = [
-      inAppWallet({
-        auth: { options: ["google", "email", "passkey", "phone"] },
-      }),
-      createWallet("io.metamask"),
-      createWallet("com.coinbase.wallet"),
-      createWallet("me.rainbow"),
-      createWallet("io.rabby"),
-      createWallet("io.zerion.wallet"),
-    ];
+  // Obtenir les informations du contrat sélectionné
+  const selectedContractInfo = contractsInfo[selectedContractName];
+
+  // Connecter au contrat sélectionné en utilisant chainId
+  const currentContract = getContract({
+    client,
+    chain: defineChain(selectedContractInfo.chainId),
+    address: selectedContractInfo.address,
+  });
+
+  const wallets = [
+    inAppWallet({
+      auth: { options: ["google", "email", "passkey", "phone"] },
+    }),
+    createWallet("io.metamask"),
+    createWallet("com.coinbase.wallet"),
+    createWallet("me.rainbow"),
+    createWallet("io.rabby"),
+    createWallet("io.zerion.wallet"),
+  ];
 
   return (
     <div className="flex flex-col items-center">
-
       <div className="decorative-title">
         -- Admin Page --
       </div>
 
       <div className="m-10">
-        <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR"/>
+        <ConnectButton client={client} wallets={wallets} connectModal={{ size: "compact" }} locale="fr_FR" />
       </div>
 
-      {isAdmin && ( // ✅ Affiche uniquement si l'utilisateur est l'administrateur
+      {isAdmin && (
         <>
-          <ClaimSnapshot onSnapshotFetched={setSnapshotData} contract={nftpNftsEd1Contract} />
-          <ClaimConditionForm initialOverrides={snapshotData} contract={nftpNftsEd1Contract} metadata={nftpNftsEd1MetadataURI} />
+          {/* Sélecteur de contrat */}
+          <div className="mb-6">
+            <label htmlFor="contract-select" className="mr-2 font-semibold">
+              Sélectionnez le contrat :
+            </label>
+            <select
+              id="contract-select"
+              value={selectedContractName}
+              onChange={(e) => setSelectedContractName(e.target.value as ContractKey)}
+              className="p-2 border rounded"
+            >
+              <option value="nftpNftsEd1">NFTP Nfts Ed1</option>
+              <option value="fragChroEd1">Frag Chro Ed1</option>
+            </select>
+          </div>
+
+          <ClaimSnapshot onSnapshotFetched={setSnapshotData} contract={currentContract} />
+          <ClaimConditionForm
+            initialOverrides={snapshotData}
+            contract={currentContract}
+            metadata={selectedContractInfo.metadataURI}
+          />
         </>
       )}
 
-        <Link
-            className="px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
-            target="_blank"
-            href="./"
-        >
-            Back to main page.
-        </Link>
+      <Link
+        className="px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
+        target="_blank"
+        href="./"
+      >
+        Back to main page.
+      </Link>
     </div>
   );
 };
