@@ -19,7 +19,7 @@ const contractsInfo = {
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "", // Ajouter l'URI si nécessaire
-    chainId: 137,
+    chainId: 80002,
   },
 };
 
