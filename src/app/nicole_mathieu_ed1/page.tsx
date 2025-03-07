@@ -48,25 +48,6 @@ async function fetchTokenMetadata(tokenId: bigint): Promise<any | null> {
   return null;
 }
 
-// Composant enfant qui lit le totalSupply d'un token via useReadContract
-function TokenTotalSupply({
-  tokenId,
-  contract,
-}: {
-  tokenId: bigint;
-  contract: any;
-}) {
-  const { data, isPending, error } = useReadContract({
-    contract,
-    method: "function totalSupply(uint256) view returns (uint256)",
-    params: [tokenId],
-  });
-
-  if (isPending) return <div>Chargement du totalSupply pour token {tokenId.toString()}...</div>;
-  if (error) return <div>Erreur pour token {tokenId.toString()}: {error.message}</div>;
-  return <div>Token {tokenId.toString()} - Total Supply: {data?.toString()}</div>;
-}
-
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -334,6 +315,7 @@ function NFTPed1Content() {
               />
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
+                metadata: {token.metadata}
               </p>
               <p>Vous en possédez {token.balance.toString()}</p>
             </div>
@@ -346,13 +328,6 @@ function NFTPed1Content() {
           </p>
         </div>
       )}
-
-      <div className="decorative-title mt-10">-- Total Supply de chaque token --</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tokenIds.map((tokenId) => (
-          <TokenTotalSupply key={tokenId.toString()} tokenId={tokenId} contract={nicoleMathieuEd1Contract} />
-        ))}
-      </div>
 
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
         Retour à la page principale.
