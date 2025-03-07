@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getActiveClaimCondition } from "thirdweb/extensions/erc721";
+import { getActiveClaimCondition } from "thirdweb/extensions/erc1155";
 import { download } from "thirdweb/storage";
 import { client } from "../constants";
 import { getContractMetadata } from "thirdweb/extensions/common";
@@ -9,10 +9,11 @@ import { ContractOptions } from "thirdweb";
 
 interface ClaimSnapshotProps {
   contract: ContractOptions<[], `0x${string}`>;
+  tokenId: bigint; // Ajout de tokenId dans les props
   onSnapshotFetched: (snapshot: any) => void;
 }
 
-export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnapshotProps) {
+export default function ClaimSnapshotERC1155({ contract, tokenId, onSnapshotFetched }: ClaimSnapshotProps) {
   const [snapshot, setSnapshot] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,11 +22,11 @@ export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnap
     async function fetchData() {
       try {
         const metadata = await getContractMetadata({ contract });
-        const activeClaimCondition = await getActiveClaimCondition({ contract });
+        const activeClaimCondition = await getActiveClaimCondition({ contract, tokenId });
         const fetchedSnapshot = await fetchSnapshot(activeClaimCondition.merkleRoot, metadata.merkle, client);
 
-        // ✅ Fonction de conversion BigInt → String
-        const replacer = (_key: any, value: { toString: () => any; }) =>
+        // Fonction de conversion BigInt → String
+        const replacer = (_key: any, value: any) =>
           typeof value === "bigint" ? value.toString() : value;
 
         console.log("Contract Metadata:", JSON.stringify(metadata, replacer, 2));
@@ -43,7 +44,7 @@ export default function ClaimSnapshot({ contract, onSnapshotFetched }: ClaimSnap
     }
 
     fetchData();
-  }, [contract, onSnapshotFetched]);
+  }, [contract, tokenId, onSnapshotFetched]);
 
   return (
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white">

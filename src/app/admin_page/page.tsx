@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import ClaimSnapshot from "../components/ClaimSnapshot";
+import { ConnectButton, useActiveAccount, useReadContract } from "thirdweb/react";
+import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
-import { defineChain, getContract } from "thirdweb";
+import { defineChain, getContract, readContract } from "thirdweb";
 import { getAll } from "thirdweb/extensions/thirdweb";
+import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 
 // Définition des informations de chaque contrat
 const contractsInfo = {
@@ -75,12 +76,20 @@ const AdminPage: React.FC = () => {
         contract: fragChroEd1Contract,
         deployer: nftpPubKey, // ou "" si aucune adresse n'est nécessaire
       });
+      console.log("getAll: ",tokens );
       setErc1155Tokens([...tokens]);
     } catch (error) {
       console.error("Erreur lors du chargement des tokens ERC1155", error);
     }
   };
-
+/* 
+  const data = await readContract({
+    contract,
+    method:
+      "function nextTokenIdToMint() view returns (uint256)",
+    params: [],
+  }); */
+  
   return (
     <div className="flex flex-col items-center">
       <div className="decorative-title">-- Admin Page --</div>
@@ -118,7 +127,7 @@ const AdminPage: React.FC = () => {
       {isAdmin && selectedContractKey === "nftpNftsEd1" && (
         <>
           {/* Section pour le contrat ERC721 (nftpNftsEd1) – comportement inchangé */}
-          <ClaimSnapshot
+          <ClaimSnapshotERC721
             onSnapshotFetched={setSnapshotData}
             contract={selectedContract}
           />
@@ -131,6 +140,14 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && selectedContractKey === "fragChroEd1" && (
         <>
+
+
+          <ClaimSnapshotERC1155
+            onSnapshotFetched={setSnapshotData}
+            contract={selectedContract}
+            tokenId={1n}
+          />
+
           {/* Section pour le contrat ERC1155 (fragChroEd1) */}
           <div className="erc1155-section mt-10">
             <h2 className="text-xl font-bold">
