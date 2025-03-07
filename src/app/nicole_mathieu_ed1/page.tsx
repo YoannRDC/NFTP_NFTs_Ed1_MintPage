@@ -39,27 +39,9 @@ const stripeMode: "test" | "live" = "test";
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 1 à 10.
 const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
-async function fetchTokenMetadata(tokenId: bigint, batches: any): Promise<any | null> {
-  if (!batches) return null;
+async function fetchTokenMetadata(tokenId: bigint): Promise<any | null> {
   try {
-    for (const batch of batches) {
-      const start = BigInt(batch.startTokenIdInclusive);
-      const end = BigInt(batch.endTokenIdInclusive);
-      if (tokenId >= start && tokenId <= end) {
-        // Conversion de la baseURI si elle commence par "ipfs://"
-        const baseURI = batch.baseURI.startsWith("ipfs://")
-          ? batch.baseURI.replace("ipfs://", "https://ipfs.io/ipfs/")
-          : batch.baseURI;
-        // Construction de l'URL des métadonnées (on suppose qu'elle se termine par (tokenId - 1).json)
-        const metadataUrl = `${baseURI}${(tokenId).toString()}.json`;
-        const response = await fetch(metadataUrl);
-        if (!response.ok) {
-          throw new Error(`Erreur lors du chargement des métadonnées depuis ${metadataUrl}`);
-        }
-        const metadata = await response.json();
-        return metadata;
-      }
-    }
+    console.log ("TODO: fetch metadata.")
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées pour le token", tokenId, error);
   }
@@ -97,14 +79,6 @@ function NFTPed1Content() {
     { tokenId: bigint; balance: bigint; metadata?: any }[]
   >([]);
 
-  // Récupération des metadata batches via useReadContract
-  const { data: allBatches } = useReadContract({
-    contract: nicoleMathieuEd1Contract,
-    method:
-      "function getAllMetadataBatches() view returns ((uint256 startTokenIdInclusive, uint256 endTokenIdInclusive, string baseURI)[])",
-    params: [],
-  });
-
   // Actualiser périodiquement la conversion EUR -> POL
   useEffect(() => {
     async function fetchConversion() {
@@ -138,7 +112,7 @@ function NFTPed1Content() {
           });
           console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
-            const metadata = await fetchTokenMetadata(tokenId, allBatches);
+            const metadata = await fetchTokenMetadata(tokenId);
             tokens.push({ tokenId, balance: tokenBalance, metadata });
           }
           console.log("done.");
@@ -150,10 +124,10 @@ function NFTPed1Content() {
         setIsLoadingNfts(false);
       }
     }
-    if (smartAccount?.address && allBatches) {
+    if (smartAccount?.address) {
       fetchOwnedTokens();
     }
-  }, [smartAccount?.address, allBatches]);
+  }, [smartAccount?.address]);
 
   return (
     <div className="flex flex-col items-center">
