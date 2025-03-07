@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { ConnectButton, useActiveAccount, useReadContract } from "thirdweb/react";
+import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
-import { getAll } from "thirdweb/extensions/thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 
 // Définition des informations de chaque contrat
@@ -50,8 +49,9 @@ const contractObjects: { [key: string]: any } = {
 const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
-  const [erc1155Tokens, setErc1155Tokens] = useState<any[]>([]);
+  const [erc1155Tokens, setErc1155Tokens] = useState<bigint[]>([]);
   const [selectedContractKey, setSelectedContractKey] = useState<string>("nftpNftsEd1");
+  const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
@@ -69,27 +69,31 @@ const AdminPage: React.FC = () => {
   // Récupérer le contrat sélectionné dans la dropdown
   const selectedContract = contractObjects[selectedContractKey];
 
-  // Fonction pour récupérer les tokens ERC1155 via getAll
-  const fetchERC1155Tokens = async () => {
+  // Fonction pour récupérer le nextTokenIdToMint (de type bigint)
+  // et créer la liste des token IDs disponibles (de 0 à nextTokenId - 1)
+  const fetchNextTokenId = async () => {
     try {
-      const tokens = await getAll({
+      const data: bigint = await readContract({
         contract: fragChroEd1Contract,
-        deployer: nftpPubKey, // ou "" si aucune adresse n'est nécessaire
+        method:
+          "function nextTokenIdToMint() view returns (uint256)",
+        params: [],
       });
-      console.log("getAll: ",tokens );
-      setErc1155Tokens([...tokens]);
+      console.log("nextTokenIdToMint: ", data);
+      const tokensArray: bigint[] = [];
+      for (let i = 0n; i < data; i++) {
+        tokensArray.push(i);
+      }
+      setErc1155Tokens(tokensArray);
+      // Définir le token sélectionné par défaut si la liste n'est pas vide
+      if (tokensArray.length > 0) {
+        setSelectedERC1155Token(tokensArray[0]);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des tokens ERC1155", error);
     }
   };
-/* 
-  const data = await readContract({
-    contract,
-    method:
-      "function nextTokenIdToMint() view returns (uint256)",
-    params: [],
-  }); */
-  
+
   return (
     <div className="flex flex-col items-center">
       <div className="decorative-title">-- Admin Page --</div>
@@ -126,7 +130,7 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && selectedContractKey === "nftpNftsEd1" && (
         <>
-          {/* Section pour le contrat ERC721 (nftpNftsEd1) – comportement inchangé */}
+          {/* Section pour le contrat ERC721 (nftpNftsEd1) */}
           <ClaimSnapshotERC721
             onSnapshotFetched={setSnapshotData}
             contract={selectedContract}
@@ -140,38 +144,43 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && selectedContractKey === "fragChroEd1" && (
         <>
-
-
-          <ClaimSnapshotERC1155
-            onSnapshotFetched={setSnapshotData}
-            contract={selectedContract}
-            tokenId={1n}
-          />
-
-          {/* Section pour le contrat ERC1155 (fragChroEd1) */}
           <div className="erc1155-section mt-10">
             <h2 className="text-xl font-bold">
               Tokens ERC1155 (fragChroEd1)
             </h2>
             <button
               className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              onClick={fetchERC1155Tokens}
+              onClick={fetchNextTokenId}
             >
-              Charger les tokens ERC1155
+              Charger la liste des tokens ERC1155
             </button>
-            <div className="mt-4">
-              {erc1155Tokens.length > 0 ? (
-                erc1155Tokens.map((token: any, index: number) => (
-                  <div key={index} className="p-2 border-b">
-                    <p>Token ID: {token.id}</p>
-                    <p>Nom: {token.name || "N/A"}</p>
-                    <p>Quantité: {token.quantity || "N/A"}</p>
-                  </div>
-                ))
-              ) : (
-                <p>Aucun token ERC1155 chargé.</p>
-              )}
-            </div>
+            {erc1155Tokens.length > 0 && (
+              <div className="mt-4">
+                <label htmlFor="erc1155-select" className="mr-2 font-bold">
+                  Sélectionner le Token ID :
+                </label>
+                <select
+                  id="erc1155-select"
+                  value={selectedERC1155Token.toString()}
+                  onChange={(e) =>
+                    setSelectedERC1155Token(BigInt(e.target.value))
+                  }
+                  className="border p-2 rounded"
+                >
+                  {erc1155Tokens.map((token, index) => (
+                    <option key={index} value={token.toString()}>
+                      Token ID: {token.toString()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <ClaimSnapshotERC1155
+              onSnapshotFetched={setSnapshotData}
+              contract={selectedContract}
+              tokenId={selectedERC1155Token}
+            />
           </div>
         </>
       )}
