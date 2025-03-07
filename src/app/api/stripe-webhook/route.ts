@@ -115,11 +115,19 @@ export async function POST(req: NextRequest) {
       if (contractType === "erc1155drop") {
         // Appel de claimTo de la librairie ERC1155
         console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity) ,", tokenId:", tokenId);
-        transaction = claimToERC1155({
+/*         transaction = claimToERC1155({
           contract: nftContract,
           to: buyerWalletAddress,
           quantity: BigInt(requestedQuantity),
           tokenId: tokenId,
+        }); */
+        transaction = safeTransferFrom({
+          contract: nftContract,
+          from: minterAddress,
+          to: buyerWalletAddress,
+          tokenId: 1n,
+          value:2n,
+          data:"0x"
         });
       } else if (contractType === "erc721drop") {
         console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
