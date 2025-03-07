@@ -211,6 +211,7 @@ function NFTPed1Content() {
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
       <div className="decorative-title mb-5">-- NFTs à vendre --</div>
+      <h1 color="red"> !! Page en construction, merci de ne pas intéragir !!</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <ItemERC1155
