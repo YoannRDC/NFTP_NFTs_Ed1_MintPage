@@ -8,7 +8,7 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, nftpPubKey } from "../constants";
+import { client, minterAddress, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { safeTransferFrom } from "thirdweb/extensions/erc1155";
@@ -44,9 +44,6 @@ export default function ItemERC1155({
   
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
-  // Adresse qui détient initialement tous les NFT (pré-mint)
-  const sellerAddress = nftpPubKey;
-
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
     (priceInPol !== null && priceInPol !== undefined
@@ -78,17 +75,14 @@ export default function ItemERC1155({
 
   // Récupérer le total supply et la balance de l'adresse pré-mint pour calculer le nombre vendu
   useEffect(() => {
-    console.log("item1155 useEffect");
     const fetchSupplyAndSold = async () => {
       try {
-        console.log(" -> tokenId", tokenId);
         // Récupère le total supply pour le token donné
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
           params: [tokenId],
         });
-        console.log(" -> totalMinted", totalMinted);
         const total = Number(totalMinted);
         setTotalSupply(total);
 
@@ -96,9 +90,9 @@ export default function ItemERC1155({
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
-          params: [sellerAddress, tokenId],
+          params: [minterAddress, tokenId],
         });
-        console.log(" -> sellerBalance", sellerBalance);
+        //console.log(" -> sellerBalance", sellerBalance);
         const sellerBal = Number(sellerBalance);
 
         // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
@@ -112,7 +106,7 @@ export default function ItemERC1155({
       }
     };
     fetchSupplyAndSold();
-  }, [contract, tokenId, sellerAddress]);
+  }, [contract, tokenId, minterAddress]);
 
   // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -199,7 +193,7 @@ export default function ItemERC1155({
               transaction={() =>
                 safeTransferFrom({
                   contract: contract,
-                  from: sellerAddress, // Adresse détentrice des NFT pré-mintés
+                  from: minterAddress, // Adresse détentrice des NFT pré-mintés
                   to: smartAccount.address, // Adresse de l'acheteur
                   tokenId: tokenId, // Utilisation de la prop tokenId
                   value: requestedQuantity, // Quantité de token à transférer

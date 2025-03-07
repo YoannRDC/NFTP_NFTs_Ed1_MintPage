@@ -19,14 +19,14 @@ export async function convertEurToPOL(eur: number): Promise<{ amount: number; da
     const symbolDirect = "MATIC/EUR";
     try {
       const tickerDirect = await exchange.fetchTicker(symbolDirect);
-      console.log("Ticker direct :", tickerDirect);
+      //console.log("Ticker direct :", tickerDirect);
       priceInEur = tickerDirect.last;
       // Si le prix direct n'est pas valide, essayer avec prevClosePrice
       if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
         const prev = parseFloat((tickerDirect.info as any).prevClosePrice);
         if (!isNaN(prev) && prev > 0) {
           priceInEur = prev;
-          console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolDirect} : ${priceInEur}`);
+          //console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolDirect} : ${priceInEur}`);
         }
       }
       usedDatetime = tickerDirect.datetime;
@@ -36,37 +36,37 @@ export async function convertEurToPOL(eur: number): Promise<{ amount: number; da
 
     // Si le ticker direct n'est pas disponible ou ne fournit pas un prix valide, utiliser le fallback.
     if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
-      console.log(`La paire ${symbolDirect} n'est pas disponible ou retourne un prix indéfini/0. Utilisation du fallback via MATIC/USDT et USDT/EUR.`);
+      //console.log(`La paire ${symbolDirect} n'est pas disponible ou retourne un prix indéfini/0. Utilisation du fallback via MATIC/USDT et USDT/EUR.`);
       const symbolMaticUsdt = "MATIC/USDT";
       const symbolUsdtEur = "USDT/EUR";
       const tickerMaticUsdt = await exchange.fetchTicker(symbolMaticUsdt);
-      console.log("Ticker MATIC/USDT :", tickerMaticUsdt);
+      //console.log("Ticker MATIC/USDT :", tickerMaticUsdt);
       let priceMaticUsdt = tickerMaticUsdt.last;
       if (priceMaticUsdt === undefined || typeof priceMaticUsdt !== "number" || priceMaticUsdt === 0) {
         const prev = parseFloat((tickerMaticUsdt.info as any).prevClosePrice);
         if (!isNaN(prev) && prev > 0) {
           priceMaticUsdt = prev;
-          console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolMaticUsdt} : ${priceMaticUsdt}`);
+          //console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolMaticUsdt} : ${priceMaticUsdt}`);
         }
       }
       if (priceMaticUsdt === undefined || typeof priceMaticUsdt !== "number" || priceMaticUsdt === 0) {
         throw new Error(`Le prix pour ${symbolMaticUsdt} n'est pas disponible.`);
       }
       const tickerUsdtEur = await exchange.fetchTicker(symbolUsdtEur);
-      console.log("Ticker USDT/EUR :", tickerUsdtEur);
+      //console.log("Ticker USDT/EUR :", tickerUsdtEur);
       let priceUsdtEur = tickerUsdtEur.last;
       if (priceUsdtEur === undefined || typeof priceUsdtEur !== "number" || priceUsdtEur === 0) {
         const prev = parseFloat((tickerUsdtEur.info as any).prevClosePrice);
         if (!isNaN(prev) && prev > 0) {
           priceUsdtEur = prev;
-          console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolUsdtEur} : ${priceUsdtEur}`);
+          //console.log(`Utilisation de ticker.info.prevClosePrice pour ${symbolUsdtEur} : ${priceUsdtEur}`);
         }
       }
       if (priceUsdtEur === undefined || typeof priceUsdtEur !== "number" || priceUsdtEur === 0) {
         throw new Error(`Le prix pour ${symbolUsdtEur} n'est pas disponible.`);
       }
       priceInEur = priceMaticUsdt * priceUsdtEur;
-      console.log(`Prix dérivé pour MATIC/EUR via fallback: ${priceInEur} EUR (MATIC/USDT: ${priceMaticUsdt}, USDT/EUR: ${priceUsdtEur})`);
+      //console.log(`Prix dérivé pour MATIC/EUR via fallback: ${priceInEur} EUR (MATIC/USDT: ${priceMaticUsdt}, USDT/EUR: ${priceUsdtEur})`);
       // On choisit la datetime de MATIC/USDT en fallback.
       usedDatetime = tickerMaticUsdt.datetime;
     } else {
@@ -78,7 +78,7 @@ export async function convertEurToPOL(eur: number): Promise<{ amount: number; da
     }
 
     const amountInPOL = eur / priceInEur;
-    console.log(`Conversion réussie : ${eur} EUR équivaut à ${amountInPOL} POL (prix MATIC/EUR: ${priceInEur})`);
+    //console.log(`Conversion réussie : ${eur} EUR équivaut à ${amountInPOL} POL (prix MATIC/EUR: ${priceInEur})`);
     return { amount: amountInPOL, datetime: usedDatetime || new Date().toISOString() };
   } catch (error) {
     console.error("Erreur lors de la conversion EUR vers POL:", error);

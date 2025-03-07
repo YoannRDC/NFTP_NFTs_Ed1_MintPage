@@ -111,7 +111,7 @@ function NFTPed1Content() {
       try {
         const result = await convertEurToPOL(NFT_PRICE_EUR);
         setConversionResult(result);
-        console.log("Dernière mise à jour EUR -> POL :", new Date(result.datetime).toLocaleString());
+        console.log("convertEurToPOL :", new Date(result.datetime).toLocaleString(), ", value (EUR):", NFT_PRICE_EUR, ", value (POL):", result.amount);
       } catch (error) {
         console.error("Erreur lors de la conversion EUR vers POL :", error);
       }
@@ -124,21 +124,24 @@ function NFTPed1Content() {
   // Récupérer les tokens ERC1155 possédés par l'utilisateur pour chacun des tokenIds
   useEffect(() => {
     async function fetchOwnedTokens() {
+      console.log("fetchOwnedTokens ...");
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
         const tokens: { tokenId: bigint; balance: bigint; metadata?: any }[] = [];
         for (const tokenId of tokenIds) {
+          console.log(" -> tokenId:", tokenId);
           const tokenBalance = await balanceOf({
             contract: nicoleMathieuEd1Contract,
             owner: smartAccount.address,
             tokenId,
           });
-          console.log("tokenId:", tokenId, "tokenBalance:", tokenBalance);
+          console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
             const metadata = await fetchTokenMetadata(tokenId, allBatches);
             tokens.push({ tokenId, balance: tokenBalance, metadata });
           }
+          console.log("done.");
         }
         setOwnedTokens(tokens);
       } catch (error) {
