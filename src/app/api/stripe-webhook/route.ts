@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       const blockchainId = paymentIntent.metadata.blockchainId;
       const requestedQuantity = paymentIntent.metadata.requestedQuantity; // en string
-      const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition"
+      const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc1155drop"
       const tokenId = paymentIntent.metadata.tokenId; 
 
       console.log("buyerWalletAddress:", buyerWalletAddress);
@@ -112,15 +112,17 @@ export async function POST(req: NextRequest) {
       });
 
       let transaction;
-      if (contractType === "erc1155drop" || contractType === "erc1155edition") {
+      if (contractType === "erc1155drop") {
         // Appel de claimTo de la librairie ERC1155
+        console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity) ,", tokenId:", tokenId);
         transaction = claimToERC1155({
           contract: nftContract,
           to: buyerWalletAddress,
           quantity: BigInt(requestedQuantity),
           tokenId: tokenId,
         });
-      } else if (contractType === "erc721drop" || contractType === "erc721collection") {
+      } else if (contractType === "erc721drop") {
+        console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
         // Appel de claimTo de la librairie ERC721
         transaction = claimToERC721({
           contract: nftContract,

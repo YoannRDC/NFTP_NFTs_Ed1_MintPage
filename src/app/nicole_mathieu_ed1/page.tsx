@@ -33,7 +33,7 @@ const collectionImageSrc = "/nicole_mathieu_ed1/Nicole_Mathieu.png";
 const collectionShortDescription = "First NFT collection of Nicole Mathieu.";
 const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
-const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc1155edition";
+const contractType: "erc721drop" | "erc1155drop" = "erc1155drop";
 const stripeMode: "test" | "live" = "test";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 1 à 10.

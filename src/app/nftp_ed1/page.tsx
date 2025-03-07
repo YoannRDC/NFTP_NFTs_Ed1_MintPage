@@ -38,7 +38,7 @@ const collectionImageSrc="/logo_seul_11.png";
 const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
-const contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition" = "erc721drop";
+const contractType: "erc721drop" | "erc1155drop" = "erc721drop";
 
 // useless in this context:
 const tokenId= 0n;

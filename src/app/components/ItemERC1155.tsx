@@ -22,7 +22,7 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
-  contractType: "erc721drop" | "erc721collection" | "erc1155drop" | "erc1155edition";
+  contractType: "erc721drop" | "erc1155drop" ;
   tokenId: bigint;
 }
 
