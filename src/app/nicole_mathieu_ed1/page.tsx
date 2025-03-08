@@ -105,6 +105,7 @@ function NFTPed1Content() {
             const metadata = await fetchTokenMetadata(tokenId);
             console.log("metadata:", metadata);
             tokens.push({ tokenId, balance: tokenBalance, metadata });
+            console.log("! metadata:", metadata);
           }
           console.log("done.");
         }
@@ -325,7 +326,6 @@ function NFTPed1Content() {
               />
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
-                metadata: {JSON.stringify(token.metadata, null, 2)}
               </p>
               <p>Vous en possédez {token.balance.toString()}</p>
             </div>
