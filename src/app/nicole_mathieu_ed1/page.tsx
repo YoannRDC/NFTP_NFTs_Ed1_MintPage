@@ -315,7 +315,7 @@ function NFTPed1Content() {
               />
               <p className="font-semibold mt-2">
                 {token.metadata?.name || `Token #${token.tokenId.toString()}`}
-                metadata: {token.metadata}
+                metadata: {token.toString()}
               </p>
               <p>Vous en possédez {token.balance.toString()}</p>
             </div>
