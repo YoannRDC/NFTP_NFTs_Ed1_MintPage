@@ -36,37 +36,43 @@ const artistProjectWebsitePrettyPrint = "NMMathieu.com";
 const contractType: "erc721drop" | "erc1155drop" = "erc1155drop";
 const stripeMode: "test" | "live" = "test";
 
-// Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 1 à 10.
+// Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
 const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
-async function fetchTokenMetadata(tokenId: bigint): Promise<any | null> {
+/**
+ * Récupère l'URI des métadonnées pour un token donné via le contrat.
+ */
+async function fetchTokenMetadata(tokenId: bigint): Promise<string | null> {
   try {
     const data = await readContract({
       contract: nicoleMathieuEd1Contract,
-      method:
-        "function uri(uint256 _tokenId) view returns (string)",
+      method: "function uri(uint256 _tokenId) view returns (string)",
       params: [tokenId],
     });
-
-    console.log("Métadonnées récupérées pour le token", tokenId, ": ", data);
+    console.log("URI récupérée pour le token", tokenId, ": ", data);
     return data;
   } catch (error) {
-    console.error("Erreur lors de la récupération des métadonnées pour le token", tokenId, error);
+    console.error("Erreur lors de la récupération de l'URI pour le token", tokenId, error);
     return null;
   }
 }
 
-async function getNFTmetadata(url: string): Promise<void> {
+/**
+ * Effectue un fetch sur l'URL fournie pour récupérer le JSON des métadonnées du NFT.
+ */
+async function getNFTmetadata(url: string): Promise<any | null> {
   try {
-    const reponse = await fetch(url);
-    if (!reponse.ok) {
-      console.error(`Erreur lors de la récupération des métadonnées : ${reponse.statusText}`);
-      return;
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`Erreur lors de la récupération des métadonnées : ${response.statusText}`);
+      return null;
     }
-    const metadata = await reponse.json();
+    const metadata = await response.json();
     console.log("Métadonnées du NFT :", metadata);
-  } catch (erreur) {
-    console.error("Erreur lors de la récupération des métadonnées du NFT :", erreur);
+    return metadata;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des métadonnées du NFT :", error);
+    return null;
   }
 }
 
@@ -77,9 +83,9 @@ function NFTPed1Content() {
   const smartAccount = useActiveAccount();
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  // ownedTokens contiendra pour chaque token possédé : tokenId, balance, metadata
+  // ownedTokens contiendra pour chaque token possédé : tokenId, balance, metadata et imageUri
   const [ownedTokens, setOwnedTokens] = useState<
-    { tokenId: bigint; balance: bigint; metadata?: any }[]
+    { tokenId: bigint; balance: bigint; metadata?: any; imageUri?: string }[]
   >([]);
 
   // Actualiser périodiquement la conversion EUR -> POL
@@ -88,7 +94,14 @@ function NFTPed1Content() {
       try {
         const result = await convertEurToPOL(NFT_PRICE_EUR);
         setConversionResult(result);
-        console.log("convertEurToPOL :", new Date(result.datetime).toLocaleString(), ", value (EUR):", NFT_PRICE_EUR, ", value (POL):", result.amount);
+        console.log(
+          "convertEurToPOL :",
+          new Date(result.datetime).toLocaleString(),
+          ", value (EUR):",
+          NFT_PRICE_EUR,
+          ", value (POL):",
+          result.amount
+        );
       } catch (error) {
         console.error("Erreur lors de la conversion EUR vers POL :", error);
       }
@@ -105,7 +118,7 @@ function NFTPed1Content() {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
-        const tokens: { tokenId: bigint; balance: bigint; metadata?: any }[] = [];
+        const tokens: { tokenId: bigint; balance: bigint; metadata?: any; imageUri?: string }[] = [];
         for (const tokenId of tokenIds) {
           console.log(" -> tokenId:", tokenId);
           const tokenBalance = await balanceOf({
@@ -115,17 +128,20 @@ function NFTPed1Content() {
           });
           console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
-            const metadata = await fetchTokenMetadata(tokenId);
-
-            const nftMetadata = await getNFTmetadata(metadata.replace("ipfs://", "https://ipfs.io/ipfs/"));
-            console.log("nftMetadata: ", nftMetadata);
-
-            
-
-            tokens.push({ tokenId, balance: tokenBalance, metadata });
-            console.log("! metadata:", metadata);
+            const metadataUri = await fetchTokenMetadata(tokenId);
+            if (metadataUri) {
+              // Conversion de l'URI IPFS en URL HTTP
+              const url = metadataUri.replace("ipfs://", "https://ipfs.io/ipfs/");
+              const nftMetadata = await getNFTmetadata(url);
+              if (nftMetadata) {
+                console.log("nftMetadata:", nftMetadata);
+                console.log("nftMetadata.image:", nftMetadata.image);
+                const imageUri = nftMetadata.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+                tokens.push({ tokenId, balance: tokenBalance, metadata: nftMetadata, imageUri });
+              }
+            }
           }
-          console.log("done.");
+          console.log("done for tokenId:", tokenId);
         }
         setOwnedTokens(tokens);
       } catch (error) {
@@ -198,7 +214,9 @@ function NFTPed1Content() {
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
       <div className="decorative-title mb-5">-- NFTs à vendre --</div>
-      <h1 style={{ fontSize: '4em', color: 'red' }}>!! Page en construction, merci de ne pas intéragir !!</h1>
+      <h1 style={{ fontSize: "4em", color: "red" }}>
+        !! Page en construction, merci de ne pas intéragir !!
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <ItemERC1155
@@ -339,7 +357,7 @@ function NFTPed1Content() {
             >
               <MediaRenderer
                 client={client}
-                src={token.metadata?.image}
+                src={token.imageUri || token.metadata?.image}
                 style={{ width: "100%", height: "auto", borderRadius: "10px" }}
               />
               <p className="font-semibold mt-2">
