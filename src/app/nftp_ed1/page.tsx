@@ -16,7 +16,7 @@ import ItemERC721 from "../components/ItemERC721";
 import { defineChain, getContract } from "thirdweb";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
-const NFT_PRICE_EUR = 15; // Prix fixe en Euros
+const NFT_PRICE_EUR = 1; // Prix fixe en Euros
 const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 const DEFAULT_NFT_PRICE_POL = 49;
 

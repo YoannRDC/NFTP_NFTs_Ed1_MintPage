@@ -49,7 +49,6 @@ async function fetchTokenMetadata(tokenId: bigint): Promise<string | null> {
       method: "function uri(uint256 _tokenId) view returns (string)",
       params: [tokenId],
     });
-    console.log("URI récupérée pour le token", tokenId, ": ", data);
     return data;
   } catch (error) {
     console.error("Erreur lors de la récupération de l'URI pour le token", tokenId, error);
@@ -68,7 +67,6 @@ async function getNFTmetadata(url: string): Promise<any | null> {
       return null;
     }
     const metadata = await response.json();
-    console.log("Métadonnées du NFT :", metadata);
     return metadata;
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées du NFT :", error);
@@ -114,19 +112,16 @@ function NFTPed1Content() {
   // Récupérer les tokens ERC1155 possédés par l'utilisateur pour chacun des tokenIds
   useEffect(() => {
     async function fetchOwnedTokens() {
-      console.log("fetchOwnedTokens ...");
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
         const tokens: { tokenId: bigint; balance: bigint; metadata?: any; imageUri?: string }[] = [];
         for (const tokenId of tokenIds) {
-          console.log(" -> tokenId:", tokenId);
           const tokenBalance = await balanceOf({
             contract: nicoleMathieuEd1Contract,
             owner: smartAccount.address,
             tokenId,
           });
-          console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
             const metadataUri = await fetchTokenMetadata(tokenId);
             if (metadataUri) {
@@ -134,14 +129,11 @@ function NFTPed1Content() {
               const url = metadataUri.replace("ipfs://", "https://ipfs.io/ipfs/");
               const nftMetadata = await getNFTmetadata(url);
               if (nftMetadata) {
-                console.log("nftMetadata:", nftMetadata);
-                console.log("nftMetadata.image:", nftMetadata.image);
                 const imageUri = nftMetadata.image.replace("ipfs://", "https://ipfs.io/ipfs/");
                 tokens.push({ tokenId, balance: tokenBalance, metadata: nftMetadata, imageUri });
               }
             }
           }
-          console.log("done for tokenId:", tokenId);
         }
         setOwnedTokens(tokens);
       } catch (error) {
