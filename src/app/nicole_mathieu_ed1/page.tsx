@@ -14,7 +14,7 @@ import ItemERC1155 from "../components/ItemERC1155";
 import { balanceOf } from "thirdweb/extensions/erc1155";
 
 // Constantes de configuration
-const NFT_PRICE_EUR = 5; // Prix fixe en Euros
+const NFT_PRICE_EUR = 1; // Prix fixe en Euros
 const DEFAULT_NFT_PRICE_POL = 49;
 
 const nicoleMathieuEd1Address = "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e";
