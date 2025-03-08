@@ -105,6 +105,8 @@ export default function ItemERC1155({
         );
       }
     };
+    
+    console.log("ICI contract:", contractType, ", quantity:", BigInt(requestedQuantity) ,", tokenId:", tokenId);
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 

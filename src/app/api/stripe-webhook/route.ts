@@ -119,8 +119,8 @@ export async function POST(req: NextRequest) {
           contract: nftContract,
           from: minterAddress,
           to: buyerWalletAddress,
-          tokenId: 1n,
-          value:2n,
+          tokenId: tokenId,
+          value:BigInt(requestedQuantity),
           data:"0x"
         });
       } else if (contractType === "erc721drop") {
