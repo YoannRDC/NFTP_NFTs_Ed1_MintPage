@@ -3,13 +3,13 @@ export const dynamic = "force-dynamic";
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
+import { MediaRenderer, useActiveAccount } from "thirdweb/react";
 import { client } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import { defineChain, getContract } from "thirdweb";
+import { defineChain, getContract, readContract } from "thirdweb";
 import ItemERC1155 from "../components/ItemERC1155";
 import { balanceOf } from "thirdweb/extensions/erc1155";
 
@@ -41,12 +41,21 @@ const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
 
 async function fetchTokenMetadata(tokenId: bigint): Promise<any | null> {
   try {
-    console.log ("TODO: fetch metadata.")
+    const data = await readContract({
+      contract: nicoleMathieuEd1Contract,
+      method:
+        "function uri(uint256 _tokenId) view returns (string)",
+      params: [tokenId],
+    });
+
+    console.log("Métadonnées récupérées pour le token", tokenId, ": ", data);
+    return data;
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées pour le token", tokenId, error);
+    return null;
   }
-  return null;
 }
+
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
