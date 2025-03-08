@@ -56,6 +56,19 @@ async function fetchTokenMetadata(tokenId: bigint): Promise<any | null> {
   }
 }
 
+async function getNFTmetadata(url: string): Promise<void> {
+  try {
+    const reponse = await fetch(url);
+    if (!reponse.ok) {
+      console.error(`Erreur lors de la récupération des métadonnées : ${reponse.statusText}`);
+      return;
+    }
+    const metadata = await reponse.json();
+    console.log("Métadonnées du NFT :", metadata);
+  } catch (erreur) {
+    console.error("Erreur lors de la récupération des métadonnées du NFT :", erreur);
+  }
+}
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -103,7 +116,12 @@ function NFTPed1Content() {
           console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
             const metadata = await fetchTokenMetadata(tokenId);
-            console.log("metadata:", metadata);
+
+            const nftMetadata = await getNFTmetadata(metadata.replace("ipfs://", "https://ipfs.io/ipfs/"));
+            console.log("nftMetadata: ", nftMetadata);
+
+            
+
             tokens.push({ tokenId, balance: tokenBalance, metadata });
             console.log("! metadata:", metadata);
           }
