@@ -103,6 +103,7 @@ function NFTPed1Content() {
           console.log(" -> tokenId:", tokenId, "tokenBalance:", tokenBalance);
           if (tokenBalance > 0n) {
             const metadata = await fetchTokenMetadata(tokenId);
+            console.log("metadata:", metadata);
             tokens.push({ tokenId, balance: tokenBalance, metadata });
           }
           console.log("done.");
