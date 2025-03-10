@@ -216,6 +216,7 @@ export default function ItemERC1155({
             </TransactionButton>
 
             <p className="mb-2">{totalPricePol} POL</p>
+            <div>
               requestedQuantity={requestedQuantity}
               amount={totalPriceEurCents}
               stripeMode={stripeMode}
@@ -223,6 +224,7 @@ export default function ItemERC1155({
               contractType={contractType}
               redirectPage={redirectPage}
               tokenId={tokenId}
+            </div>
             <PurchasePage
               requestedQuantity={requestedQuantity}
               amount={totalPriceEurCents}
