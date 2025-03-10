@@ -11,7 +11,7 @@ import {
 import { client, minterAddress, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
-import { safeTransferFrom } from "thirdweb/extensions/erc1155";
+import { claimTo, safeTransferFrom } from "thirdweb/extensions/erc1155";
 import { convertPriceInPolToWei } from "../utils/conversion";
 import PurchasePage from "./PurchasePage";
 
@@ -106,7 +106,6 @@ export default function ItemERC1155({
       }
     };
     
-    console.log("ICI contract:", contractType, ", quantity:", BigInt(requestedQuantity) ,", tokenId:", tokenId);
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
@@ -193,17 +192,15 @@ export default function ItemERC1155({
 
             <TransactionButton
               transaction={() =>
-                safeTransferFrom({
+                claimTo({
                   contract: contract,
-                  from: minterAddress, // Adresse détentrice des NFT pré-mintés
-                  to: smartAccount.address, // Adresse de l'acheteur
-                  tokenId: tokenId, // Utilisation de la prop tokenId
-                  value: requestedQuantity, // Quantité de token à transférer
-                  data: "0x", // Données supplémentaires
-                  overrides: {
+                  to: smartAccount.address,
+                  tokenId: tokenId,
+                  quantity: BigInt(requestedQuantity),
+/*                   overrides: {
                     // Définir le prix du NFT en wei
                     value: convertPriceInPolToWei(totalPricePol),
-                  },
+                  }, */
                 })
               }
               onError={(error: Error) => {
@@ -219,6 +216,13 @@ export default function ItemERC1155({
             </TransactionButton>
 
             <p className="mb-2">{totalPricePol} POL</p>
+              requestedQuantity={requestedQuantity}
+              amount={totalPriceEurCents}
+              stripeMode={stripeMode}
+              contract={contract}
+              contractType={contractType}
+              redirectPage={redirectPage}
+              tokenId={tokenId}
             <PurchasePage
               requestedQuantity={requestedQuantity}
               amount={totalPriceEurCents}
