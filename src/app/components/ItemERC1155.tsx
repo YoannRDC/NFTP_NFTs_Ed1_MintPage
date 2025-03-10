@@ -216,15 +216,25 @@ export default function ItemERC1155({
             </TransactionButton>
 
             <p className="mb-2">{totalPricePol} POL</p>
-            <div>
-              requestedQuantity={requestedQuantity}
-              amount={totalPriceEurCents}
-              stripeMode={stripeMode}
-              contract={contract}
-              contractType={contractType}
-              redirectPage={redirectPage}
-              tokenId={tokenId}
-            </div>
+            <div className="debug-logs">
+            <h3>Logs (temporaire)</h3>
+            <pre>
+              {JSON.stringify(
+                {
+                  requestedQuantity: requestedQuantity.toString(),
+                  amount: totalPriceEurCents,
+                  stripeMode,
+                  // Pour éviter d'afficher trop d'informations du contrat, on peut n'afficher que son adresse
+                  contract: contract?.address,
+                  contractType,
+                  redirectPage,
+                  tokenId: tokenId.toString(),
+                },
+                null,
+                2
+              )}
+            </pre>
+          </div>
             <PurchasePage
               requestedQuantity={requestedQuantity}
               amount={totalPriceEurCents}
