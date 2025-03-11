@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { setClaimConditions } from "thirdweb/extensions/erc721";
+import { setClaimConditions as setClaimConditionsERC721 } from "thirdweb/extensions/erc721";
+import { setClaimConditions as setClaimConditionsERC1155 } from "thirdweb/extensions/erc1155";
 import { ContractOptions, sendTransaction } from "thirdweb";
 import { useActiveAccount } from "thirdweb/react";
 import { nftpPubKey } from "../constants";
@@ -9,19 +10,21 @@ import { nftpPubKey } from "../constants";
 interface ClaimConditionFormProps {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
+  contractType: "erc721drop" | "erc1155drop"; // nouveau paramètre
+  tokenId?: bigint;
 }
 
-export default function ClaimConditionForm({ contract, initialOverrides = [] }: ClaimConditionFormProps) {
+export default function ClaimConditionForm({ contract, initialOverrides = [], contractType, tokenId }: ClaimConditionFormProps) {
   const smartAccount = useActiveAccount();
   const [overrideList, setOverrideList] = useState<{ address: string; maxClaimable: string; price: string }[]>([]);
 
-  // ✅ Champs généraux avec des valeurs par défaut
-  const [maxClaimableSupply, setMaxClaimableSupply] = useState("10000");
-  const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("10");
-  const [currencyAddress, setCurrencyAddress] = useState("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
-  const [price, setPrice] = useState("49");
+  // Champs généraux avec des valeurs par défaut
+  const [maxClaimableSupply, setMaxClaimableSupply] = useState("");
+  const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("");
+  const [currencyAddress, setCurrencyAddress] = useState("");
+  const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
-  const [metadata, setMetadata] = useState("ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0");
+  const [metadata, setMetadata] = useState(""); // ex: ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0
 
   useEffect(() => {
     if (initialOverrides.length > 0) {
@@ -48,26 +51,52 @@ export default function ClaimConditionForm({ contract, initialOverrides = [] }: 
   const handleSubmit = async () => {
     console.log("smartAccount.address.toLowerCase():", smartAccount!.address.toLowerCase());
     console.log("nftpPubKey.toLowerCase():", nftpPubKey.toLowerCase());
+    console.log("contractType:", contractType);
     if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
 
     try {
-      const transaction = setClaimConditions({
-        contract: contract, // Utilisation du contrat passé en prop
-        phases: [
-          {
-            maxClaimableSupply: BigInt(maxClaimableSupply),
-            maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-            currencyAddress,
-            price: parseFloat(price),
-            startTime: new Date(startDate),
-            overrideList,
-            metadata,
-          },
-        ],
-      });
+      let transaction;
+      if (contractType === "erc721drop") {
+        transaction = setClaimConditionsERC721({
+          contract: contract,
+          phases: [
+            {
+              maxClaimableSupply: BigInt(maxClaimableSupply),
+              maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
+              currencyAddress,
+              price: parseFloat(price),
+              startTime: new Date(startDate),
+              overrideList,
+              metadata,
+            },
+          ],
+        });
+      } else if (contractType === "erc1155drop") {
+        if (tokenId === undefined) {
+          alert("Le tokenId est requis pour un contrat ERC1155.");
+          return;
+        }
+        transaction = setClaimConditionsERC1155({
+          contract: contract,
+          tokenId: tokenId,
+          phases: [
+            {
+              maxClaimableSupply: BigInt(maxClaimableSupply),
+              maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
+              currencyAddress,
+              price: parseFloat(price),
+              startTime: new Date(startDate),
+              overrideList,
+              metadata,
+            },
+          ],
+        });
+      } else {
+        throw new Error("Unsupported contract type");
+      }
 
       await sendTransaction({ transaction, account: smartAccount });
       alert("✅ Conditions mises à jour avec succès !");

@@ -27,6 +27,9 @@ const contractsInfo = {
   },
 };
 
+// Définition d'un type pour les clés de contractsInfo
+type ContractKey = keyof typeof contractsInfo;
+
 // Connexion aux contrats
 const nftpNftsEd1Contract = getContract({
   client,
@@ -41,7 +44,7 @@ const fragChroEd1Contract = getContract({
 });
 
 // Objet pour associer une clé à son contrat
-const contractObjects: { [key: string]: any } = {
+const contractObjects: { [key in ContractKey]: any } = {
   nftpNftsEd1: nftpNftsEd1Contract,
   fragChroEd1: fragChroEd1Contract,
 };
@@ -50,7 +53,8 @@ const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
   const [erc1155Tokens, setErc1155Tokens] = useState<bigint[]>([]);
-  const [selectedContractKey, setSelectedContractKey] = useState<string>("nftpNftsEd1");
+  // On restreint le type ici aux clés définies dans ContractKey
+  const [selectedContractKey, setSelectedContractKey] = useState<ContractKey>("nftpNftsEd1");
   const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
@@ -66,8 +70,9 @@ const AdminPage: React.FC = () => {
     createWallet("io.zerion.wallet"),
   ];
 
-  // Récupérer le contrat sélectionné dans la dropdown
+  // Récupérer le contrat et son type à partir de la clé sélectionnée
   const selectedContract = contractObjects[selectedContractKey];
+  const selectedContractType = contractsInfo[selectedContractKey].contractType;
 
   // Fonction pour récupérer le nextTokenIdToMint (de type bigint)
   // et créer la liste des token IDs disponibles (de 0 à nextTokenId - 1)
@@ -84,7 +89,6 @@ const AdminPage: React.FC = () => {
         tokensArray.push(i);
       }
       setErc1155Tokens(tokensArray);
-      // Définir le token sélectionné par défaut si la liste n'est pas vide
       if (tokensArray.length > 0) {
         setSelectedERC1155Token(tokensArray[0]);
       }
@@ -93,14 +97,14 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // useEffect : dès que le contrat sélectionné est fragChroEd1, on récupère automatiquement les token IDs
+  // useEffect : dès que le contrat sélectionné est de type erc1155drop, on récupère automatiquement les token IDs
   useEffect(() => {
-    if (selectedContractKey === "fragChroEd1") {
+    if (selectedContractType === "erc1155drop") {
       fetchNextTokenId();
     } else {
       setErc1155Tokens([]);
     }
-  }, [selectedContractKey]);
+  }, [selectedContractType]);
 
   return (
     <div className="flex flex-col items-center">
@@ -115,7 +119,6 @@ const AdminPage: React.FC = () => {
         />
       </div>
 
-      {/* Dropdown pour sélectionner le contrat */}
       {isAdmin && (
         <div className="my-4">
           <label htmlFor="contract-select" className="mr-2 font-bold">
@@ -124,7 +127,7 @@ const AdminPage: React.FC = () => {
           <select
             id="contract-select"
             value={selectedContractKey}
-            onChange={(e) => setSelectedContractKey(e.target.value)}
+            onChange={(e) => setSelectedContractKey(e.target.value as ContractKey)}
             className="border p-2 rounded"
           >
             {Object.keys(contractsInfo).map((key) => (
@@ -136,9 +139,8 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && selectedContractKey === "nftpNftsEd1" && (
+      {isAdmin && selectedContractType === "erc721drop" && (
         <>
-          {/* Section pour le contrat ERC721 (nftpNftsEd1) */}
           <ClaimSnapshotERC721
             onSnapshotFetched={setSnapshotData}
             contract={selectedContract}
@@ -146,11 +148,12 @@ const AdminPage: React.FC = () => {
           <ClaimConditionForm
             initialOverrides={snapshotData}
             contract={selectedContract}
+            contractType={selectedContractType}
           />
         </>
       )}
 
-      {isAdmin && selectedContractKey === "fragChroEd1" && (
+      {isAdmin && selectedContractType === "erc1155drop" && (
         <div className="erc1155-section mt-10">
           <h2 className="text-xl font-bold">Tokens ERC1155 (fragChroEd1)</h2>
           {erc1155Tokens.length > 0 && (
