@@ -16,9 +16,9 @@ import ItemERC721 from "../components/ItemERC721";
 import { defineChain, getContract } from "thirdweb";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
-const NFT_PRICE_EUR = 15; // Prix fixe en Euros
+const NFT_PRICE_EUR = 19; // Prix fixe en Euros
 const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
-const DEFAULT_NFT_PRICE_POL = 49;
+const DISPLAYED_NFT_PRICE_POL = 99; // Informative: Price is set via Claim conditions.  
 
 // NFTP contracts
 const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
@@ -49,12 +49,15 @@ function NFTPed1Content() {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
+
+  // Price is set in Claim conditions. Cannot define another price during when user claims. 
   const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
-  useEffect(() => {
+  // Works but useless as POL price is set in claim conditions.
+/*   useEffect(() => {
     async function fetchConversion() {
       try {
         const result = await convertEurToPOL(NFT_PRICE_EUR);
@@ -67,7 +70,7 @@ function NFTPed1Content() {
     fetchConversion();
     const interval = setInterval(fetchConversion, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, []); */
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
@@ -149,7 +152,7 @@ function NFTPed1Content() {
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
         <ItemERC721 
           totalSupply={TOTAL_SUPPLY} 
-          priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+          priceInPol={DISPLAYED_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
           contract={nftpNftsEd1Contract}
           stripeMode={stripeMode}

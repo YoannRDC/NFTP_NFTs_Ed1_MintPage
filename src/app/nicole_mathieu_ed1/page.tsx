@@ -15,7 +15,7 @@ import { balanceOf } from "thirdweb/extensions/erc1155";
 
 // Constantes de configuration
 const NFT_PRICE_EUR = 5; // Prix fixe en Euros
-const DEFAULT_NFT_PRICE_POL = 49;
+const DISPLAYED_NFT_PRICE_POL = 49; // Only for display, real price in POL in set in the claim conditions.
 
 const nicoleMathieuEd1Address = "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e";
 const nicoleMathieuEd1Contract = getContract({
@@ -213,7 +213,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={0n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -225,7 +225,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={1n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -237,7 +237,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={2n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -249,7 +249,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={3n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -261,7 +261,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={4n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -273,7 +273,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={5n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -285,7 +285,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={6n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -297,7 +297,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={7n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -309,7 +309,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={8n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -321,7 +321,7 @@ function NFTPed1Content() {
         <div>
           <ItemERC1155
             tokenId={9n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DEFAULT_NFT_PRICE_POL}
+            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}

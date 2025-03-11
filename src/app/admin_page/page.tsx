@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
@@ -75,8 +75,7 @@ const AdminPage: React.FC = () => {
     try {
       const data: bigint = await readContract({
         contract: fragChroEd1Contract,
-        method:
-          "function nextTokenIdToMint() view returns (uint256)",
+        method: "function nextTokenIdToMint() view returns (uint256)",
         params: [],
       });
       console.log("nextTokenIdToMint: ", data);
@@ -93,6 +92,15 @@ const AdminPage: React.FC = () => {
       console.error("Erreur lors du chargement des tokens ERC1155", error);
     }
   };
+
+  // useEffect : dès que le contrat sélectionné est fragChroEd1, on récupère automatiquement les token IDs
+  useEffect(() => {
+    if (selectedContractKey === "fragChroEd1") {
+      fetchNextTokenId();
+    } else {
+      setErc1155Tokens([]);
+    }
+  }, [selectedContractKey]);
 
   return (
     <div className="flex flex-col items-center">
@@ -143,46 +151,36 @@ const AdminPage: React.FC = () => {
       )}
 
       {isAdmin && selectedContractKey === "fragChroEd1" && (
-        <>
-          <div className="erc1155-section mt-10">
-            <h2 className="text-xl font-bold">
-              Tokens ERC1155 (fragChroEd1)
-            </h2>
-            <button
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              onClick={fetchNextTokenId}
-            >
-              Charger la liste des tokens ERC1155
-            </button>
-            {erc1155Tokens.length > 0 && (
-              <div className="mt-4">
-                <label htmlFor="erc1155-select" className="mr-2 font-bold">
-                  Sélectionner le Token ID :
-                </label>
-                <select
-                  id="erc1155-select"
-                  value={selectedERC1155Token.toString()}
-                  onChange={(e) =>
-                    setSelectedERC1155Token(BigInt(e.target.value))
-                  }
-                  className="border p-2 rounded"
-                >
-                  {erc1155Tokens.map((token, index) => (
-                    <option key={index} value={token.toString()}>
-                      Token ID: {token.toString()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+        <div className="erc1155-section mt-10">
+          <h2 className="text-xl font-bold">Tokens ERC1155 (fragChroEd1)</h2>
+          {erc1155Tokens.length > 0 && (
+            <div className="mt-4">
+              <label htmlFor="erc1155-select" className="mr-2 font-bold">
+                Sélectionner le Token ID :
+              </label>
+              <select
+                id="erc1155-select"
+                value={selectedERC1155Token.toString()}
+                onChange={(e) =>
+                  setSelectedERC1155Token(BigInt(e.target.value))
+                }
+                className="border p-2 rounded"
+              >
+                {erc1155Tokens.map((token, index) => (
+                  <option key={index} value={token.toString()}>
+                    Token ID: {token.toString()}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-            <ClaimSnapshotERC1155
-              onSnapshotFetched={setSnapshotData}
-              contract={selectedContract}
-              tokenId={selectedERC1155Token}
-            />
-          </div>
-        </>
+          <ClaimSnapshotERC1155
+            onSnapshotFetched={setSnapshotData}
+            contract={selectedContract}
+            tokenId={selectedERC1155Token}
+          />
+        </div>
       )}
 
       <Link

@@ -8,11 +8,10 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, minterAddress, nftpPubKey } from "../constants";
+import { client, minterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
-import { claimTo, safeTransferFrom } from "thirdweb/extensions/erc1155";
-import { convertPriceInPolToWei } from "../utils/conversion";
+import { claimTo } from "thirdweb/extensions/erc1155";
 import PurchasePage from "./PurchasePage";
 
 interface ItemERC721Props {
