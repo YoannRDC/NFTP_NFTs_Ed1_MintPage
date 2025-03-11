@@ -9,6 +9,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
+import { token } from "thirdweb/extensions/vote";
 
 // Définition des informations de chaque contrat
 const contractsInfo = {
@@ -181,6 +182,12 @@ const AdminPage: React.FC = () => {
           <ClaimSnapshotERC1155
             onSnapshotFetched={setSnapshotData}
             contract={selectedContract}
+            tokenId={selectedERC1155Token}
+          />
+          <ClaimConditionForm
+            initialOverrides={snapshotData}
+            contract={selectedContract}
+            contractType={selectedContractType}
             tokenId={selectedERC1155Token}
           />
         </div>
