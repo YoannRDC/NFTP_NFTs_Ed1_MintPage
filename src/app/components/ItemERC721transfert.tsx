@@ -11,7 +11,6 @@ import PurchasePage from "./PurchasePage";
 import { client, minterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { prepareContractCall, readContract } from "thirdweb";
-import { claimTo } from "thirdweb/extensions/erc721";
 
 // Définition de l'interface pour les props
 interface ItemERC721transfertProps {
@@ -27,7 +26,6 @@ interface ItemERC721transfertProps {
 }
 
 export default function ItemERC721transfert({
-  totalSupply,
   priceInPol,
   priceInEur,
   contract,
@@ -84,7 +82,7 @@ export default function ItemERC721transfert({
       </div>
 
       <div className="text-gray-500 mt-2 flex justify-center">
-        {mintedCount}/{totalSupply} NFT vendu
+        {mintedCount} NFT vendu
       </div>
 
       <div className="text-center mt-10">

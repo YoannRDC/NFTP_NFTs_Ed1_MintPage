@@ -1,48 +1,74 @@
-"use client";
+"use client"; 
 export const dynamic = "force-dynamic";
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { MediaRenderer, useActiveAccount } from "thirdweb/react";
+import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import { client } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-// Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
+import ItemERC721transfert from "../components/ItemERC721transfert";
 
-//const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
-const NFT_PRICE_EUR = 19; // Prix fixe en Euros
-const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
-const DISPLAYED_NFT_PRICE_POL = 99; // Informative: Price is set via Claim conditions.  
+// Constantes de configuration
+const NFT_PRICE_EUR = 19;
+const TOTAL_SUPPLY = 100;
+const DISPLAYED_NFT_PRICE_POL = 99;
 
-// NFTP contracts
+// Adresse du contrat NFTP
 const nftpNftsEd1Address = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
 
-// connect to your contract
+// Adresse du minter (à adapter)
+const minterAddress = "0xYourMinterAddressHere";
+
+// Connexion au contrat
 const nftpNftsEd1Contract = getContract({
   client,
   chain: defineChain(137),
   address: nftpNftsEd1Address,
 });
 
-const videoPresentationLink="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
-const videoPresentationTitle="Présentation Art Cards";
-const collectionName="Art cards";
-const collectionPageRef="/artcards";
-const collectionImageSrc="/ArtCards.gif";
-const collectionShortDescription="Art cards by YoArt.";
-const artistProjectWebsite="https://yoart.art";
-const artistProjectWebsitePrettyPrint="YoArt.art";
+const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
+const videoPresentationTitle = "Présentation Art Cards";
+const collectionName = "Art cards";
+const collectionPageRef = "/artcards";
+const collectionImageSrc = "/ArtCards.gif";
+const collectionShortDescription = "Art cards by YoArt.";
+const artistProjectWebsite = "https://yoart.art";
+const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721transfert";
 
-// useless in this context:
-const tokenId= 0n;
+// Composant pour afficher l'état de vente du NFT
+function NFTStatusLabel({
+  tokenId,
+  contract,
+  minterAddress,
+}: {
+  tokenId: bigint;
+  contract: any;
+  minterAddress: string;
+}) {
+  const { data: owner, isPending: ownerLoading } = useReadContract({
+    contract,
+    method: "function ownerOf(uint256 tokenId) view returns (address)",
+    params: [tokenId],
+  });
 
+  if (ownerLoading) return <span>Chargement...</span>;
+
+  return (
+    <span>
+      {owner?.toLowerCase() === minterAddress.toLowerCase() ? "A vendre" : "Vendu"}
+    </span>
+  );
+}
+
+// Composant principal
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -50,27 +76,18 @@ function NFTPed1Content() {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  // Price is set in Claim conditions. Cannot define another price during when user claims. 
-  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
-
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
+  const stripeMode: "test" | "live" = "live";
 
-  // Works but useless as POL price is set in claim conditions.
-/*   useEffect(() => {
-    async function fetchConversion() {
-      try {
-        const result = await convertEurToPOL(NFT_PRICE_EUR);
-        setConversionResult(result);
-        console.log("Last upadte EUR->POL price:", new Date(result.datetime).toLocaleString());
-      } catch (error) {
-        console.error("Erreur lors de la conversion EUR vers POL :", error);
-      }
-    }
-    fetchConversion();
-    const interval = setInterval(fetchConversion, 60000);
-    return () => clearInterval(interval);
-  }, []); */
+  // Récupérer le nombre total de tokens mintés
+  const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
+    contract: nftpNftsEd1Contract,
+    method: "function totalMinted() view returns (uint256)",
+    params: [],
+  });
+
+  // Conversion du résultat en nombre
+  const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
@@ -149,18 +166,36 @@ function NFTPed1Content() {
         -- NFTs à vendre --
       </div>
       
+      {/* Affichage d'un ItemERC721transfert pour chaque token minté avec son statut */}
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC721drop 
-          totalSupply={TOTAL_SUPPLY} 
-          priceInPol={DISPLAYED_NFT_PRICE_POL}
-          priceInEur={NFT_PRICE_EUR} 
-          contract={nftpNftsEd1Contract}
-          stripeMode={stripeMode}
-          previewImage={`${collectionPageRef}/preview.gif`}
-          redirectPage={collectionPageRef}
-          contractType={contractType}
-          tokenId={tokenId}
-        />
+        {isMintedLoading ? (
+          <p>Chargement des NFT mintés...</p>
+        ) : (
+          mintedCount > 0 ? (
+            Array.from({ length: mintedCount }, (_, index) => (
+              <div key={index} className="my-4">
+                <ItemERC721transfert 
+                  tokenId={BigInt(index)}
+                  totalSupply={TOTAL_SUPPLY} 
+                  priceInPol={DISPLAYED_NFT_PRICE_POL}
+                  priceInEur={NFT_PRICE_EUR} 
+                  contract={nftpNftsEd1Contract}
+                  stripeMode={stripeMode}
+                  previewImage={`${collectionPageRef}/ArtCards.gif`}
+                  redirectPage={collectionPageRef}
+                  contractType={contractType}
+                />
+                <NFTStatusLabel 
+                  tokenId={BigInt(index)} 
+                  contract={nftpNftsEd1Contract} 
+                  minterAddress={minterAddress} 
+                />
+              </div>
+            ))
+          ) : (
+            <p>Aucun NFT minté pour le moment.</p>
+          )
+        )}
       </div>
       
       <div className="decorative-title">
