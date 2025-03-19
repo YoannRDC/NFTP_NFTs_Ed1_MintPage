@@ -43,6 +43,16 @@ const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721transfert";
 
+const imagesContext = (require as any).context("../public/artcards", false, /\.(png|jpe?g|gif)$/);
+
+function getPreviewImage(index: number): string {
+  const paddedIndex = index.toString().padStart(2, '0');
+  // Les clés retournées sont du style "./08ArtCard_Clubs_9.png"
+  const keys = imagesContext.keys();
+  const foundKey = keys.find((key: string) => key.slice(2, 4) === paddedIndex);
+  return foundKey ? imagesContext(foundKey) : "";
+}
+
 // Composant pour afficher l'état de vente du NFT
 function NFTStatusLabel({
   tokenId,
