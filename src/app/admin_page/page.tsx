@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ConnectButton, useActiveAccount } from "thirdweb/react";
+import {
+  ConnectButton,
+  useActiveAccount,
+  useSendTransaction,
+} from "thirdweb/react";
+import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client, nftpPubKey } from "../constants";
@@ -9,7 +14,6 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
-import { token } from "thirdweb/extensions/vote";
 
 // Définition des informations de chaque contrat
 const contractsInfo = {
@@ -28,7 +32,8 @@ const contractsInfo = {
   },
   artcards: {
     address: "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47",
-    metadataURI: "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0",
+    metadataURI:
+      "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0",
     chainId: 137,
     contractType: "erc721transfert" as const,
   },
@@ -52,8 +57,8 @@ const fragChroEd1Contract = getContract({
 
 const artcardsContract = getContract({
   client,
-  chain: defineChain(contractsInfo.fragChroEd1.chainId),
-  address: contractsInfo.fragChroEd1.address,
+  chain: defineChain(contractsInfo.artcards.chainId),
+  address: contractsInfo.artcards.address,
 });
 
 // Objet pour associer une clé à son contrat
@@ -68,8 +73,12 @@ const AdminPage: React.FC = () => {
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
   const [erc1155Tokens, setErc1155Tokens] = useState<bigint[]>([]);
   // On restreint le type ici aux clés définies dans ContractKey
-  const [selectedContractKey, setSelectedContractKey] = useState<ContractKey>("nftpNftsEd1");
+  const [selectedContractKey, setSelectedContractKey] =
+    useState<ContractKey>("nftpNftsEd1");
   const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
+  // Nouveau state pour le nombre de tokens à réclamer
+  const [numberToClaim, setNumberToClaim] = useState("1");
+
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
@@ -87,6 +96,31 @@ const AdminPage: React.FC = () => {
   // Récupérer le contrat et son type à partir de la clé sélectionnée
   const selectedContract = contractObjects[selectedContractKey];
   const selectedContractType = contractsInfo[selectedContractKey].contractType;
+
+  // Hook pour envoyer la transaction via useSendTransaction
+  const {
+    mutate: sendTransaction,
+    status,
+    error: claimError,
+  } = useSendTransaction();
+
+  // Fonction déclenchée lors du clic sur le bouton Claim
+  const handleClaim = () => {
+    if (!account?.address) {
+      console.error("Aucun compte connecté");
+      return;
+    }
+    // Conversion du nombre de claim en BigInt
+    const claimNumber = BigInt(parseInt(numberToClaim));
+    // Construction de la transaction via claimTo de l'extension ERC721
+    const transaction = claimTo({
+      contract: selectedContract,
+      to: account.address,
+      quantity: claimNumber,
+    });
+    // Envoi de la transaction
+    sendTransaction(transaction);
+  };
 
   // Fonction pour récupérer le nextTokenIdToMint (de type bigint)
   // et créer la liste des token IDs disponibles (de 0 à nextTokenId - 1)
@@ -141,7 +175,9 @@ const AdminPage: React.FC = () => {
           <select
             id="contract-select"
             value={selectedContractKey}
-            onChange={(e) => setSelectedContractKey(e.target.value as ContractKey)}
+            onChange={(e) =>
+              setSelectedContractKey(e.target.value as ContractKey)
+            }
             className="border p-2 rounded"
           >
             {Object.keys(contractsInfo).map((key) => (
@@ -153,23 +189,55 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && (selectedContractType === "erc721drop" || selectedContractType === "erc721transfert") && (
-        <>
-          <ClaimSnapshotERC721
-            onSnapshotFetched={setSnapshotData}
-            contract={selectedContract}
-          />
-          <ClaimConditionForm
-            initialOverrides={snapshotData}
-            contract={selectedContract}
-            contractType={selectedContractType}
-          />
-        </>
-      )}
+      {isAdmin &&
+        (selectedContractType === "erc721drop" ||
+          selectedContractType === "erc721transfert") && (
+          <>
+            <ClaimSnapshotERC721
+              onSnapshotFetched={setSnapshotData}
+              contract={selectedContract}
+            />
+            <ClaimConditionForm
+              initialOverrides={snapshotData}
+              contract={selectedContract}
+              contractType={selectedContractType}
+            />
+            {/* Affichage du champ et du bouton Claim uniquement pour les contrats erc721transfert */}
+            {selectedContractType === "erc721transfert" && (
+              <div className="mt-4">
+                <label htmlFor="numberToClaim" className="mr-2 font-bold">
+                  Number of claim:
+                </label>
+                <input
+                  id="numberToClaim"
+                  type="number"
+                  value={numberToClaim}
+                  onChange={(e) => setNumberToClaim(e.target.value)}
+                  className="border p-2 rounded"
+                  min="1"
+                />
+                <button
+                  onClick={handleClaim}
+                  disabled={status === "pending"}
+                  className="ml-2 px-4 py-2 bg-green-500 text-white rounded"
+                >
+                  {status === "pending" ? "Claiming..." : "Claim"}
+                </button>
+                {claimError && (
+                  <p className="text-red-500 mt-2">
+                    Error: {claimError.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </>
+        )}
 
       {isAdmin && selectedContractType === "erc1155drop" && (
         <div className="erc1155-section mt-10">
-          <h2 className="text-xl font-bold">Tokens ERC1155 (fragChroEd1)</h2>
+          <h2 className="text-xl font-bold">
+            Tokens ERC1155 (fragChroEd1)
+          </h2>
           {erc1155Tokens.length > 0 && (
             <div className="mt-4">
               <label htmlFor="erc1155-select" className="mr-2 font-bold">
