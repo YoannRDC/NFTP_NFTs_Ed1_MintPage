@@ -185,7 +185,7 @@ function NFTPed1Content() {
               priceInEur={NFT_PRICE_EUR} 
               contract={nftpNftsEd1Contract}
               stripeMode={stripeMode}
-              previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.png`}
+              previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
               redirectPage={collectionPageRef}
               contractType={contractType}
             />
