@@ -10,7 +10,7 @@ import { nftpPubKey } from "../constants";
 interface ClaimConditionFormProps {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
-  contractType: "erc721drop" | "erc1155drop"; // nouveau paramètre
+  contractType: "erc721drop" | "erc1155drop" | "erc721transfert"; // nouveau paramètre
   tokenId?: bigint;
 }
 
@@ -59,7 +59,7 @@ export default function ClaimConditionForm({ contract, initialOverrides = [], co
 
     try {
       let transaction;
-      if (contractType === "erc721drop") {
+      if (contractType === "erc721drop" || contractType === "erc721transfert") {
         transaction = setClaimConditionsERC721({
           contract: contract,
           phases: [

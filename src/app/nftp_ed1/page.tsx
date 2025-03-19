@@ -12,7 +12,7 @@ import MenuItem from "../components/MenuItem";
 // Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
 import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import ItemERC721 from "../components/ItemERC721";
+import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
@@ -38,7 +38,7 @@ const collectionImageSrc="/logo_seul_11.png";
 const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
-const contractType: "erc721drop" | "erc1155drop" = "erc721drop";
+const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721drop";
 
 // useless in this context:
 const tokenId= 0n;
@@ -150,7 +150,7 @@ function NFTPed1Content() {
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC721 
+        <ItemERC721drop 
           totalSupply={TOTAL_SUPPLY} 
           priceInPol={DISPLAYED_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 

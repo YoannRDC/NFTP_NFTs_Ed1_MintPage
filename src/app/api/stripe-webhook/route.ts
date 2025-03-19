@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
-import { claimTo as claimToERC1155, safeTransferFrom } from "thirdweb/extensions/erc1155";
-import { createThirdwebClient, defineChain, getContract, sendTransaction } from "thirdweb";
+import { claimTo as claimToERC1155 } from "thirdweb/extensions/erc1155";
+import { createThirdwebClient, defineChain, getContract, prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { minterAddress, nftpPubKey } from "@/app/constants";
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       const nftContractAddress = paymentIntent.metadata.nftContractAddress;
       const blockchainId = paymentIntent.metadata.blockchainId;
       const requestedQuantity = paymentIntent.metadata.requestedQuantity; // en string
-      const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc1155drop"
+      const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc1155drop" | "erc721transfert"
       const tokenId = paymentIntent.metadata.tokenId; 
 
       console.log("buyerWalletAddress:", buyerWalletAddress);
@@ -139,6 +139,15 @@ export async function POST(req: NextRequest) {
           to: buyerWalletAddress,
           quantity: BigInt(requestedQuantity),
           from: minterAddress,
+        });
+      } else if (contractType === "erc721transfert") {
+        console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
+        // Appel de transfetTo de la librairie ERC721
+        transaction = prepareContractCall({
+          contract: nftContract,
+          method:
+            "function safeTransferFrom(address from, address to, uint256 tokenId)",
+          params: [minterAddress, buyerWalletAddress, tokenId],
         });
       } else {
         console.error("Unknown contract type");

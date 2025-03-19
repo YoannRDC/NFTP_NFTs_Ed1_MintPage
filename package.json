@@ -17,7 +17,7 @@
 		"react-dom": "^18",
 		"sharp": "^0.33.5",
 		"stripe": "^17.6.0",
-		"thirdweb": "^5.89.0"
+		"thirdweb": "^5.92.1"
 	},
 	"devDependencies": {
 		"@types/node": "^20",

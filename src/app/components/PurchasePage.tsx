@@ -13,7 +13,7 @@ interface PurchasePageProps {
   amount: number; // montant en centimes
   stripeMode: "test" | "live";
   contract: any;
-  contractType: "erc721drop" | "erc1155drop";
+  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   redirectPage: string;
   tokenId: bigint;
 }

@@ -26,6 +26,12 @@ const contractsInfo = {
     chainId: 80002,
     contractType: "erc1155drop" as const,
   },
+  artcards: {
+    address: "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47",
+    metadataURI: "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0",
+    chainId: 137,
+    contractType: "erc721transfert" as const,
+  },
 };
 
 // Définition d'un type pour les clés de contractsInfo
@@ -44,10 +50,17 @@ const fragChroEd1Contract = getContract({
   address: contractsInfo.fragChroEd1.address,
 });
 
+const artcardsContract = getContract({
+  client,
+  chain: defineChain(contractsInfo.fragChroEd1.chainId),
+  address: contractsInfo.fragChroEd1.address,
+});
+
 // Objet pour associer une clé à son contrat
 const contractObjects: { [key in ContractKey]: any } = {
   nftpNftsEd1: nftpNftsEd1Contract,
   fragChroEd1: fragChroEd1Contract,
+  artcards: artcardsContract,
 };
 
 const AdminPage: React.FC = () => {
@@ -140,7 +153,7 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && selectedContractType === "erc721drop" && (
+      {isAdmin && (selectedContractType === "erc721drop" || selectedContractType === "erc721transfert") && (
         <>
           <ClaimSnapshotERC721
             onSnapshotFetched={setSnapshotData}

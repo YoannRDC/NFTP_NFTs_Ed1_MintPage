@@ -14,7 +14,7 @@ import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
 
 // Définition de l'interface pour les props
-interface ItemERC721Props {
+interface ItemERC721dropProps {
   totalSupply: number;
   priceInPol: number | string | null;
   priceInEur: number | string | null;
@@ -22,11 +22,11 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Nouvelle prop pour l'image de preview
   redirectPage: string; // Nouvelle prop pour la page de redirection
-  contractType: "erc721drop" | "erc1155drop";
+  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   tokenId: bigint;
 }
 
-export default function ItemERC721({
+export default function ItemERC721drop({
   totalSupply,
   priceInPol,
   priceInEur,
@@ -36,7 +36,7 @@ export default function ItemERC721({
   redirectPage,
   contractType,
   tokenId
-}: ItemERC721Props) {
+}: ItemERC721dropProps) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
