@@ -9,7 +9,7 @@ import {
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
-import { client, nftpPubKey } from "../constants";
+import { client, minterAddress, nftpPubKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
@@ -80,7 +80,7 @@ const AdminPage: React.FC = () => {
   const [numberToClaim, setNumberToClaim] = useState("1");
 
   const isAdmin =
-    account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
+    account?.address?.toLowerCase() === nftpPubKey.toLowerCase() || account?.address?.toLowerCase() === minterAddress.toLowerCase();
 
   const wallets = [
     inAppWallet({
