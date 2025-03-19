@@ -139,15 +139,19 @@ function NFTPed1Content() {
       
       <div className="mb-10">
         <div className="decorative-description">
-          NFT Propulsion accompagne les artistes dans la création et la vente d’œuvres d’art sous forme de NFTs, garantissant authenticité, traçabilité et nouvelles opportunités.
+        Cette collection comprend 52 œuvres d’arts, chacune marquée, en bas à droite de l’image par l’un des 4 symboles parmi trèfle, carreau, pique, ou cœur, et par une valeur, de 2 à 10 plus Valet (Jack), Dame (Queen), Roi (King) ou As (Ace).
         </div>
         <div className="decorative-description">
-          Cette collection exclusive représente la 1ère édition de NFTs créés par NFT Propulsion. <br />
-          Limitée à 100 pièces uniques, chaque NFT incarne une vague aux couleurs distinctes, symbolisant la diversité et l’innovation dans l’univers numérique. <br />
-          Chaque pièce est numérotée individuellement, offrant à son détenteur un objet rare et authentique, ancré sur la blockchain.
+        Chaque symbole est lié à un sens humain spécifique : le trèfle représente la vue, le carreau le son, le cœur l’odorat, et le pique le goût.
         </div>
         <div className="decorative-description">
-          Rejoignez cette aventure et possédez un morceau de l’histoire de NFT Propulsion ! 
+        L’objectif central de cette collection est de réinventer et d’embellir ces quatre symboles universels et intemporels du jeu de cartes, qui nous sont familiers dès le plus jeune âge et qui sont reconnus à travers le monde, en leur attribuant une nouvelle dimension artistique à travers le prisme des sens humains.
+        </div>
+        <div className="decorative-description">
+        Les quatre images ont été créées par une intelligence artificielle, à partir de photos reflétant les idées de l’artiste. Les textes sont de l’artiste et l’IA les a intégrés à l’image lors de la génération. Les couples uniques : symbole - valeur, ont été ajoutés manuellement aux œuvres.
+        </div>
+        <div className="decorative-description">
+        Chaque oeuvre est un NFT, garantissant son unicité, son authenticité, son attachement direct à l’artiste, et sa possession exclusive à un seul détenteur. Cette exclusivité vise à créer une communauté de propriétaires partageant un intérêt commun pour cette forme d’art.
         </div>
       </div>
       
@@ -174,17 +178,17 @@ function NFTPed1Content() {
           mintedCount > 0 ? (
             Array.from({ length: mintedCount }, (_, index) => (
               <div key={index} className="my-4">
-                <ItemERC721transfert 
-                  tokenId={BigInt(index)}
-                  totalSupply={TOTAL_SUPPLY} 
-                  priceInPol={DISPLAYED_NFT_PRICE_POL}
-                  priceInEur={NFT_PRICE_EUR} 
-                  contract={nftpNftsEd1Contract}
-                  stripeMode={stripeMode}
-                  previewImage={`${collectionPageRef}/ArtCards.gif`}
-                  redirectPage={collectionPageRef}
-                  contractType={contractType}
-                />
+              <ItemERC721transfert 
+                tokenId={BigInt(index)}
+                totalSupply={TOTAL_SUPPLY} 
+                priceInPol={DISPLAYED_NFT_PRICE_POL}
+                priceInEur={NFT_PRICE_EUR} 
+                contract={nftpNftsEd1Contract}
+                stripeMode={stripeMode}
+                previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.gif`}
+                redirectPage={collectionPageRef}
+                contractType={contractType}
+              />
                 <NFTStatusLabel 
                   tokenId={BigInt(index)} 
                   contract={nftpNftsEd1Contract} 
