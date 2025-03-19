@@ -80,7 +80,7 @@ const AdminPage: React.FC = () => {
   const [numberToClaim, setNumberToClaim] = useState("1");
 
   const isAdmin =
-    account?.address?.toLowerCase() === nftpPubKey.toLowerCase() || account?.address?.toLowerCase() === minterAddress.toLowerCase();
+    account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
   const wallets = [
     inAppWallet({
@@ -115,7 +115,7 @@ const AdminPage: React.FC = () => {
     // Construction de la transaction via claimTo de l'extension ERC721
     const transaction = claimTo({
       contract: selectedContract,
-      to: account.address,
+      to: minterAddress,
       quantity: claimNumber,
     });
     // Envoi de la transaction
