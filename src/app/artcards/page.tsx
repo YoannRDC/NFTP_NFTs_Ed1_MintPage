@@ -9,9 +9,7 @@ import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 
@@ -21,7 +19,7 @@ const TOTAL_SUPPLY = 100;
 const DISPLAYED_NFT_PRICE_POL = 99;
 
 // Adresse du contrat NFTP
-const nftpNftsEd1Address = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
+const contractAddress = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
 
 // Adresse du minter (à adapter)
 const minterAddress = "0xYourMinterAddressHere";
@@ -30,7 +28,7 @@ const minterAddress = "0xYourMinterAddressHere";
 const nftpNftsEd1Contract = getContract({
   client,
   chain: defineChain(137),
-  address: nftpNftsEd1Address,
+  address: contractAddress,
 });
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
