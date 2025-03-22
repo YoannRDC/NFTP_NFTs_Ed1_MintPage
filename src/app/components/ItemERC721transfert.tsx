@@ -6,6 +6,7 @@ import {
   MediaRenderer,
   TransactionButton,
   useActiveAccount,
+  useReadContract,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
 import { client, minterAddress } from "../constants";
@@ -33,11 +34,13 @@ export default function ItemERC721transfert({
   previewImage,
   redirectPage,
   contractType,
-  tokenId
+  tokenId,
+  totalSupply,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
-  const [mintedCount, setMintedCount] = useState<number>(0);
+  const [soldCount, setSoldCount] = useState<number>(0);
 
+  // Configuration des wallets
   const wallets = [
     inAppWallet({
       auth: { options: ["google", "email", "passkey", "phone"] },
@@ -53,21 +56,41 @@ export default function ItemERC721transfert({
     throw new Error("Le prix en Euros (priceInEur) doit être défini.");
   }
 
-  // Récupérer le nombre total de NFTs mintés
+  /**
+   * Récupère le nombre de NFT vendus en se basant sur la propriété ownerOf :
+   * - On appelle totalMinted() pour connaître le nombre de tokens réellement mintés
+   * - Pour chaque token [0..totalMinted-1], on vérifie si ownerOf(tokenId) != minterAddress
+   * - On incrémente le compteur soldCount si c'est différent
+   */
   useEffect(() => {
-    const fetchTotalMinted = async () => {
+    const fetchSoldCount = async () => {
       try {
+        // 1) Récupérer le nombre de tokens mintés
         const totalMinted = await readContract({
-          contract: contract,
+          contract,
           method: "function totalMinted() view returns (uint256)",
           params: [],
         });
-        setMintedCount(Number(totalMinted));
+
+        let sold = 0;
+        // 2) Pour chaque token, on appelle ownerOf
+        for (let i = 0; i < Number(totalMinted); i++) {
+          const owner = await readContract({
+            contract,
+            method: "function ownerOf(uint256 tokenId) view returns (address)",
+            params: [BigInt(i)],
+          });
+          // 3) Si l'adresse est différente du minterAddress, on considère que le NFT est vendu
+          if (owner?.toLowerCase() !== minterAddress.toLowerCase()) {
+            sold++;
+          }
+        }
+        setSoldCount(sold);
       } catch (error) {
-        console.error("Erreur lors de la récupération du total minted :", error);
+        console.error("Erreur lors de la récupération du total minted ou du ownerOf :", error);
       }
     };
-    fetchTotalMinted();
+    fetchSoldCount();
   }, [contract]);
 
   return (
@@ -76,15 +99,17 @@ export default function ItemERC721transfert({
       <div className="mt-10 flex justify-center">
         <MediaRenderer
           client={client}
-          src={previewImage}  // Utilisation de la prop passée en paramètre
+          src={previewImage}
           style={{ height: "auto", borderRadius: "10px" }}
         />
       </div>
 
+      {/* Affiche le nombre de NFT vendus */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {mintedCount} NFT vendu
+        {soldCount} NFT vendu
       </div>
 
+      {/* Bouton de connexion */}
       <div className="text-center mt-10">
         <ConnectButton
           client={client}
@@ -94,7 +119,7 @@ export default function ItemERC721transfert({
         />
       </div>
 
-      {/* Section Mint */}
+      {/* Section d'achat (crypto ou euros) */}
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
@@ -102,8 +127,7 @@ export default function ItemERC721transfert({
               transaction={() =>
                 prepareContractCall({
                   contract,
-                  method:
-                    "function safeTransferFrom(address from, address to, uint256 tokenId)",
+                  method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
                   params: [minterAddress, smartAccount.address, tokenId],
                 })
               }
