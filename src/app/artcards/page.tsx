@@ -43,31 +43,6 @@ const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721transfert";
 
-// Composant pour afficher l'état de vente du NFT
-function NFTStatusLabel({
-  tokenId,
-  contract,
-  minterAddress,
-}: {
-  tokenId: bigint;
-  contract: any;
-  minterAddress: string;
-}) {
-  const { data: owner, isPending: ownerLoading } = useReadContract({
-    contract,
-    method: "function ownerOf(uint256 tokenId) view returns (address)",
-    params: [tokenId],
-  });
-
-  if (ownerLoading) return <span>Chargement...</span>;
-
-  return (
-    <span>
-      {owner?.toLowerCase() === minterAddress.toLowerCase() ? "A vendre" : "Vendu"}
-    </span>
-  );
-}
-
 // Composant principal
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -178,21 +153,16 @@ function NFTPed1Content() {
           mintedCount > 0 ? (
             Array.from({ length: mintedCount }, (_, index) => (
               <div key={index} className="my-4">
-            <ItemERC721transfert 
-              tokenId={BigInt(index)}
-              totalSupply={TOTAL_SUPPLY} 
-              priceInPol={DISPLAYED_NFT_PRICE_POL}
-              priceInEur={NFT_PRICE_EUR} 
-              contract={nftpNftsEd1Contract}
-              stripeMode={stripeMode}
-              previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
-              redirectPage={collectionPageRef}
-              contractType={contractType}
-            />
-                <NFTStatusLabel 
-                  tokenId={BigInt(index)} 
-                  contract={nftpNftsEd1Contract} 
-                  minterAddress={minterAddress} 
+                <ItemERC721transfert 
+                  tokenId={BigInt(index-1)}
+                  totalSupply={TOTAL_SUPPLY} 
+                  priceInPol={DISPLAYED_NFT_PRICE_POL}
+                  priceInEur={NFT_PRICE_EUR} 
+                  contract={nftpNftsEd1Contract}
+                  stripeMode={stripeMode}
+                  previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
+                  redirectPage={collectionPageRef}
+                  contractType={contractType}
                 />
               </div>
             ))
