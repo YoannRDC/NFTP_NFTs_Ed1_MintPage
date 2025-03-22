@@ -43,7 +43,6 @@ const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721transfert";
 
-// Composant principal
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
@@ -89,7 +88,7 @@ function NFTPed1Content() {
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
         </div>
       )}
       {paymentResult === "error" && (
@@ -114,19 +113,19 @@ function NFTPed1Content() {
       
       <div className="mb-10">
         <div className="decorative-description">
-        Cette collection comprend 52 œuvres d’arts, chacune marquée, en bas à droite de l’image par l’un des 4 symboles parmi trèfle, carreau, pique, ou cœur, et par une valeur, de 2 à 10 plus Valet (Jack), Dame (Queen), Roi (King) ou As (Ace).
+          Cette collection comprend 52 œuvres d’arts, chacune marquée, en bas à droite de l’image par l’un des 4 symboles parmi trèfle, carreau, pique, ou cœur, et par une valeur, de 2 à 10 plus Valet (Jack), Dame (Queen), Roi (King) ou As (Ace).
         </div>
         <div className="decorative-description">
-        Chaque symbole est lié à un sens humain spécifique : le trèfle représente la vue, le carreau le son, le cœur l’odorat, et le pique le goût.
+          Chaque symbole est lié à un sens humain spécifique : le trèfle représente la vue, le carreau le son, le cœur l’odorat, et le pique le goût.
         </div>
         <div className="decorative-description">
-        L’objectif central de cette collection est de réinventer et d’embellir ces quatre symboles universels et intemporels du jeu de cartes, qui nous sont familiers dès le plus jeune âge et qui sont reconnus à travers le monde, en leur attribuant une nouvelle dimension artistique à travers le prisme des sens humains.
+          L’objectif central de cette collection est de réinventer et d’embellir ces quatre symboles universels et intemporels du jeu de cartes, qui nous sont familiers dès le plus jeune âge et qui sont reconnus à travers le monde, en leur attribuant une nouvelle dimension artistique à travers le prisme des sens humains.
         </div>
         <div className="decorative-description">
-        Les quatre images ont été créées par une intelligence artificielle, à partir de photos reflétant les idées de l’artiste. Les textes sont de l’artiste et l’IA les a intégrés à l’image lors de la génération. Les couples uniques : symbole - valeur, ont été ajoutés manuellement aux œuvres.
+          Les quatre images ont été créées par une intelligence artificielle, à partir de photos reflétant les idées de l’artiste. Les textes sont de l’artiste et l’IA les a intégrés à l’image lors de la génération. Les couples uniques : symbole - valeur, ont été ajoutés manuellement aux œuvres.
         </div>
         <div className="decorative-description">
-        Chaque oeuvre est un NFT, garantissant son unicité, son authenticité, son attachement direct à l’artiste, et sa possession exclusive à un seul détenteur. Cette exclusivité vise à créer une communauté de propriétaires partageant un intérêt commun pour cette forme d’art.
+          Chaque oeuvre est un NFT, garantissant son unicité, son authenticité, son attachement direct à l’artiste, et sa possession exclusive à un seul détenteur. Cette exclusivité vise à créer une communauté de propriétaires partageant un intérêt commun pour cette forme d’art.
         </div>
       </div>
       
@@ -153,14 +152,15 @@ function NFTPed1Content() {
           mintedCount > 0 ? (
             Array.from({ length: mintedCount }, (_, index) => (
               <div key={index} className="my-4">
+                {/* Remarque : on ajoute 1 à l'index pour que le tokenId commence à 1 */}
                 <ItemERC721transfert 
-                  tokenId={BigInt(index-1)}
+                  tokenId={BigInt(index + 1)}
                   totalSupply={TOTAL_SUPPLY} 
                   priceInPol={DISPLAYED_NFT_PRICE_POL}
                   priceInEur={NFT_PRICE_EUR} 
                   contract={nftpNftsEd1Contract}
                   stripeMode={stripeMode}
-                  previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
+                  previewImage={`${collectionPageRef}/${(index + 1).toString().padStart(2, '0')}.jpg`}
                   redirectPage={collectionPageRef}
                   contractType={contractType}
                 />
@@ -217,7 +217,6 @@ function NFTPed1Content() {
   );
 }
 
-// Wrap the content in a Suspense boundary to satisfy Next.js requirements
 export default function NFTPed1() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
