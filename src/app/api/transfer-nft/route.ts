@@ -5,7 +5,6 @@ import {
   defineChain, 
   getContract, 
   prepareContractCall, 
-  sendTransaction, 
   toWei
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";

@@ -58,23 +58,6 @@ function NFTPed1Content() {
   });
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
 
-  // Récupérer la transaction via eth_getTransactionByHash
-  useEffect(() => {
-    async function fetchTransaction() {
-      const rpcRequest = getRpcClient({ client, chain: polygon });
-      try {
-        const transaction2 = await eth_getTransactionByHash(rpcRequest, {
-          hash: "0x73193bd8a13a6fc620e0f1f0ffedcbd716203a4562ac1db87ccf59907cfd5995",
-        });
-        setTransaction(transaction2);
-      } catch (error) {
-        console.error("Error fetching transaction:", error);
-        setTransaction(null);
-      }
-    }
-    fetchTransaction();
-  }, []);
-
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
     async function fetchNFTs() {

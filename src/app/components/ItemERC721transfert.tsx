@@ -83,7 +83,7 @@ export default function ItemERC721transfert({
       // Transfert de la crypto vers minterAddress
       const transaction = prepareTransaction({
         to: minterAddress,
-        chain: polygonAmoy,
+        chain: polygon,
         client: client,
         value: toWei(priceInPol.toString()),
         gasPrice: 30n,
