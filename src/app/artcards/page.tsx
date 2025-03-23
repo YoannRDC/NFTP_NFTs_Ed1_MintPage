@@ -40,6 +40,8 @@ const contractType = "erc721transfert";
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
+  // Récupère un éventuel message d'erreur détaillé dans l'URL
+  const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
@@ -103,7 +105,10 @@ function NFTPed1Content() {
       )}
       {paymentResult === "error" && (
         <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
-          Échec du paiement. Veuillez réessayer ou contacter le support. {paymentResult}
+          Échec du paiement. Veuillez réessayer ou contacter le support.
+          {errorMessage && (
+            <pre className="whitespace-pre-wrap text-xs mt-2">{errorMessage}</pre>
+          )}
         </div>
       )}
 
