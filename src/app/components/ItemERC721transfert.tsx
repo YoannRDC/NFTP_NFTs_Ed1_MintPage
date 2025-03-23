@@ -149,9 +149,9 @@ export default function ItemERC721transfert({
       {isProcessing && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg">
-            <p className="text-center">
-              La transaction est en cours de traitement, veuillez patienter...
-            </p>
+          <p className="text-center text-black">
+            La transaction est en cours de traitement, veuillez patienter...
+          </p>
           </div>
         </div>
       )}
