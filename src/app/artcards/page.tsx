@@ -103,7 +103,7 @@ function NFTPed1Content() {
       )}
       {paymentResult === "error" && (
         <div className="my-4 p-4 border-2 border-red-500 text-red-600 rounded">
-          Échec du paiement. Veuillez réessayer ou contacter le support.
+          Échec du paiement. Veuillez réessayer ou contacter le support. {paymentResult}
         </div>
       )}
 
