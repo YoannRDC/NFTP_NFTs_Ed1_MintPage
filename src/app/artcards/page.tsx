@@ -227,7 +227,11 @@ function NFTPed1Content() {
       <div className="w-full max-w-3xl p-4 border rounded-lg bg-gray-50">
         {transaction ? (
           <pre className="whitespace-pre-wrap text-xs">
-            {JSON.stringify(transaction, null, 2)}
+            {JSON.stringify(
+              transaction,
+              (key, value) => typeof value === "bigint" ? value.toString() : value,
+              2
+            )}
           </pre>
         ) : (
           <p>Chargement de la transaction...</p>
