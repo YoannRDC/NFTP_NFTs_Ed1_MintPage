@@ -128,9 +128,9 @@ export default function ItemERC721transfert({
         throw new Error(data.error || "Erreur lors du transfert NFT");
       }
       window.location.href = `${redirectPage}?paymentResult=success`;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      window.location.href = `${redirectPage}?paymentResult=error`;
+      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${encodeURIComponent(error.message || "Erreur inconnue")}`;
     }
   };
 
