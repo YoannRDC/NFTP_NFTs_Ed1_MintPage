@@ -3,24 +3,24 @@ import React from "react";
 import {
   ConnectButton,
   MediaRenderer,
-  TransactionButton,
   useActiveAccount,
   useReadContract,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
 import { client, minterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
-import { prepareContractCall } from "thirdweb";
+import { ethers } from "ethers";
+import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
+import { polygon, polygonAmoy } from "thirdweb/chains";
 
-// Définition de l'interface pour les props
 interface ItemERC721transfertProps {
   totalSupply: number;
-  priceInPol: number | string | null;
+  priceInPol: number | string | null; // Montant attendu en crypto (exprimé en ETH ou MATIC)
   priceInEur: number | string | null;
   contract: any;
   stripeMode: "test" | "live";
-  previewImage: string; // Image de preview
-  redirectPage: string; // Page de redirection
+  previewImage: string;
+  redirectPage: string;
   contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   tokenId: bigint;
 }
@@ -37,14 +37,14 @@ export default function ItemERC721transfert({
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
 
-  // Utilisation de useReadContract pour récupérer le propriétaire du token
+  // Récupération du propriétaire du token via ownerOf
   const { data: owner, isPending: ownerLoading } = useReadContract({
     contract,
     method: "function ownerOf(uint256 tokenId) view returns (address)",
     params: [tokenId],
   });
 
-  // Le NFT est "Disponible" s'il appartient à minterAddress, "Vendu" sinon
+  // Détermine le statut du NFT : "Disponible" s'il appartient à minterAddress, "Vendu" sinon
   let nftStatus = "Chargement...";
   if (!ownerLoading && owner) {
     nftStatus =
@@ -68,6 +68,59 @@ export default function ItemERC721transfert({
   if (priceInEur === null) {
     throw new Error("Le prix en Euros (priceInEur) doit être défini.");
   }
+
+  // handlePurchase : effectue d'abord le paiement en crypto vers minterAddress, puis appelle l'API
+  const handlePurchase = async () => {
+    if (!smartAccount?.address) {
+      console.error("Aucun wallet connecté");
+      return;
+    }
+    if (!priceInPol) {
+      console.error("Le montant à payer n'est pas défini");
+      return;
+    }
+    try {
+      // Transfert de la crypto vers minterAddress
+      const transaction = prepareTransaction({
+        to: minterAddress,
+        chain: polygonAmoy,
+        client: client,
+        value: toWei(priceInPol.toString()),
+        gasPrice: 30n,
+      });
+      
+      const receipt = await sendTransaction({ transaction, account: smartAccount });
+      
+      // Une fois la transaction confirmée, on récupère son hash
+      console.log("Transaction result:", receipt);
+      const paymentTxHash = receipt.transactionHash;
+      console.log("Transaction de paiement confirmée :", paymentTxHash);
+      
+      // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
+      const response = await fetch("/api/transfer-nft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tokenId: tokenId.toString(),
+          buyerWalletAddress: smartAccount.address,
+          nftContractAddress: contract.address, // L'adresse du contrat NFT
+          blockchainId: 137, // ou la chaîne appropriée
+          contractType: contractType,
+          paymentTxHash, // Hash de la transaction de paiement
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors du transfert NFT");
+      }
+      window.location.href = `${redirectPage}?paymentResult=success`;
+    } catch (error) {
+      console.error(error);
+      window.location.href = `${redirectPage}?paymentResult=error`;
+    }
+  };
 
   return (
     <div>
@@ -99,28 +152,16 @@ export default function ItemERC721transfert({
       <div className="flex flex-col m-10">
         {smartAccount ? (
           <div className="text-center">
-            <TransactionButton
-              transaction={() =>
-                prepareContractCall({
-                  contract,
-                  method:
-                    "function safeTransferFrom(address from, address to, uint256 tokenId)",
-                  params: [minterAddress, smartAccount.address, tokenId],
-                })
-              }
-              onError={(error: Error) => {
-                console.error(error);
-                window.location.href = `${redirectPage}?paymentResult=error`;
-              }}
-              onTransactionConfirmed={async () => {
-                window.location.href = `${redirectPage}?paymentResult=success`;
-              }}
+            <button
+              onClick={handlePurchase}
               disabled={nftStatus === "Vendu"}
+              className="px-4 py-2 bg-green-500 text-white rounded"
             >
               Acheter en Crypto
-            </TransactionButton>
+            </button>
             <p className="mb-2">{priceInPol} POL</p>
 
+            {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
             <PurchasePage
               requestedQuantity={1n}
               amount={Number(priceInEur)}

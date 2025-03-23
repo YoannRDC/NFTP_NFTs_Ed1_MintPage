@@ -9,22 +9,18 @@ import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
-import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
-import ItemERC721drop from "../components/ItemERC721drop";
-import { defineChain, getContract } from "thirdweb";
+import { defineChain, eth_getTransactionByHash, getContract, getRpcClient } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
+import { polygon } from "thirdweb/chains";
 
 // Constantes de configuration
-const NFT_PRICE_EUR = 19;
+const NFT_PRICE_EUR = 5;
 const TOTAL_SUPPLY = 100;
-const DISPLAYED_NFT_PRICE_POL = 99;
+const NFT_PRICE_POL = 1;
 
 // Adresse du contrat NFTP
 const nftpNftsEd1Address = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
-
-// Adresse du minter (à adapter)
-const minterAddress = "0xYourMinterAddressHere";
 
 // Connexion au contrat
 const nftpNftsEd1Contract = getContract({
@@ -32,6 +28,16 @@ const nftpNftsEd1Contract = getContract({
   chain: defineChain(137),
   address: nftpNftsEd1Address,
 });
+
+// ******
+// temp
+// ******
+const rpcRequest = getRpcClient({ client, chain: polygon, });
+const transaction2 = await eth_getTransactionByHash(rpcRequest, {
+  hash: "0x73193bd8a13a6fc620e0f1f0ffedcbd716203a4562ac1db87ccf59907cfd5995",
+});
+
+console.log("transaction2: ", transaction2);
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle = "Présentation Art Cards";
@@ -52,7 +58,7 @@ function NFTPed1Content() {
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live";
+  const stripeMode: "test" | "live" = "test";
 
   // Récupérer le nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
@@ -156,7 +162,7 @@ function NFTPed1Content() {
                 <ItemERC721transfert 
                   tokenId={BigInt(index)}
                   totalSupply={TOTAL_SUPPLY} 
-                  priceInPol={DISPLAYED_NFT_PRICE_POL}
+                  priceInPol={NFT_PRICE_POL}
                   priceInEur={NFT_PRICE_EUR} 
                   contract={nftpNftsEd1Contract}
                   stripeMode={stripeMode}
