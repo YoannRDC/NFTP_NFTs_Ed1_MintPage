@@ -149,7 +149,7 @@ function NFTPed1Content() {
         ) : (
           mintedCount > 0 ? (
             Array.from({ length: mintedCount }, (_, index) => (
-              <div key={index} className="my-4 border">
+              <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
                 <ItemERC721transfert 
                   tokenId={BigInt(index)}
                   totalSupply={TOTAL_SUPPLY} 
