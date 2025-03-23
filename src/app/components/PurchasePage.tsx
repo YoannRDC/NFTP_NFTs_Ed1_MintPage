@@ -27,6 +27,8 @@ export default function PurchasePage({
   redirectPage,
   tokenId
 }: PurchasePageProps) {
+  
+  console.log("PurchasePage called");
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
 
@@ -38,6 +40,15 @@ export default function PurchasePage({
 
   // Chargement de Stripe avec la clé correspondante
   const stripePromise = loadStripe(stripePublishableKey);
+
+  console.log("smartAccount?.address: ", smartAccount?.address);
+  console.log("contract?.address: ", contract?.address);
+  console.log("contract.chain.id.toString(): ", contract.chain.id.toString());
+  console.log("requestedQuantity.toString(): ", requestedQuantity.toString());
+  console.log("amount.toString(): ", amount.toString());
+  console.log("stripeMode.toString(): ", stripeMode.toString());
+  console.log("contractType.toString(): ", contractType.toString());
+  console.log("tokenId.toString(): ", tokenId.toString());
 
   // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {

@@ -44,6 +44,9 @@ export async function POST(req: Request) {
     },
   });
 
+  console.log("paymentIntent: ", paymentIntent)
+  console.log("paymentIntent.client_secret: ", paymentIntent.client_secret)
+
   return NextResponse.json({
     clientSecret: paymentIntent.client_secret,
   });
