@@ -5,6 +5,7 @@ import {
   defineChain, 
   getContract, 
   prepareContractCall, 
+  sendTransaction, 
   toWei
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
@@ -48,12 +49,6 @@ export async function POST(req: NextRequest) {
     }
     if (!process.env.PRIVATE_KEY_MINTER) {
       return NextResponse.json({ error: "PRIVATE_KEY_MINTER manquant" }, { status: 500 });
-    }
-    if (!process.env.POLYGON_RPC_URL) {
-      return NextResponse.json({ error: "POLYGON_RPC_URL manquant" }, { status: 500 });
-    }
-    if (!process.env.EXPECTED_PRICE) {
-      return NextResponse.json({ error: "EXPECTED_PRICE manquant" }, { status: 500 });
     }
 
     // Création du client Thirdweb
@@ -112,14 +107,14 @@ export async function POST(req: NextRequest) {
     
     console.log("NFT Pret a etre trnasmis !!  :", account.address);
 
-/*     // Envoi de la transaction de transfert du NFT
+     // Envoi de la transaction de transfert du NFT
     const result = await sendTransaction({
       transaction,
       account,
     });
     console.log("Transaction de transfert envoyée :", result.transactionHash); 
 
-    return NextResponse.json({ transactionHash: result.transactionHash });*/
+    return NextResponse.json({ transactionHash: result.transactionHash });
   } catch (error) {
     console.error("Erreur dans la route transfer-nft :", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
