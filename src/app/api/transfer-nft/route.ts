@@ -102,10 +102,8 @@ export async function POST(req: NextRequest) {
       client,
       privateKey: process.env.PRIVATE_KEY_MINTER,
     });
-    console.log("Compte minter utilisé :", account.address);
-
-    
-    console.log("NFT Pret a etre trnasmis !!  :", account.address);
+    console.log("Compte minter utilisé :", account.address);   
+    console.log("NFT Pret a etre transmis !!  :", account.address);
 
      // Envoi de la transaction de transfert du NFT
     const result = await sendTransaction({

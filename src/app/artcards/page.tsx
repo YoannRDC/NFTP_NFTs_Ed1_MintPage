@@ -10,9 +10,8 @@ import Link from "next/link";
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
-import { defineChain, eth_getTransactionByHash, getContract, getRpcClient } from "thirdweb";
+import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
-import { polygon } from "thirdweb/chains";
 
 // Constantes de configuration
 const NFT_PRICE_EUR = 5;

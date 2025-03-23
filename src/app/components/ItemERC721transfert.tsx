@@ -114,7 +114,6 @@ export default function ItemERC721transfert({
       }
       console.log("Transaction de paiement confirmée :", paymentTxHash);
 
-
       // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
       const response = await fetch("/api/transfer-nft", {
         method: "POST",
@@ -149,9 +148,9 @@ export default function ItemERC721transfert({
       {isProcessing && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg">
-          <p className="text-center text-black">
-            La transaction est en cours de traitement, veuillez patienter...
-          </p>
+            <p className="text-center text-black">
+              La transaction est en cours de traitement ...
+            </p>
           </div>
         </div>
       )}
@@ -170,49 +169,56 @@ export default function ItemERC721transfert({
         {nftStatus}
       </div>
 
-      {/* Bouton de connexion */}
-      <div className="text-center mt-10">
-        <ConnectButton
-          client={client}
-          wallets={wallets}
-          connectModal={{ size: "compact" }}
-          locale="fr_FR"
-        />
-      </div>
-
-      {/* Section Achat */}
-      <div className="flex flex-col m-10">
-        {smartAccount ? (
-          <div className="text-center">
-            <button
-              onClick={handlePurchase}
-              disabled={nftStatus === "Vendu"}
-              className="px-4 py-2 bg-green-500 text-white rounded"
-            >
-              Acheter en Crypto
-            </button>
-            <p className="mb-2">{priceInPol} POL</p>
-
-            {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
-            <PurchasePage
-              requestedQuantity={1n}
-              amount={Number(priceInEur)}
-              stripeMode={stripeMode}
-              contract={contract}
-              contractType={contractType}
-              redirectPage={redirectPage}
-              tokenId={tokenId}
+      {/* Si l'œuvre est vendue, on n'affiche pas les boutons de connexion et d'achat */}
+      {nftStatus === "Disponible" ? (
+        <>
+          {/* Bouton de connexion */}
+          <div className="text-center mt-10">
+            <ConnectButton
+              client={client}
+              wallets={wallets}
+              connectModal={{ size: "compact" }}
+              locale="fr_FR"
             />
-            <p>{priceInEur} Euros</p>
           </div>
-        ) : (
-          <div className="text-center">
-            <p className="w-full">
-              Connectez-vous pour acheter le NFT (euros ou crypto).
-            </p>
+
+          {/* Section Achat */}
+          <div className="flex flex-col m-10">
+            {smartAccount ? (
+              <div className="text-center">
+                <button
+                  onClick={handlePurchase}
+                  className="px-4 py-2 bg-green-500 text-white rounded"
+                >
+                  Acheter en Crypto
+                </button>
+                <p className="mb-2">{priceInPol} POL</p>
+
+                {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
+                <PurchasePage
+                  requestedQuantity={1n}
+                  amount={Number(priceInEur)}
+                  stripeMode={stripeMode}
+                  contract={contract}
+                  contractType={contractType}
+                  redirectPage={redirectPage}
+                  tokenId={tokenId}
+                />
+                <p>{priceInEur} Euros</p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="w-full">
+                  Connectez-vous pour acheter le NFT (euros ou crypto).
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        // Si l'œuvre est vendue ("Vendu"), seuls l'aperçu et le statut sont affichés.
+        <></>
+      )}
     </div>
   );
 }
