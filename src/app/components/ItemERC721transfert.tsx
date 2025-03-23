@@ -86,7 +86,7 @@ export default function ItemERC721transfert({
         chain: polygon,
         client: client,
         value: toWei(priceInPol.toString()),
-        gasPrice: 30n,
+        gasPrice: 30000000000n,
       });
       
       const receipt = await sendTransaction({ transaction, account: smartAccount });
