@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   ConnectButton,
   MediaRenderer,
@@ -10,7 +10,7 @@ import PurchasePage from "./PurchasePage";
 import { client, minterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
-import { polygon, polygonAmoy } from "thirdweb/chains";
+import { polygon } from "thirdweb/chains";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 
 interface ItemERC721transfertProps {
@@ -36,6 +36,7 @@ export default function ItemERC721transfert({
   tokenId,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Récupération du propriétaire du token via ownerOf
   const { data: owner, isPending: ownerLoading } = useReadContract({
@@ -80,6 +81,7 @@ export default function ItemERC721transfert({
       return;
     }
     try {
+      setIsProcessing(true);
       // Transfert de la crypto vers minterAddress
       const transaction = prepareTransaction({
         to: minterAddress,
@@ -143,6 +145,17 @@ export default function ItemERC721transfert({
 
   return (
     <div>
+      {/* Popup de traitement de la transaction */}
+      {isProcessing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <p className="text-center">
+              La transaction est en cours de traitement, veuillez patienter...
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Aperçu du NFT */}
       <div className="mt-10 flex justify-center">
         <MediaRenderer
