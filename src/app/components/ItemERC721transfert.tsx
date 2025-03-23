@@ -68,8 +68,8 @@ export default function ItemERC721transfert({
   }
 
   // handlePurchase : effectue d'abord le paiement en crypto vers minterAddress,
-  // puis vérifie que la transaction est confirmée via eth_getTransactionByHash.
-  // Si c'est le cas, l'appel API de transfert du NFT est lancé.
+  // vérifie que la transaction est confirmée via eth_getTransactionByHash,
+  // attend 15 secondes, puis appelle l'API de transfert du NFT.
   const handlePurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
@@ -108,6 +108,10 @@ export default function ItemERC721transfert({
       }
       console.log("Transaction de paiement confirmée :", paymentTxHash);
 
+      // Attendre 15 secondes avant d'appeler l'API de transfert du NFT
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+      console.log("15 secondes écoulées, appel de l'API de transfert");
+
       // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
       const response = await fetch("/api/transfer-nft", {
         method: "POST",
@@ -130,7 +134,9 @@ export default function ItemERC721transfert({
       window.location.href = `${redirectPage}?paymentResult=success`;
     } catch (error: any) {
       console.error(error);
-      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${encodeURIComponent(error.message || "Erreur inconnue")}`;
+      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${encodeURIComponent(
+        error.message || "Erreur inconnue"
+      )}`;
     }
   };
 
