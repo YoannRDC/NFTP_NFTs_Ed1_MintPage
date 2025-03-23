@@ -197,7 +197,7 @@ export default function ItemERC721transfert({
                 {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
                 <PurchasePage
                   requestedQuantity={1n}
-                  amount={Number(priceInEur)}
+                  amount={Number(priceInEur)*100}
                   stripeMode={stripeMode}
                   contract={contract}
                   contractType={contractType}
