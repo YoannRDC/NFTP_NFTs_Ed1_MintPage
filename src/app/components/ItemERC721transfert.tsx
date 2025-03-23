@@ -94,6 +94,10 @@ export default function ItemERC721transfert({
 
       // Récupération du hash de la transaction de paiement
       const paymentTxHash = receipt.transactionHash;
+
+      // Attendre 15 secondes avant d'appeler l'API de transfert du NFT
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+      console.log("15 secondes écoulées, appel de l'API de transfert");
       
       // Vérification de la transaction via eth_getTransactionByHash
       const rpcRequest = getRpcClient({ client, chain: polygon });
@@ -108,9 +112,6 @@ export default function ItemERC721transfert({
       }
       console.log("Transaction de paiement confirmée :", paymentTxHash);
 
-      // Attendre 15 secondes avant d'appeler l'API de transfert du NFT
-      await new Promise((resolve) => setTimeout(resolve, 15000));
-      console.log("15 secondes écoulées, appel de l'API de transfert");
 
       // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
       const response = await fetch("/api/transfer-nft", {
