@@ -9,9 +9,9 @@ import {
 import PurchasePage from "./PurchasePage";
 import { client, minterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
-import { ethers } from "ethers";
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { polygon, polygonAmoy } from "thirdweb/chains";
+import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 
 interface ItemERC721transfertProps {
   totalSupply: number;
@@ -48,9 +48,7 @@ export default function ItemERC721transfert({
   let nftStatus = "Chargement...";
   if (!ownerLoading && owner) {
     nftStatus =
-      owner.toLowerCase() === minterAddress.toLowerCase()
-        ? "Disponible"
-        : "Vendu";
+      owner.toLowerCase() === minterAddress.toLowerCase() ? "Disponible" : "Vendu";
   }
 
   // Configuration des wallets
@@ -69,7 +67,9 @@ export default function ItemERC721transfert({
     throw new Error("Le prix en Euros (priceInEur) doit être défini.");
   }
 
-  // handlePurchase : effectue d'abord le paiement en crypto vers minterAddress, puis appelle l'API
+  // handlePurchase : effectue d'abord le paiement en crypto vers minterAddress,
+  // puis vérifie que la transaction est confirmée via eth_getTransactionByHash.
+  // Si c'est le cas, l'appel API de transfert du NFT est lancé.
   const handlePurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
@@ -90,12 +90,24 @@ export default function ItemERC721transfert({
       });
       
       const receipt = await sendTransaction({ transaction, account: smartAccount });
-      
-      // Une fois la transaction confirmée, on récupère son hash
-      console.log("Transaction result:", receipt);
+      console.log("Transaction de paiement envoyée:", receipt.transactionHash);
+
+      // Récupération du hash de la transaction de paiement
       const paymentTxHash = receipt.transactionHash;
-      console.log("Transaction de paiement confirmée :", paymentTxHash);
       
+      // Vérification de la transaction via eth_getTransactionByHash
+      const rpcRequest = getRpcClient({ client, chain: polygon });
+      const paymentTx = await eth_getTransactionByHash(rpcRequest, {
+        hash: paymentTxHash,
+      });
+      console.log("Détails de la transaction de paiement:", paymentTx);
+
+      // Vérifier que la transaction est confirmée (ex. présence de blockNumber)
+      if (!paymentTx.blockNumber) {
+        throw new Error("La transaction de paiement n'est pas confirmée");
+      }
+      console.log("Transaction de paiement confirmée :", paymentTxHash);
+
       // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
       const response = await fetch("/api/transfer-nft", {
         method: "POST",

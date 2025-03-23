@@ -10,7 +10,6 @@ import {
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { minterAddress } from "@/app/constants"; // Adaptez le chemin si nécessaire
-import { ethers } from "ethers";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
 
@@ -22,7 +21,7 @@ const isValidEthereumAddress = (address: string): boolean => {
 const EXPECTED_AMOUNT = toWei("1.0");
 
 export async function POST(req: NextRequest) {
-/*   try {
+  try {
     const { 
       tokenId, 
       buyerWalletAddress, 
@@ -71,12 +70,12 @@ export async function POST(req: NextRequest) {
       address: nftContractAddress,
     });
     
-    const rpcRequest = getRpcClient({ client, chain: polygon, });
-    const transaction2 = await eth_getTransactionByHash(rpcRequest, {
-      hash: "0x73193bd8a13a6fc620e0f1f0ffedcbd716203a4562ac1db87ccf59907cfd5995",
+    // Récupération de la transaction de paiement via eth_getTransactionByHash
+    const rpcRequest = getRpcClient({ client, chain: polygon });
+    const paymentTx = await eth_getTransactionByHash(rpcRequest, {
+      hash: paymentTxHash,
     });
-
-    console.log("transaction2: ",transaction2 );
+    console.log("paymentTx: ", paymentTx);
 
     // Vérifier que la transaction est confirmée (inclusion dans un bloc)
     if (!paymentTx.blockNumber) {
@@ -90,36 +89,40 @@ export async function POST(req: NextRequest) {
 
     // Vérifier que le montant payé correspond à la valeur attendue (stockée côté serveur)
     console.log("paymentTxHash: ", paymentTxHash);
-    console.log("EXPECTED_AMOUNT_TEST: ", EXPECTED_AMOUNT);
-    const expectedValue = ethers.BigNumber.from(EXPECTED_AMOUNT);
-    if (!paymentTx.value.eq(expectedValue)) {
+    console.log("EXPECTED_AMOUNT: ", EXPECTED_AMOUNT);
+    // Convertir EXPECTED_AMOUNT en bigint pour la comparaison
+    const expectedValue = BigInt(EXPECTED_AMOUNT);
+    if (paymentTx.value !== expectedValue) {
       return NextResponse.json({ error: "Le montant payé ne correspond pas au montant attendu" }, { status: 400 });
     }
 
-    // Toutes les validations ont réussi, on prépare l'appel à safeTransferFrom pour transférer le NFT
+    // Préparation de l'appel à safeTransferFrom pour transférer le NFT
     const transaction = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
       params: [minterAddress, buyerWalletAddress, tokenId],
     });
 
-    // Création du compte minter à partir de la clé privée stockée en .env
+    // Création du compte minter à partir de la clé privée stockée dans l'environnement
     const account = privateKeyToAccount({
       client,
       privateKey: process.env.PRIVATE_KEY_MINTER,
     });
     console.log("Compte minter utilisé :", account.address);
 
-    // Envoi de la transaction de transfert du NFT
+    
+    console.log("NFT Pret a etre trnasmis !!  :", account.address);
+
+/*     // Envoi de la transaction de transfert du NFT
     const result = await sendTransaction({
       transaction,
       account,
     });
-    console.log("Transaction de transfert envoyée :", result.transactionHash);
+    console.log("Transaction de transfert envoyée :", result.transactionHash); 
 
-    return NextResponse.json({ transactionHash: result.transactionHash });
+    return NextResponse.json({ transactionHash: result.transactionHash });*/
   } catch (error) {
     console.error("Erreur dans la route transfer-nft :", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
-  } */
+  }
 }
