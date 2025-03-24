@@ -47,7 +47,7 @@ function NFTPed1Content() {
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "test";
+  const stripeMode: "test" | "live" = "live";
 
   // Récupérer le nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
