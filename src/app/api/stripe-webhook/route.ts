@@ -4,7 +4,7 @@ import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
 import { claimTo as claimToERC1155 } from "thirdweb/extensions/erc1155";
 import { createThirdwebClient, defineChain, getContract, prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { minterAddress, nftpPubKey } from "@/app/constants";
+import { minterAddress } from "@/app/constants";
 
 // ----------------------------------------------------------------------------
 // Implémentation simple d'idempotence (à remplacer par une solution persistante en prod)
