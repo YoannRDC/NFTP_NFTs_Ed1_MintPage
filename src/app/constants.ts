@@ -1,4 +1,4 @@
-import { createThirdwebClient, toWei } from "thirdweb";
+import { createThirdwebClient } from "thirdweb";
 import { polygon } from "thirdweb/chains";
 import { SmartWalletOptions } from "thirdweb/wallets";
 import { convertEurToPOL } from "./utils/conversion";
