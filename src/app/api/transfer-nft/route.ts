@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     const artcardPolPrice = await getArtcardPolPrice(artcardEuroPrice);
     const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
 
-    console.error("paymentTxHash: ", paymentTx.value);
+    console.error("paymentTx.value: ", paymentTx.value);
     console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
     // Calculer la différence absolue entre le montant payé et le prix attendu
@@ -97,14 +97,13 @@ export async function POST(req: NextRequest) {
 
     // Vérifier que l'écart est inférieur ou égal à la tolérance autorisée
     if (diff > toleranceWei) {
-      return NextResponse.json(
-        { 
-          error: "Le montant payé ne correspond pas au montant attendu (différence trop importante)",
-          paid: paymentTx.value.toString(),      // montant payé (converti en string)
-          expected: artcardPolWeiPrice.toString()  // montant attendu (converti en string)
-        },
-        { status: 400 }
-      );
+      const errorResponse = {
+        error: "Le montant payé ne correspond pas au montant attendu (différence trop importante)",
+        paid: paymentTx.value.toString(),
+        expected: artcardPolWeiPrice.toString()
+      };
+      console.log("Erreur détaillée :", errorResponse);
+      return NextResponse.json(errorResponse, { status: 400 });
     }
 
     // Préparation de l'appel à safeTransferFrom pour transférer le NFT
