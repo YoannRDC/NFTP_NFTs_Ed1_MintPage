@@ -99,8 +99,8 @@ function NFTPed1Content() {
         for (let i = 0; i < mintedCount; i++) {
           const euroPrice = getArtcardEuroPrice(i);
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
-          // montant en POL = montant en EUR / polEurRate
-          newPrices[i] = euroPrice / polEurRate;
+          // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
+          newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
       }
