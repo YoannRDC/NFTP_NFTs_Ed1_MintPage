@@ -163,7 +163,6 @@ export default function ItemERC721transfert({
         />
       </div>
 
-
       {/* Affichage du mode plein écran */}
       {isFullscreen && (
         <div
