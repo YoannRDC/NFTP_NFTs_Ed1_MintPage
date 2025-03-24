@@ -12,7 +12,6 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getArtcardEuroPrice, getArtcardPolPrice, minterAddress } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
-import { convertEurToPOL } from "@/app/utils/conversion";
 
 // Vérification simple d'une adresse Ethereum
 const isValidEthereumAddress = (address: string): boolean => {
@@ -85,8 +84,8 @@ export async function POST(req: NextRequest) {
     const artcardPolPrice = await getArtcardPolPrice(artcardEuroPrice);
     const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
 
-    console.log("paymentTxHash: ", paymentTxHash);
-    console.log("artcardPolWeiPrice: ", artcardPolWeiPrice);
+    console.error("paymentTxHash: ", paymentTx.value);
+    console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
     // Calculer la différence absolue entre le montant payé et le prix attendu
     const diff = paymentTx.value >= artcardPolWeiPrice 
@@ -99,7 +98,11 @@ export async function POST(req: NextRequest) {
     // Vérifier que l'écart est inférieur ou égal à la tolérance autorisée
     if (diff > toleranceWei) {
       return NextResponse.json(
-        { error: "Le montant payé ne correspond pas au montant attendu (différence trop importante)" },
+        { 
+          error: "Le montant payé ne correspond pas au montant attendu (différence trop importante)",
+          paid: paymentTx.value.toString(),      // montant payé (converti en string)
+          expected: artcardPolWeiPrice.toString()  // montant attendu (converti en string)
+        },
         { status: 400 }
       );
     }
