@@ -29,7 +29,7 @@ export const accountAbstraction: SmartWalletOptions = {
 // *******
 
 // Artcards prices
-const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 6, 1, 300];
+const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 6, 260, 300];
 export function getArtcardEuroPrice(tokenId: number) {
   // Le modulo assure la répétition du cycle
   return artCardEuroPrices[tokenId % artCardEuroPrices.length];

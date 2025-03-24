@@ -1,3 +1,10 @@
+// Désactivation du body parser automatique pour conserver le corps brut de la requête
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";

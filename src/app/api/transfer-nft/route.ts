@@ -98,6 +98,9 @@ export async function POST(req: NextRequest) {
     // Calculer la tolérance en fonction de 10 % du prix attendu (opérations en bigint)
     const toleranceWei = (artcardPolWeiPrice * 10n) / 100n;
 
+    console.error("diff: ", diff);
+    console.error("toleranceWei: ", toleranceWei);
+
     // Vérifier que l'écart est inférieur ou égal à la tolérance autorisée
     if (diff > toleranceWei) {
       const errorResponse = {
