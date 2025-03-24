@@ -1,6 +1,7 @@
-import { createThirdwebClient } from "thirdweb";
+import { createThirdwebClient, toWei } from "thirdweb";
 import { polygon } from "thirdweb/chains";
 import { SmartWalletOptions } from "thirdweb/wallets";
+import { convertEurToPOL } from "./utils/conversion";
 
 const clientId = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 
@@ -23,4 +24,17 @@ export const accountAbstraction: SmartWalletOptions = {
 	sponsorGas: true,
 };
 
+// *******
+// Artcards
+// *******
 
+// Artcards prices
+const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
+export function getArtcardEuroPrice(tokenId: number) {
+  // Le modulo assure la répétition du cycle
+  return artCardEuroPrices[tokenId % artCardEuroPrices.length];
+}
+export async function getArtcardPolPrice(tokenId: number) {
+	const artcardEuroPrice = getArtcardEuroPrice(tokenId);
+	return (await convertEurToPOL(artcardEuroPrice)).amount;
+}

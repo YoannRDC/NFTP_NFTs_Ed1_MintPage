@@ -9,16 +9,15 @@ import {
   toWei
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { minterAddress } from "@/app/constants"; // Adaptez le chemin si nécessaire
+import { getArtcardEuroPrice, getArtcardPolPrice, minterAddress } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
+import { convertEurToPOL } from "@/app/utils/conversion";
 
 // Vérification simple d'une adresse Ethereum
 const isValidEthereumAddress = (address: string): boolean => {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 };
-
-const EXPECTED_AMOUNT = toWei("1.0");
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,13 +80,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Le destinataire de la transaction de paiement n'est pas le minter" }, { status: 400 });
     }
 
-    // Vérifier que le montant payé correspond à la valeur attendue (stockée côté serveur)
+    // Calculer le prix attendu en euros, puis le convertir en POL et enfin en wei
+    const artcardEuroPrice = getArtcardEuroPrice(tokenId);
+    const artcardPolWeiPrice = toWei(getArtcardPolPrice(artcardEuroPrice).toString());
+
     console.log("paymentTxHash: ", paymentTxHash);
-    console.log("EXPECTED_AMOUNT: ", EXPECTED_AMOUNT);
-    // Convertir EXPECTED_AMOUNT en bigint pour la comparaison
-    const expectedValue = BigInt(EXPECTED_AMOUNT);
-    if (paymentTx.value !== expectedValue) {
-      return NextResponse.json({ error: "Le montant payé ne correspond pas au montant attendu" }, { status: 400 });
+    console.log("artcardPolWeiPrice: ", artcardPolWeiPrice);
+
+    // Calculer la différence absolue entre le montant payé et le prix attendu
+    const diff = paymentTx.value >= artcardPolWeiPrice 
+      ? paymentTx.value - artcardPolWeiPrice 
+      : artcardPolWeiPrice - paymentTx.value;
+
+    // Calculer la tolérance en fonction de 10 % du prix attendu (opérations en bigint)
+    const toleranceWei = (artcardPolWeiPrice * 10n) / 100n;
+
+    // Vérifier que l'écart est inférieur ou égal à la tolérance autorisée
+    if (diff > toleranceWei) {
+      return NextResponse.json(
+        { error: "Le montant payé ne correspond pas au montant attendu (différence trop importante)" },
+        { status: 400 }
+      );
     }
 
     // Préparation de l'appel à safeTransferFrom pour transférer le NFT
@@ -103,9 +116,9 @@ export async function POST(req: NextRequest) {
       privateKey: process.env.PRIVATE_KEY_MINTER,
     });
     console.log("Compte minter utilisé :", account.address);   
-    console.log("NFT Pret a etre transmis !!  :", account.address);
+    console.log("NFT prêt à être transmis :", account.address);
 
-     // Envoi de la transaction de transfert du NFT
+    // Envoi de la transaction de transfert du NFT
     const result = await sendTransaction({
       transaction,
       account,

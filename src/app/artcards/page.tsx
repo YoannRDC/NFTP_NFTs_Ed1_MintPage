@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import { client } from "../constants";
+import { client, getArtcardEuroPrice } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
@@ -12,11 +12,7 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
-
-// Constantes de configuration
-const NFT_PRICE_EUR = 5;
-const TOTAL_SUPPLY = 100;
-const NFT_PRICE_POL = 1;
+import { getPolEuroRate } from "../utils/conversion";
 
 const nftpNftsEd1Address = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
 const nftpNftsEd1Contract = getContract({
@@ -45,6 +41,10 @@ function NFTPed1Content() {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [transaction, setTransaction] = useState<any>(null);
+  // Stocker les prix en POL pour chaque tokenId (clé : tokenId, valeur : number)
+  const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
+  // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
+  const [polEurRate, setPolEurRate] = useState<number | null>(null);
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "test";
@@ -77,6 +77,36 @@ function NFTPed1Content() {
     }
     fetchNFTs();
   }, [smartAccount?.address]);
+
+  // Appeler getPolEurRate() une seule fois pour récupérer le taux de conversion POL/EUR
+  useEffect(() => {
+    async function fetchConversionRate() {
+      try {
+        const { rate } = await getPolEuroRate();
+        setPolEurRate(rate);
+      } catch (error) {
+        console.error("Erreur lors de la récupération du taux de conversion POL/EUR:", error);
+      }
+    }
+    fetchConversionRate();
+  }, []);
+
+  // Calculer et stocker les prix en POL pour chaque token une fois que mintedCount et le taux de conversion sont disponibles
+  useEffect(() => {
+    async function fetchPrices() {
+      if (mintedCount > 0 && polEurRate !== null) {
+        const newPrices: { [tokenId: number]: number } = {};
+        for (let i = 0; i < mintedCount; i++) {
+          const euroPrice = getArtcardEuroPrice(i);
+          // Conversion : si 1 POL vaut "polEurRate" euros, alors:
+          // montant en POL = montant en EUR / polEurRate
+          newPrices[i] = euroPrice / polEurRate;
+        }
+        setPricesInPol(newPrices);
+      }
+    }
+    fetchPrices();
+  }, [mintedCount, polEurRate]);
 
   return (
     <div className="flex flex-col items-center">
@@ -146,26 +176,23 @@ function NFTPed1Content() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isMintedLoading ? (
           <p>Chargement des NFT mintés...</p>
+        ) : mintedCount > 0 ? (
+          Array.from({ length: mintedCount }, (_, index) => (
+            <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
+              <ItemERC721transfert 
+                tokenId={BigInt(index)}
+                priceInPol={pricesInPol[index] ?? null}
+                priceInEur={getArtcardEuroPrice(index)}
+                contract={nftpNftsEd1Contract}
+                stripeMode={stripeMode}
+                previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
+                redirectPage={collectionPageRef}
+                contractType={contractType}
+              />
+            </div>
+          ))
         ) : (
-          mintedCount > 0 ? (
-            Array.from({ length: mintedCount }, (_, index) => (
-              <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
-                <ItemERC721transfert 
-                  tokenId={BigInt(index)}
-                  totalSupply={TOTAL_SUPPLY} 
-                  priceInPol={NFT_PRICE_POL}
-                  priceInEur={NFT_PRICE_EUR} 
-                  contract={nftpNftsEd1Contract}
-                  stripeMode={stripeMode}
-                  previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
-                  redirectPage={collectionPageRef}
-                  contractType={contractType}
-                />
-              </div>
-            ))
-          ) : (
-            <p>Aucun NFT minté pour le moment.</p>
-          )
+          <p>Aucun NFT minté pour le moment.</p>
         )}
       </div>
 
@@ -216,7 +243,7 @@ function NFTPed1Content() {
           <pre className="whitespace-pre-wrap text-xs">
             {JSON.stringify(
               transaction,
-              (key, value) => typeof value === "bigint" ? value.toString() : value,
+              (key, value) => (typeof value === "bigint" ? value.toString() : value),
               2
             )}
           </pre>

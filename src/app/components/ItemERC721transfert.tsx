@@ -14,8 +14,7 @@ import { polygon } from "thirdweb/chains";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 
 interface ItemERC721transfertProps {
-  totalSupply: number;
-  priceInPol: number | string | null; // Montant attendu en crypto (exprimé en ETH ou MATIC)
+  priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
   stripeMode: "test" | "live";
@@ -183,7 +182,7 @@ export default function ItemERC721transfert({
           </div>
 
           {/* Section Achat */}
-          <div className="flex flex-col m-10">
+          <div className="flex flex-col m-1 mt-10">
             {smartAccount ? (
               <div className="text-center">
                 <button
