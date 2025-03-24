@@ -81,9 +81,12 @@ export async function POST(req: NextRequest) {
 
     // Récupération du prix en euros et conversion en POL en attente de résolution
     const artcardEuroPrice = getArtcardEuroPrice(tokenId);
-    const artcardPolPrice = await getArtcardPolPrice(artcardEuroPrice);
+    const artcardPolPrice = await getArtcardPolPrice(tokenId);
     const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
 
+    console.error("tokenId: ", tokenId);
+    console.error("artcardEuroPrice: ", artcardEuroPrice);
+    console.error("artcardPolPrice: ", artcardPolPrice);
     console.error("paymentTx.value: ", paymentTx.value);
     console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
