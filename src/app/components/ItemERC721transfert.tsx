@@ -36,6 +36,7 @@ export default function ItemERC721transfert({
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Récupération du propriétaire du token via ownerOf
   const { data: owner, isPending: ownerLoading } = useReadContract({
@@ -154,14 +155,28 @@ export default function ItemERC721transfert({
         </div>
       )}
 
-      {/* Aperçu du NFT */}
-      <div className="mt-10 flex justify-center">
+      <div className="mt-10 flex justify-center" onClick={() => setIsFullscreen(true)} style={{ cursor: "pointer" }}>
         <MediaRenderer
           client={client}
           src={previewImage}
           style={{ height: "auto", borderRadius: "10px" }}
         />
       </div>
+
+
+      {/* Affichage du mode plein écran */}
+      {isFullscreen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
+          onClick={() => setIsFullscreen(false)}
+        >
+          <img
+            src={previewImage}
+            alt="NFT en plein écran"
+            className="max-w-full max-h-full"
+          />
+        </div>
+      )}
 
       {/* Affichage du statut : Disponible ou Vendu */}
       <div className="text-gray-500 mt-2 flex justify-center">
@@ -196,7 +211,7 @@ export default function ItemERC721transfert({
                 {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
                 <PurchasePage
                   requestedQuantity={1n}
-                  amount={Number(priceInEur)*100}
+                  amount={Number(priceInEur) * 100}
                   stripeMode={stripeMode}
                   contract={contract}
                   contractType={contractType}

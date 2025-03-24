@@ -128,7 +128,7 @@ function NFTPed1Content() {
         -- Présentation de la collection --
       </div>
       <div className="decorative-subtitle">
-        NFT Propulsion Edition 1
+        Art cards by YoArt.
       </div>
 
       <div className="mb-10">
@@ -233,24 +233,6 @@ function NFTPed1Content() {
           )}
         </div>
       )}
-
-      <div className="decorative-title">
-        -- Détails de la transaction --
-      </div>
-
-      <div className="w-full max-w-3xl p-4 border rounded-lg bg-gray-50">
-        {transaction ? (
-          <pre className="whitespace-pre-wrap text-xs">
-            {JSON.stringify(
-              transaction,
-              (key, value) => (typeof value === "bigint" ? value.toString() : value),
-              2
-            )}
-          </pre>
-        ) : (
-          <p>Chargement de la transaction...</p>
-        )}
-      </div>
 
       <Link href={"/"} className="text-sm text-gray-400 mt-8">
         Retour à la page principale.
