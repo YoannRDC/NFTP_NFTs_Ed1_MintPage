@@ -80,9 +80,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Le destinataire de la transaction de paiement n'est pas le minter" }, { status: 400 });
     }
 
-    // Calculer le prix attendu en euros, puis le convertir en POL et enfin en wei
+    // Récupération du prix en euros et conversion en POL en attente de résolution
     const artcardEuroPrice = getArtcardEuroPrice(tokenId);
-    const artcardPolWeiPrice = toWei(getArtcardPolPrice(artcardEuroPrice).toString());
+    const artcardPolPrice = await getArtcardPolPrice(artcardEuroPrice);
+    const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
 
     console.log("paymentTxHash: ", paymentTxHash);
     console.log("artcardPolWeiPrice: ", artcardPolWeiPrice);
