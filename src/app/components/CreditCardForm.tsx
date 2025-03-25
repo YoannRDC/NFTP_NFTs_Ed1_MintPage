@@ -11,6 +11,7 @@ const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showTransactionMessage, setShowTransactionMessage] = useState(false);
   // Construit l'URL de retour à partir du domaine et du chemin passé en prop
   const returnUrl = `https://www.authentart.com${redirectPage}`;
 
@@ -34,8 +35,11 @@ const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {
       if ("paymentIntent" in result && result.paymentIntent) {
         const paymentIntent: PaymentIntent = result.paymentIntent;
         if (paymentIntent.status === "succeeded") {
-          // Redirige vers la page avec le paramètre indiquant le succès
-          window.location.href = `${returnUrl}?paymentResult=success`;
+          // Affiche le message de transaction en cours et attend 15 secondes avant de rediriger
+          setShowTransactionMessage(true);
+          setTimeout(() => {
+            window.location.href = `${returnUrl}?paymentResult=success`;
+          }, 15000);
         } else {
           console.error("Paiement en attente ou incomplet :", paymentIntent.status);
           window.location.href = `${returnUrl}?paymentResult=error`;
@@ -51,6 +55,15 @@ const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {
       setIsProcessing(false);
     }
   };
+
+  // Si le paiement est réussi, on affiche le message pendant 15 secondes
+  if (showTransactionMessage) {
+    return (
+      <div className="bg-white p-5 rounded mx-auto" style={{ maxWidth: "400px" }}>
+        <p>Transaction en cours ...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-5 rounded mx-auto" style={{ maxWidth: "400px" }}>
