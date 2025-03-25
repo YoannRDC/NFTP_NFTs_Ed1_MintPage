@@ -9,7 +9,7 @@ import {
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
-import { client, minterAddress, nftpPubKey } from "../constants";
+import { client, nftpPubKey, getProjectPublicKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
@@ -112,6 +112,8 @@ const AdminPage: React.FC = () => {
     }
     // Conversion du nombre de claim en BigInt
     const claimNumber = BigInt(parseInt(numberToClaim));
+    // Récupération de l'adresse du minter via le mapping (pour le projet "ARTCARDS")
+    const minterAddress = getProjectPublicKey("ARTCARDS");
     // Construction de la transaction via claimTo de l'extension ERC721
     const transaction = claimTo({
       contract: selectedContract,
@@ -216,6 +218,7 @@ const AdminPage: React.FC = () => {
                   className="border p-2 rounded"
                   min="1"
                 />
+                
                 <button
                   onClick={handleClaim}
                   disabled={status === "pending"}
@@ -235,9 +238,7 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && selectedContractType === "erc1155drop" && (
         <div className="erc1155-section mt-10">
-          <h2 className="text-xl font-bold">
-            Tokens ERC1155 (fragChroEd1)
-          </h2>
+          <h2 className="text-xl font-bold">Tokens ERC1155 (fragChroEd1)</h2>
           {erc1155Tokens.length > 0 && (
             <div className="mt-4">
               <label htmlFor="erc1155-select" className="mr-2 font-bold">

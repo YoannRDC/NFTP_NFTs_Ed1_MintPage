@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import { client, getArtcardEuroPrice } from "../constants";
+import { client, getNFTEuroPrice } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
@@ -30,6 +30,7 @@ const collectionShortDescription = "Art cards by YoArt.";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType = "erc721transfert";
+const projectName = "ARTCARDS" // define in .env and constant.tsx.
 
 // Composant principal
 function NFTPed1Content() {
@@ -40,7 +41,6 @@ function NFTPed1Content() {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  const [transaction, setTransaction] = useState<any>(null);
   // Stocker les prix en POL pour chaque tokenId (clé : tokenId, valeur : number)
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
@@ -97,7 +97,7 @@ function NFTPed1Content() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getArtcardEuroPrice(i);
+          const euroPrice = getNFTEuroPrice(projectName,i);
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
           // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
@@ -182,12 +182,13 @@ function NFTPed1Content() {
               <ItemERC721transfert 
                 tokenId={BigInt(index)}
                 priceInPol={pricesInPol[index] ?? null}
-                priceInEur={getArtcardEuroPrice(index)}
+                priceInEur={getNFTEuroPrice(projectName, index)}
                 contract={nftpNftsEd1Contract}
                 stripeMode={stripeMode}
                 previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
                 redirectPage={collectionPageRef}
                 contractType={contractType}
+                projectName={projectName}
               />
             </div>
           ))

@@ -1,4 +1,3 @@
-// app/api/transfer-nft/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { 
   createThirdwebClient, 
@@ -9,7 +8,12 @@ import {
   toWei
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { getArtcardEuroPrice, getArtcardPolPrice, minterAddress } from "@/app/constants"; // Adaptez le chemin si nécessaire
+import { 
+  getProjectPublicKey,
+  getProjectPrivateKeyEnvName,
+  getNFTEuroPrice,
+  getNFTPolPrice
+} from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
 
@@ -26,7 +30,8 @@ export async function POST(req: NextRequest) {
       nftContractAddress, 
       blockchainId, 
       contractType,
-      paymentTxHash
+      paymentTxHash, 
+      projectName
     } = await req.json();
 
     // Validation des paramètres de base
@@ -45,8 +50,12 @@ export async function POST(req: NextRequest) {
     if (!process.env.THIRDWEB_API_SECRET_KEY) {
       return NextResponse.json({ error: "THIRDWEB_API_SECRET_KEY manquant" }, { status: 500 });
     }
-    if (!process.env.PRIVATE_KEY_MINTER) {
-      return NextResponse.json({ error: "PRIVATE_KEY_MINTER manquant" }, { status: 500 });
+    
+    // Récupérer le nom de la variable d'environnement pour la clé privée via la fonction getProjectPrivateKeyEnvName
+    const privateKeyEnvName = getProjectPrivateKeyEnvName(projectName);
+    const privateKey = process.env[privateKeyEnvName];
+    if (!privateKey) {
+      return NextResponse.json({ error: `Clé privée pour le projet ${projectName} manquante` }, { status: 500 });
     }
 
     // Création du client Thirdweb
@@ -74,14 +83,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "La transaction de paiement n'est pas confirmée" }, { status: 400 });
     }
 
-    // Vérifier que le destinataire de la transaction est bien le minter
+    // Récupération de l'adresse du minter via le mapping en fonction du projectName
+    const minterAddress = getProjectPublicKey(projectName);
+
+    // Vérifier que le destinataire de la transaction est bien le minter attendu
     if (!paymentTx.to || paymentTx.to.toLowerCase() !== minterAddress.toLowerCase()) {
       return NextResponse.json({ error: "Le destinataire de la transaction de paiement n'est pas le minter" }, { status: 400 });
     }
 
-    // Récupération du prix en euros et conversion en POL en attente de résolution
-    const artcardEuroPrice = getArtcardEuroPrice(tokenId);
-    const artcardPolPrice = await getArtcardPolPrice(tokenId);
+    // Récupération du prix en euros et conversion en POL
+    const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
+    const artcardPolPrice = await getNFTPolPrice(projectName, tokenId);
     const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
 
     console.error("tokenId: ", tokenId);
@@ -119,10 +131,10 @@ export async function POST(req: NextRequest) {
       params: [minterAddress, buyerWalletAddress, tokenId],
     });
 
-    // Création du compte minter à partir de la clé privée stockée dans l'environnement
+    // Création du compte minter à partir de la clé privée récupérée via le mapping
     const account = privateKeyToAccount({
       client,
-      privateKey: process.env.PRIVATE_KEY_MINTER,
+      privateKey: privateKey,
     });
     console.log("Compte minter utilisé :", account.address);   
     console.log("NFT prêt à être transmis :", account.address);

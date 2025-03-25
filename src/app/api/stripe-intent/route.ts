@@ -10,7 +10,8 @@ export async function POST(req: Request) {
     amount,
     stripeMode, // "test" ou "live"
     contractType,
-    tokenId
+    tokenId,
+    projectName
   } = await req.json();
 
   // Sélection de la clé Stripe en fonction du mode demandé
@@ -40,12 +41,12 @@ export async function POST(req: Request) {
       blockchainId,
       requestedQuantity,
       contractType, 
-      tokenId
+      tokenId, 
+      projectName
     },
   });
 
   console.log("paymentIntent: ", paymentIntent)
-  console.log("paymentIntent.client_secret: ", paymentIntent.client_secret)
 
   return NextResponse.json({
     clientSecret: paymentIntent.client_secret,

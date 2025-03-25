@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
+import { client, getProjectPublicKey } from "../constants";
 
 // Définition des props attendues par PurchasePage, incluant le contrat et la page de retour
 interface PurchasePageProps {
@@ -16,6 +17,7 @@ interface PurchasePageProps {
   contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   redirectPage: string;
   tokenId: bigint;
+  projectName: string;
 }
 
 export default function PurchasePage({
@@ -25,7 +27,8 @@ export default function PurchasePage({
   contract,
   contractType,
   redirectPage,
-  tokenId
+  tokenId,
+  projectName,
 }: PurchasePageProps) {
   
   console.log("PurchasePage called");
@@ -49,6 +52,7 @@ export default function PurchasePage({
   console.log("stripeMode.toString(): ", stripeMode.toString());
   console.log("contractType.toString(): ", contractType.toString());
   console.log("tokenId.toString(): ", tokenId.toString());
+  console.log("projectName: ", projectName);
 
   // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {
@@ -65,6 +69,7 @@ export default function PurchasePage({
           stripeMode: stripeMode.toString(),
           contractType: contractType.toString(),
           tokenId: tokenId.toString(), 
+          projectName,
         }),
       });
       if (!response.ok) {

@@ -7,7 +7,7 @@ import {
   useReadContract,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
-import { client, minterAddress } from "../constants";
+import { client, getProjectPublicKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { polygon } from "thirdweb/chains";
@@ -22,6 +22,7 @@ interface ItemERC721transfertProps {
   redirectPage: string;
   contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   tokenId: bigint;
+  projectName: string;
 }
 
 export default function ItemERC721transfert({
@@ -33,6 +34,7 @@ export default function ItemERC721transfert({
   redirectPage,
   contractType,
   tokenId,
+  projectName,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,7 +47,10 @@ export default function ItemERC721transfert({
     params: [tokenId],
   });
 
-  // Détermine le statut du NFT : "Disponible" s'il appartient à minterAddress, "Vendu" sinon
+  // Récupération de l'adresse du minter via le mapping à partir du projectName
+  const minterAddress = getProjectPublicKey(projectName);
+
+  // Détermine le statut du NFT : "Disponible" s'il appartient au minter, "Vendu" sinon
   let nftStatus = "Chargement...";
   if (!ownerLoading && owner) {
     nftStatus =
@@ -68,9 +73,8 @@ export default function ItemERC721transfert({
     throw new Error("Le prix en Euros (priceInEur) doit être défini.");
   }
 
-  // handlePurchase : effectue d'abord le paiement en crypto vers minterAddress,
-  // vérifie que la transaction est confirmée via eth_getTransactionByHash,
-  // attend 15 secondes, puis appelle l'API de transfert du NFT.
+  // handlePurchase : effectue le paiement en crypto vers l'adresse du minter récupérée dynamiquement,
+  // vérifie la confirmation de la transaction et appelle ensuite l'API de transfert du NFT.
   const handlePurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
@@ -82,7 +86,7 @@ export default function ItemERC721transfert({
     }
     try {
       setIsProcessing(true);
-      // Transfert de la crypto vers minterAddress
+      // Transfert de la crypto vers l'adresse du minter
       const transaction = prepareTransaction({
         to: minterAddress,
         chain: polygon,
@@ -90,17 +94,16 @@ export default function ItemERC721transfert({
         value: toWei(priceInPol.toString()),
         gasPrice: 30000000000n,
       });
-      
+
       const receipt = await sendTransaction({ transaction, account: smartAccount });
       console.log("Transaction de paiement envoyée:", receipt.transactionHash);
 
-      // Récupération du hash de la transaction de paiement
       const paymentTxHash = receipt.transactionHash;
 
       // Attendre 15 secondes avant d'appeler l'API de transfert du NFT
       await new Promise((resolve) => setTimeout(resolve, 15000));
       console.log("15 secondes écoulées, appel de l'API de transfert");
-      
+
       // Vérification de la transaction via eth_getTransactionByHash
       const rpcRequest = getRpcClient({ client, chain: polygon });
       const paymentTx = await eth_getTransactionByHash(rpcRequest, {
@@ -108,7 +111,6 @@ export default function ItemERC721transfert({
       });
       console.log("Détails de la transaction de paiement:", paymentTx);
 
-      // Vérifier que la transaction est confirmée (ex. présence de blockNumber)
       if (!paymentTx.blockNumber) {
         throw new Error("La transaction de paiement n'est pas confirmée");
       }
@@ -123,10 +125,11 @@ export default function ItemERC721transfert({
         body: JSON.stringify({
           tokenId: tokenId.toString(),
           buyerWalletAddress: smartAccount.address,
-          nftContractAddress: contract.address, // L'adresse du contrat NFT
-          blockchainId: 137, // ou la chaîne appropriée
+          nftContractAddress: contract.address,
+          blockchainId: 137,
           contractType: contractType,
-          paymentTxHash, // Hash de la transaction de paiement
+          paymentTxHash,
+          projectName,
         }),
       });
       const data = await response.json();
@@ -144,7 +147,6 @@ export default function ItemERC721transfert({
 
   return (
     <div>
-      {/* Popup de traitement de la transaction */}
       {isProcessing && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg">
@@ -163,7 +165,6 @@ export default function ItemERC721transfert({
         />
       </div>
 
-      {/* Affichage du mode plein écran */}
       {isFullscreen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
@@ -177,15 +178,12 @@ export default function ItemERC721transfert({
         </div>
       )}
 
-      {/* Affichage du statut : Disponible ou Vendu */}
       <div className="text-gray-500 mt-2 flex justify-center">
         {nftStatus}
       </div>
 
-      {/* Si l'œuvre est vendue, on n'affiche pas les boutons de connexion et d'achat */}
       {nftStatus === "Disponible" ? (
         <>
-          {/* Bouton de connexion */}
           <div className="text-center mt-10">
             <ConnectButton
               client={client}
@@ -195,7 +193,6 @@ export default function ItemERC721transfert({
             />
           </div>
 
-          {/* Section Achat */}
           <div className="flex flex-col m-1 mt-10">
             {smartAccount ? (
               <div className="text-center">
@@ -207,7 +204,6 @@ export default function ItemERC721transfert({
                 </button>
                 <p className="mb-2">{priceInPol} POL</p>
 
-                {/* Ne pas modifier PurchasePage (fonctionnalité Stripe distincte) */}
                 <PurchasePage
                   requestedQuantity={1n}
                   amount={Number(priceInEur) * 100}
@@ -216,6 +212,7 @@ export default function ItemERC721transfert({
                   contractType={contractType}
                   redirectPage={redirectPage}
                   tokenId={tokenId}
+                  projectName={projectName}
                 />
                 <p>{priceInEur} Euros</p>
               </div>
@@ -229,7 +226,6 @@ export default function ItemERC721transfert({
           </div>
         </>
       ) : (
-        // Si l'œuvre est vendue ("Vendu"), seuls l'aperçu et le statut sont affichés.
         <></>
       )}
     </div>

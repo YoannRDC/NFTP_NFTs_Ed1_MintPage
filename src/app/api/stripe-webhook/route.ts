@@ -4,10 +4,11 @@ import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
 import { claimTo as claimToERC1155 } from "thirdweb/extensions/erc1155";
 import { createThirdwebClient, defineChain, getContract, prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { minterAddress } from "@/app/constants";
+import { projectMappings } from "@/app/constants";
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Implémentation simple d'idempotence (à remplacer par une solution persistante en prod)
+// -----------------------------------------------------------------------------
 const processedEvents = new Set<string>();
 
 function hasEventBeenProcessed(eventId: string): boolean {
@@ -18,14 +19,16 @@ function markEventAsProcessed(eventId: string): void {
   processedEvents.add(eventId);
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Validation des adresses Ethereum
+// -----------------------------------------------------------------------------
 const isValidEthereumAddress = (address: string): boolean => {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 };
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Masquage de la clé secrète pour l'affichage
+// -----------------------------------------------------------------------------
 const maskSecretKey = (secretKey: string): string => {
   if (secretKey.length <= 8) return secretKey;
   return secretKey.slice(0, 4) + "..." + secretKey.slice(-4);
@@ -88,7 +91,7 @@ export async function POST(req: NextRequest) {
   if (event.type === "charge.succeeded") {
     console.log("###############");
     console.log("New Customer");
-    const paymentIntent = event.data.object as any; // dans cet exemple, c'est un objet charge
+    const paymentIntent = event.data.object as any; // Dans cet exemple, c'est un objet charge
 
     // Extraction des données depuis les metadata Stripe
     const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
@@ -97,12 +100,15 @@ export async function POST(req: NextRequest) {
     const requestedQuantity = paymentIntent.metadata.requestedQuantity; // en string
     const contractType = paymentIntent.metadata.contractType; // "erc721drop" | "erc1155drop" | "erc721transfert"
     const tokenId = paymentIntent.metadata.tokenId; 
+    const projectName = paymentIntent.metadata.projectName;
 
     console.log("buyerWalletAddress:", buyerWalletAddress);
     console.log("nftContractAddress:", nftContractAddress);
     console.log("blockchainId:", blockchainId);
     console.log("requestedQuantity:", requestedQuantity);
     console.log("contractType:", contractType);
+    console.log("tokenId:", tokenId);
+    console.log("projectName:", projectName);
     console.log("paymentIntent.metadata:", paymentIntent.metadata);
 
     // Validation des adresses Ethereum
@@ -131,6 +137,26 @@ export async function POST(req: NextRequest) {
       address: nftContractAddress,
     });
 
+    // Récupération de la configuration du projet via le mapping
+    if (!projectName) {
+      console.error("Missing projectName in metadata");
+      return NextResponse.json({ error: "Missing projectName" }, { status: 400 });
+    }
+    const mapping = projectMappings[projectName.toUpperCase()];
+    if (!mapping) {
+      console.error(`No mapping found for projectName: ${projectName}`);
+      return NextResponse.json({ error: "Invalid projectName" }, { status: 400 });
+    }
+    const minterAddress = mapping.publicKey;
+    const privateKeyEnvName = mapping.privateKeyEnv;
+    const privateKeyMinter = process.env[privateKeyEnvName];
+    if (!privateKeyMinter) {
+      console.error(`Missing private key for project ${projectName} from environment variable ${privateKeyEnvName}`);
+      return NextResponse.json({ error: "Missing private key" }, { status: 400 });
+    }
+    console.log("Selected minterAddress:", minterAddress);
+    console.log("Valid environment variables");
+
     let transaction;
     if (contractType === "erc1155drop") {
       console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity), ", tokenId:", tokenId);
@@ -139,7 +165,7 @@ export async function POST(req: NextRequest) {
         to: buyerWalletAddress,
         quantity: BigInt(requestedQuantity),
         from: minterAddress,
-        tokenId: tokenId
+        tokenId: tokenId,
       });
     } else if (contractType === "erc721drop") {
       console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
@@ -150,7 +176,7 @@ export async function POST(req: NextRequest) {
         from: minterAddress,
       });
     } else if (contractType === "erc721transfert") {
-      console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
+      console.log("contract:", contractType, ", to:", buyerWalletAddress, ", tokenId:", tokenId);
       transaction = prepareContractCall({
         contract: nftContract,
         method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
@@ -161,15 +187,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unknown contract type" }, { status: 400 });
     }
 
-    if (!process.env.PRIVATE_KEY_MINTER) {
-      console.error("Missing PRIVATE_KEY_MINTER");
-      return NextResponse.json({ error: "Missing PRIVATE_KEY_MINTER" }, { status: 400 });
-    }
-    console.log("Valid environment variables");
-
     const account = privateKeyToAccount({
       client,
-      privateKey: process.env.PRIVATE_KEY_MINTER,
+      privateKey: privateKeyMinter,
     });
     console.log("account.address:", account.address);
 
@@ -189,6 +209,5 @@ export async function POST(req: NextRequest) {
   }
 
   markEventAsProcessed(event.id);
-
   return NextResponse.json({ message: "OK" });
 }

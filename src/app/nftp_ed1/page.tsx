@@ -10,7 +10,6 @@ import Link from "next/link";
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
 // Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
-import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
@@ -39,6 +38,7 @@ const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721drop";
+const projectName="NFTPED1";
 
 // useless in this context:
 const tokenId= 0n;
@@ -160,6 +160,7 @@ function NFTPed1Content() {
           redirectPage={collectionPageRef}
           contractType={contractType}
           tokenId={tokenId}
+          projectName={projectName}
         />
       </div>
       

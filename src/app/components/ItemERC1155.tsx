@@ -8,7 +8,7 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, minterAddress } from "../constants";
+import { client, getProjectPublicKey } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
@@ -21,8 +21,9 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert" ;
+  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   tokenId: bigint;
+  projectName: string;
 }
 
 export default function ItemERC1155({
@@ -33,15 +34,19 @@ export default function ItemERC1155({
   previewImage,
   redirectPage,
   contractType,
-  tokenId
+  tokenId,
+  projectName,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
-  
+
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
+
+  // Récupération de l'adresse du minter via le mapping à partir du projectName
+  const minterAddress = getProjectPublicKey(projectName);
 
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
@@ -85,13 +90,12 @@ export default function ItemERC1155({
         const total = Number(totalMinted);
         setTotalSupply(total);
 
-        // Récupère le solde de l'adresse pré-mint pour le token donné
+        // Récupère le solde de l'adresse pré-mint pour le token donné en utilisant l'adresse du minter issue du mapping
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
           params: [minterAddress, tokenId],
         });
-        //console.log(" -> sellerBalance", sellerBalance);
         const sellerBal = Number(sellerBalance);
 
         // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
@@ -104,7 +108,7 @@ export default function ItemERC1155({
         );
       }
     };
-    
+
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
@@ -196,10 +200,6 @@ export default function ItemERC1155({
                   to: smartAccount.address,
                   tokenId: tokenId,
                   quantity: BigInt(requestedQuantity),
-/*                   overrides: {
-                    // Définir le prix du NFT en wei
-                    value: convertPriceInPolToWei(totalPricePol),
-                  }, */
                 })
               }
               onError={(error: Error) => {
@@ -224,6 +224,7 @@ export default function ItemERC1155({
               contractType={contractType}
               redirectPage={redirectPage}
               tokenId={tokenId}
+              projectName={projectName}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

@@ -8,7 +8,7 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import PurchasePage from "./PurchasePage";
-import { client } from "../constants";
+import { client, projectMappings } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
@@ -24,6 +24,7 @@ interface ItemERC721dropProps {
   redirectPage: string; // Nouvelle prop pour la page de redirection
   contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
   tokenId: bigint;
+  projectName: string;
 }
 
 export default function ItemERC721drop({
@@ -35,7 +36,8 @@ export default function ItemERC721drop({
   previewImage,
   redirectPage,
   contractType,
-  tokenId
+  tokenId, 
+  projectName
 }: ItemERC721dropProps) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
@@ -173,6 +175,7 @@ export default function ItemERC721drop({
               contractType={contractType}
               redirectPage={redirectPage}
               tokenId={tokenId}
+              projectName={projectName}
             />
             <p>{totalPriceEur} Euros</p>
           </div>
