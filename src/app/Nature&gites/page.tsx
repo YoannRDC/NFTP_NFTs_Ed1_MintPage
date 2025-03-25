@@ -14,7 +14,7 @@ import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 
-const contractAddress = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
+const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
 const contract = getContract({
   client,
   chain: defineChain(137),
@@ -22,15 +22,15 @@ const contract = getContract({
 });
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
-const videoPresentationTitle = "Présentation Art Cards";
-const collectionName = "Art cards";
-const collectionPageRef = "/artcards";
-const collectionImageSrc = "/ArtCards.gif";
-const collectionShortDescription = "Art cards by YoArt.";
-const artistProjectWebsite = "https://yoart.art";
-const artistProjectWebsitePrettyPrint = "YoArt.art";
+const videoPresentationTitle = "Présentation Nature & Gîtes";
+const collectionName = "Nature & Gîtes";
+const collectionPageRef = "/nature&gites";
+const collectionImageSrc = "/Nature et Gites.jpg";
+const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
+const artistProjectWebsite = "TBD";
+const artistProjectWebsitePrettyPrint = "Site en construction";
 const contractType = "erc721transfert";
-const projectName = "ARTCARDS" // define in .env and constant.tsx.
+const projectName = "NATETGITES" // define in .env and constant.tsx.
 
 // Composant principal
 function NFTPed1Content() {
@@ -128,7 +128,7 @@ function NFTPed1Content() {
         -- Présentation de la collection --
       </div>
       <div className="decorative-subtitle">
-        Art cards by YoArt.
+        Nature & Gîtes
       </div>
 
       <div className="mb-10">
@@ -142,19 +142,22 @@ function NFTPed1Content() {
 
       <div className="mb-10">
         <div className="decorative-description">
-          Cette collection comprend 52 œuvres d’arts, chacune marquée, en bas à droite de l’image par l’un des 4 symboles parmi trèfle, carreau, pique, ou cœur, et par une valeur, de 2 à 10 plus Valet (Jack), Dame (Queen), Roi (King) ou As (Ace).
+        Nature & Gîtes est un projet d’écotourisme innovant, fondé sur la création de lieux de vie autonomes, connectés à la nature et accessibles à tous.
         </div>
         <div className="decorative-description">
-          Chaque symbole est lié à un sens humain spécifique : le trèfle représente la vue, le carreau le son, le cœur l’odorat, et le pique le goût.
+        Chaque gîte est pensé comme un espace de ressourcement, intégrant des systèmes d’autonomie énergétique, de gestion responsable de l’eau et de valorisation de l’environnement local.
         </div>
         <div className="decorative-description">
-          L’objectif central de cette collection est de réinventer et d’embellir ces quatre symboles universels et intemporels du jeu de cartes, qui nous sont familiers dès le plus jeune âge et qui sont reconnus à travers le monde, en leur attribuant une nouvelle dimension artistique à travers le prisme des sens humains.
+        Cette collection de NFTs symbolise le lancement du projet et sert à financer ses premières étapes concrètes. Elle met à l’honneur Rêve, la mascotte du projet : un chien doux et puissant, compagnon de vie et de voyage, qui incarne le lien entre l’humain, la nature et l’animal.
         </div>
         <div className="decorative-description">
-          Les quatre images ont été créées par une intelligence artificielle, à partir de photos reflétant les idées de l’artiste. Les textes sont de l’artiste et l’IA les a intégrés à l’image lors de la génération. Les couples uniques : symbole - valeur, ont été ajoutés manuellement aux œuvres.
+        Chaque NFT représente une œuvre unique basée sur des photographies de Rêve, habillées de textures naturelles et de variations visuelles. En plus de leur valeur artistique, ces NFTs peuvent donner accès à des avantages exclusifs : nuitées offertes, rencontres, goodies, et bien plus encore.
         </div>
         <div className="decorative-description">
-          Chaque oeuvre est un NFT, garantissant son unicité, son authenticité, son attachement direct à l’artiste, et sa possession exclusive à un seul détenteur. Cette exclusivité vise à créer une communauté de propriétaires partageant un intérêt commun pour cette forme d’art.
+        En achetant un NFT de cette collection, vous devenez acteur d’un projet éthique et durable, tout en participant à l’exploration des usages positifs du Web3.
+        </div>
+        <div className="decorative-description">
+        Soutenez un mode de vie alternatif et responsable, en devenant membre de la communauté Nature & Gîtes.
         </div>
       </div>
 

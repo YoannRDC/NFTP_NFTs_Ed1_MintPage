@@ -71,7 +71,7 @@ export function getProjectPrivateKeyEnvName(projectName: string): string {
 // *******
 // Artcards - Politique de prix par défaut pour le projet "ARTCARDS"
 // *******
-const artCardEuroPrices = [120, 6, 6, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
+const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
 
 // Fonction pour calculer le prix en euros en fonction du tokenId et du projet
 export function getNFTEuroPrice( projectName: string, tokenId: number): number {
