@@ -4,10 +4,9 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import Image from "next/image";
 import Link from "next/link";
 
-import { client, getNFTEuroPrice, getProjectPublicKey } from "../constants";
+import { client, getNFTEuroPrice } from "../constants";
 import { getOwnedERC721s } from "../components/getOwnedERC721s";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
@@ -17,8 +16,7 @@ import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
 import { FilterDropdowns } from "../components/FilterDropdowns";
 
-// Le fichier metadata est placé dans public/nature_et_gites/metadata.json
-// On le charge via fetch et on le typage via l'interface suivante :
+// Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
   name: string;
   description: string;
@@ -34,6 +32,7 @@ interface NFTMetadata {
   editor: string;
 }
 
+// Récupération du contrat
 const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
 const contract = getContract({
   client,
@@ -41,6 +40,7 @@ const contract = getContract({
   address: contractAddress,
 });
 
+// Constantes d'affichage
 const videoPresentationLink = "https://youtube.com/embed/tpnHZBySDPw?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle = "Présentation Nature & Gîtes";
 const collectionName = "Nature & Gîtes - Edition originale";
@@ -58,19 +58,19 @@ function NFTPed1Content() {
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
-  
+
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  
+
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
-  
+
   const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
-  
+
   const stripeMode: "test" | "live" = "live";
-  
+
   // Charger metadata depuis public/nature_et_gites/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);
   useEffect(() => {
@@ -79,17 +79,17 @@ function NFTPed1Content() {
       .then((data: NFTMetadata[]) => setMetadataData(data))
       .catch((err) => console.error("Erreur lors du chargement de metadata", err));
   }, []);
-  
-  // Récupération du nombre total de tokens mintés depuis le contrat
+
+  // Récupération du nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
-    contract: contract,
+    contract,
     method: "function totalMinted() view returns (uint256)",
     params: [],
   });
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
   const totalPages = Math.ceil(mintedCount / itemsPerPage);
-  
-  // Choisir une page aléatoire lors du premier chargement
+
+  // Page aléatoire au premier chargement
   useEffect(() => {
     if (!hasRandomized && mintedCount > 0 && totalPages > 0) {
       const randomPage = Math.floor(Math.random() * totalPages);
@@ -97,15 +97,15 @@ function NFTPed1Content() {
       setHasRandomized(true);
     }
   }, [mintedCount, totalPages, hasRandomized]);
-  
-  // Récupérer les NFTs possédés par l'utilisateur
+
+  // Récupérer les NFTs possédés
   useEffect(() => {
     async function fetchNFTs() {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
         const fetchedNfts = await getOwnedERC721s({
-          contract: contract,
+          contract,
           owner: smartAccount.address,
           requestPerSec: 99,
         });
@@ -118,8 +118,8 @@ function NFTPed1Content() {
     }
     fetchNFTs();
   }, [smartAccount?.address]);
-  
-  // Récupérer le taux de conversion POL/EUR
+
+  // Taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
       try {
@@ -131,7 +131,7 @@ function NFTPed1Content() {
     }
     fetchConversionRate();
   }, []);
-  
+
   // Calculer les prix en POL
   useEffect(() => {
     async function fetchPrices() {
@@ -146,19 +146,19 @@ function NFTPed1Content() {
     }
     fetchPrices();
   }, [mintedCount, polEurRate]);
-  
+
   // --- Filtres ---
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedTexture, setSelectedTexture] = useState<string>("");
   const [selectedReve, setSelectedReve] = useState<string>("");
 
-  // Filtrer les métadonnées dont l'edition est inférieure ou égale au mintedCount
-  const mintedMetadata = useMemo(() => {
+  // NFTs dont l'edition <= mintedCount
+  const mintedMetadata = React.useMemo(() => {
     return metadataData.filter((item) => item.edition <= mintedCount);
   }, [metadataData, mintedCount]);
 
-  // Options pour le filtre Catégorie
-  const categoryOptions = useMemo((): string[] => {
+  // Catégories possibles (on force "Argent")
+  const categoryOptions = React.useMemo((): string[] => {
     const opts = mintedMetadata.map((item) => {
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
       if (!cat) return "";
@@ -167,30 +167,41 @@ function NFTPed1Content() {
       if (normalized === "bg_argent") return "Argent";
       return cat;
     });
-    return Array.from(new Set(opts)).filter((opt) => opt !== "");
+    // Ajout manuel de "Argent" pour être sûr qu'il soit proposé
+    const setOpts = new Set(opts);
+    setOpts.add("Argent"); 
+    const finalArray = Array.from(setOpts).filter((opt) => opt !== "");
+    return finalArray;
   }, [mintedMetadata]);
 
-  const textureOptions = useMemo((): string[] => {
+  // Texture
+  const textureOptions = React.useMemo((): string[] => {
     const opts = mintedMetadata.map(
       (item) => item.attributes.find((a) => a.trait_type === "Texture")?.value || ""
     );
     return Array.from(new Set(opts)).filter((opt) => opt !== "");
   }, [mintedMetadata]);
 
-  const reveOptions = useMemo((): string[] => {
+  // Reve
+  const reveOptions = React.useMemo((): string[] => {
     const opts = mintedMetadata.map(
       (item) => item.attributes.find((a) => a.trait_type === "Reve")?.value || ""
     );
     return Array.from(new Set(opts)).filter((opt) => opt !== "");
   }, [mintedMetadata]);
 
-  // Filtrer les NFTs selon les filtres sélectionnés
-  const filteredNFTs = useMemo(() => {
+  // Filtrer selon les filtres sélectionnés
+  const filteredNFTs = React.useMemo(() => {
     return mintedMetadata.filter((item) => {
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
-      const category = cat && cat.toLowerCase() === "bg_or" ? "Or" : cat && cat.toLowerCase() === "bg_argent" ? "Argent" : cat;
+      let category = "";
+      if (cat?.toLowerCase() === "bg_or") category = "Or";
+      else if (cat?.toLowerCase() === "bg_argent") category = "Argent";
+      else category = cat || "";
+
       const texture = item.attributes.find((a) => a.trait_type === "Texture")?.value;
       const reve = item.attributes.find((a) => a.trait_type === "Reve")?.value;
+
       const categoryMatch = selectedCategory === "" || category === selectedCategory;
       const textureMatch = selectedTexture === "" || texture === selectedTexture;
       const reveMatch = selectedReve === "" || reve === selectedReve;
@@ -201,7 +212,8 @@ function NFTPed1Content() {
   // Pagination sur les NFTs filtrés
   const filteredTotal = filteredNFTs.length;
   const filteredTotalPages = Math.ceil(filteredTotal / itemsPerPage);
-  useEffect(() => {
+  // Reset page si on dépasse
+  React.useEffect(() => {
     if (currentPage >= filteredTotalPages) {
       setCurrentPage(0);
     }
@@ -261,10 +273,7 @@ function NFTPed1Content() {
       </div>
 
       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
-        <VideoPresentation
-          src={videoPresentationLink}
-          title={videoPresentationTitle}
-        />
+        <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
       </div>
 
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
@@ -274,17 +283,52 @@ function NFTPed1Content() {
       <div className="decorative-title">-- NFTs à vendre --</div>
 
       {/* Composant de filtres */}
-      <FilterDropdowns
-        categoryOptions={categoryOptions}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        textureOptions={textureOptions}
-        selectedTexture={selectedTexture}
-        onTextureChange={setSelectedTexture}
-        reveOptions={reveOptions}
-        selectedReve={selectedReve}
-        onReveChange={setSelectedReve}
-      />
+      <div className="flex flex-wrap gap-4 mb-4 justify-center items-center">
+        <div className="relative">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">All Categories</option>
+            {categoryOptions.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="relative">
+          <select
+            value={selectedTexture}
+            onChange={(e) => setSelectedTexture(e.target.value)}
+            className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">All Textures</option>
+            {textureOptions.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="relative">
+          <select
+            value={selectedReve}
+            onChange={(e) => setSelectedReve(e.target.value)}
+            className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">All Reve</option>
+            {reveOptions.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {/* Pagination en haut */}
       {filteredTotalPages > 1 && (
@@ -299,12 +343,11 @@ function NFTPed1Content() {
         {isMintedLoading ? (
           <p>Chargement des NFT mintés...</p>
         ) : filteredNFTs.length > 0 ? (
-          displayedNFTs.map((item: NFTMetadata) => {
-            // tokenIndex correspond à edition - 1
+          displayedNFTs.map((item) => {
             const tokenIndex = item.edition - 1;
             return (
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
-                <ItemERC721transfert 
+                <ItemERC721transfert
                   tokenId={BigInt(tokenIndex)}
                   priceInPol={pricesInPol[tokenIndex] ?? null}
                   priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
