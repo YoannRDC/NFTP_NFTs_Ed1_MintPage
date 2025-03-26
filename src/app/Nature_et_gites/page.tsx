@@ -159,19 +159,21 @@ function NFTPed1Content() {
 
   // Catégories possibles (on force "Argent")
   const categoryOptions = React.useMemo((): string[] => {
-    const opts = mintedMetadata.map((item) => {
-      const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
-      if (!cat) return "";
-      const normalized = cat.toLowerCase();
-      if (normalized === "bg_or") return "Or";
-      if (normalized === "bg_argent") return "Argent";
-      return cat;
+    // On crée un Set avec "Or" et "Argent" pour s'assurer qu'ils apparaissent
+    const setOpts = new Set<string>(["Or", "Argent"]);
+  
+    // Parcours des NFTs pour détecter si "bg_or" ou autre chose
+    mintedMetadata.forEach((item) => {
+      const cat = item.attributes.find((a) => a.trait_type === "Or")?.value?.toLowerCase();
+      // Si on détecte bg_or, on ajoute "Or". Sinon, on ajoute "Argent"
+      if (cat === "bg_or") {
+        setOpts.add("Or");
+      } else {
+        setOpts.add("Argent");
+      }
     });
-    // Ajout manuel de "Argent" pour être sûr qu'il soit proposé
-    const setOpts = new Set(opts);
-    setOpts.add("Argent"); 
-    const finalArray = Array.from(setOpts).filter((opt) => opt !== "");
-    return finalArray;
+  
+    return Array.from(setOpts);
   }, [mintedMetadata]);
 
   // Texture
@@ -193,18 +195,22 @@ function NFTPed1Content() {
   // Filtrer selon les filtres sélectionnés
   const filteredNFTs = React.useMemo(() => {
     return mintedMetadata.filter((item) => {
-      const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
-      let category = "";
-      if (cat?.toLowerCase() === "bg_or") category = "Or";
-      else if (cat?.toLowerCase() === "bg_argent") category = "Argent";
-      else category = cat || "";
-
+      const cat = item.attributes.find((a) => a.trait_type === "Or")?.value?.toLowerCase();
+  
+      // Tout ce qui n'est pas bg_or => Argent
+      let category = "Argent";
+      if (cat === "bg_or") {
+        category = "Or";
+      }
+  
       const texture = item.attributes.find((a) => a.trait_type === "Texture")?.value;
       const reve = item.attributes.find((a) => a.trait_type === "Reve")?.value;
-
+  
+      // Vérifie les correspondances
       const categoryMatch = selectedCategory === "" || category === selectedCategory;
       const textureMatch = selectedTexture === "" || texture === selectedTexture;
       const reveMatch = selectedReve === "" || reve === selectedReve;
+  
       return categoryMatch && textureMatch && reveMatch;
     });
   }, [mintedMetadata, selectedCategory, selectedTexture, selectedReve]);
