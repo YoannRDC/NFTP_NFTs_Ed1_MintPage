@@ -14,7 +14,6 @@ import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
-import { FilterDropdowns } from "../components/FilterDropdowns";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -65,6 +64,7 @@ function NFTPed1Content() {
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
 
+  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
@@ -153,73 +153,103 @@ function NFTPed1Content() {
   const [selectedReve, setSelectedReve] = useState<string>("");
 
   // NFTs dont l'edition <= mintedCount
-  const mintedMetadata = React.useMemo(() => {
+  const mintedMetadata = useMemo(() => {
     return metadataData.filter((item) => item.edition <= mintedCount);
   }, [metadataData, mintedCount]);
 
-  // Catégories possibles (on force "Argent")
-  const categoryOptions = React.useMemo((): string[] => {
-    // On crée un Set avec "Or" et "Argent" pour s'assurer qu'ils apparaissent
+  // 1) Catégories (tout ce qui est bg_or => "Or", sinon => "Argent")
+  const categoryOptions = useMemo((): string[] => {
+    // On part d'un Set contenant Or et Argent pour être sûr qu'ils apparaissent
     const setOpts = new Set<string>(["Or", "Argent"]);
-  
-    // Parcours des NFTs pour détecter si "bg_or" ou autre chose
+
     mintedMetadata.forEach((item) => {
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value?.toLowerCase();
-      // Si on détecte bg_or, on ajoute "Or". Sinon, on ajoute "Argent"
       if (cat === "bg_or") {
         setOpts.add("Or");
       } else {
+        // tout ce qui n'est pas bg_or => "Argent"
         setOpts.add("Argent");
       }
     });
-  
+
     return Array.from(setOpts);
   }, [mintedMetadata]);
 
-  // Texture
-  const textureOptions = React.useMemo((): string[] => {
-    const opts = mintedMetadata.map(
-      (item) => item.attributes.find((a) => a.trait_type === "Texture")?.value || ""
-    );
-    return Array.from(new Set(opts)).filter((opt) => opt !== "");
+  // 2) Textures
+  const textureOptions = useMemo((): string[] => {
+    const rawSet = new Set<string>();
+    mintedMetadata.forEach((item) => {
+      const val = item.attributes.find((a) => a.trait_type === "Texture")?.value;
+      if (val) rawSet.add(val);
+    });
+    return Array.from(rawSet);
   }, [mintedMetadata]);
 
-  // Reve
-  const reveOptions = React.useMemo((): string[] => {
-    const opts = mintedMetadata.map(
-      (item) => item.attributes.find((a) => a.trait_type === "Reve")?.value || ""
-    );
-    return Array.from(new Set(opts)).filter((opt) => opt !== "");
+  // 3) Reve : on transforme "reve14" => "Reve 14", trié par la partie numérique
+  // On stocke la valeur brute pour filtrer, mais on affiche un label plus joli
+  type ReveOption = { rawValue: string; numericValue: number; displayValue: string };
+
+  const reveOptions = useMemo(() => {
+    // Récupération brute
+    const rawReveSet = new Set<string>();
+    mintedMetadata.forEach((item) => {
+      const rawValue = item.attributes.find((a) => a.trait_type === "Reve")?.value || "";
+      if (rawValue) rawReveSet.add(rawValue);
+    });
+
+    // Transforme en tableau
+    const reveArray = Array.from(rawReveSet); // ex. ["reve14", "reve5", "reve70", ...]
+
+    // Parser la partie numérique
+    const reveParsed: ReveOption[] = reveArray.map((raw) => {
+      const match = raw.match(/^reve(\d+)$/i);
+      const numericValue = match ? parseInt(match[1], 10) : 0;
+      const padded = numericValue.toString().padStart(2, "0");
+      return {
+        rawValue: raw,
+        numericValue,
+        displayValue: `Reve ${padded}`,
+      };
+    });
+
+    // Tri par numericValue
+    reveParsed.sort((a, b) => a.numericValue - b.numericValue);
+
+    return reveParsed;
   }, [mintedMetadata]);
 
-  // Filtrer selon les filtres sélectionnés
-  const filteredNFTs = React.useMemo(() => {
+  // Filtrage
+  const filteredNFTs = useMemo(() => {
     return mintedMetadata.filter((item) => {
+      // Catégorie
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value?.toLowerCase();
-  
-      // Tout ce qui n'est pas bg_or => Argent
-      let category = "Argent";
-      if (cat === "bg_or") {
-        category = "Or";
-      }
-  
-      const texture = item.attributes.find((a) => a.trait_type === "Texture")?.value;
-      const reve = item.attributes.find((a) => a.trait_type === "Reve")?.value;
-  
-      // Vérifie les correspondances
-      const categoryMatch = selectedCategory === "" || category === selectedCategory;
-      const textureMatch = selectedTexture === "" || texture === selectedTexture;
-      const reveMatch = selectedReve === "" || reve === selectedReve;
-  
+      const category = (cat === "bg_or") ? "Or" : "Argent";
+
+      // Texture
+      const texture = item.attributes.find((a) => a.trait_type === "Texture")?.value || "";
+
+      // Reve (valeur brute)
+      const rawReve = item.attributes.find((a) => a.trait_type === "Reve")?.value || "";
+
+      // Vérifie la catégorie
+      const categoryMatch = (selectedCategory === "" || category === selectedCategory);
+
+      // Vérifie la texture
+      const textureMatch = (selectedTexture === "" || texture === selectedTexture);
+
+      // Vérifie le reve
+      const reveMatch = (selectedReve === "" || rawReve === selectedReve);
+
       return categoryMatch && textureMatch && reveMatch;
     });
   }, [mintedMetadata, selectedCategory, selectedTexture, selectedReve]);
 
-  // Pagination sur les NFTs filtrés
+  // Pagination
   const filteredTotal = filteredNFTs.length;
   const filteredTotalPages = Math.ceil(filteredTotal / itemsPerPage);
-  // Reset page si on dépasse
-  React.useEffect(() => {
+
+  // Si la page courante dépasse le nb total, on reset
+  useEffect(() => {
     if (currentPage >= filteredTotalPages) {
       setCurrentPage(0);
     }
@@ -288,8 +318,9 @@ function NFTPed1Content() {
 
       <div className="decorative-title">-- NFTs à vendre --</div>
 
-      {/* Composant de filtres */}
+      {/* Dropdowns de filtres */}
       <div className="flex flex-wrap gap-4 mb-4 justify-center items-center">
+        {/* Catégorie */}
         <div className="relative">
           <select
             value={selectedCategory}
@@ -297,14 +328,15 @@ function NFTPed1Content() {
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Categories</option>
-            {categoryOptions.map((opt, index) => (
-              <option key={index} value={opt}>
+            {categoryOptions.map((opt) => (
+              <option key={opt} value={opt}>
                 {opt}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Texture */}
         <div className="relative">
           <select
             value={selectedTexture}
@@ -312,14 +344,15 @@ function NFTPed1Content() {
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Textures</option>
-            {textureOptions.map((opt, index) => (
-              <option key={index} value={opt}>
+            {textureOptions.map((opt) => (
+              <option key={opt} value={opt}>
                 {opt}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Reve */}
         <div className="relative">
           <select
             value={selectedReve}
@@ -327,9 +360,10 @@ function NFTPed1Content() {
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Reve</option>
-            {reveOptions.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
+            {/** On affiche la liste triée (ex: "Reve 02", "Reve 14"...) */}
+            {reveOptions.map(({ rawValue, displayValue }) => (
+              <option key={rawValue} value={rawValue}>
+                {displayValue}
               </option>
             ))}
           </select>
