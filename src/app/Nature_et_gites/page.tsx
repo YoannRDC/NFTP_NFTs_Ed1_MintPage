@@ -69,7 +69,7 @@ function NFTPed1Content() {
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
 
-  const stripeMode: "test" | "live" = "live";
+  const stripeMode: "test" | "live" = "test";
 
   // Charger metadata depuis public/nature_et_gites/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);
@@ -316,7 +316,7 @@ function NFTPed1Content() {
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
 
-      <div className="decorative-title">-- NFTs à vendre --</div>
+      <div className="decorative-title mb-4">-- NFTs à vendre --</div>
 
       {/* Dropdowns de filtres */}
       <div className="flex flex-wrap gap-4 mb-4 justify-center items-center">
