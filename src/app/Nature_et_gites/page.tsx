@@ -21,32 +21,32 @@ const contract = getContract({
   address: contractAddress,
 });
 
-const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
+const videoPresentationLink = "https://youtube.com/embed/tpnHZBySDPw?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle = "Présentation Nature & Gîtes";
-const collectionName = "Nature & Gîtes";
-const collectionPageRef = "/nature&gites";
-const collectionImageSrc = "/Nature et Gites.jpg";
+const collectionName = "Nature & Gîtes - Edition originale";
+const collectionPageRef = "/nature_et_gites";
+const nftImagesFolder = "/nftImagesFolder";
+const collectionImageSrc = "/Nature_et_Gites.jpg";
 const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
 const contractType = "erc721transfert";
-const projectName = "NATETGITES" // define in .env and constant.tsx.
+const projectName = "NATETGITES"; // define in .env and constant.tsx.
 
-// Composant principal
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
-  // Récupère un éventuel message d'erreur détaillé dans l'URL
   const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  // Stocker les prix en POL pour chaque tokenId (clé : tokenId, valeur : number)
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
-  // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
+  
+  // Pagination pour les NFTs mintés
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 50;
 
-  // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live";
 
   // Récupérer le nombre total de tokens mintés
@@ -56,6 +56,7 @@ function NFTPed1Content() {
     params: [],
   });
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
+  const totalPages = Math.ceil(mintedCount / itemsPerPage);
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
@@ -78,7 +79,7 @@ function NFTPed1Content() {
     fetchNFTs();
   }, [smartAccount?.address]);
 
-  // Appeler getPolEurRate() une seule fois pour récupérer le taux de conversion POL/EUR
+  // Récupérer le taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
       try {
@@ -91,15 +92,13 @@ function NFTPed1Content() {
     fetchConversionRate();
   }, []);
 
-  // Calculer et stocker les prix en POL pour chaque token une fois que mintedCount et le taux de conversion sont disponibles
+  // Calculer et stocker les prix en POL pour chaque token
   useEffect(() => {
     async function fetchPrices() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName,i);
-          // Conversion : si 1 POL vaut "polEurRate" euros, alors:
-          // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
+          const euroPrice = getNFTEuroPrice(projectName, i);
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
@@ -142,22 +141,22 @@ function NFTPed1Content() {
 
       <div className="mb-10">
         <div className="decorative-description">
-        Nature & Gîtes est un projet d’écotourisme innovant, fondé sur la création de lieux de vie autonomes, connectés à la nature et accessibles à tous.
+          Nature & Gîtes est un projet d’écotourisme innovant, fondé sur la création de lieux de vie autonomes, connectés à la nature et accessibles à tous.
         </div>
         <div className="decorative-description">
-        Chaque gîte est pensé comme un espace de ressourcement, intégrant des systèmes d’autonomie énergétique, de gestion responsable de l’eau et de valorisation de l’environnement local.
+          Chaque gîte est pensé comme un espace de ressourcement, intégrant des systèmes d’autonomie énergétique, de gestion responsable de l’eau et de valorisation de l’environnement local.
         </div>
         <div className="decorative-description">
-        Cette collection de NFTs symbolise le lancement du projet et sert à financer ses premières étapes concrètes. Elle met à l’honneur Rêve, la mascotte du projet : un chien doux et puissant, compagnon de vie et de voyage, qui incarne le lien entre l’humain, la nature et l’animal.
+          Cette collection de NFTs symbolise le lancement du projet et sert à financer ses premières étapes concrètes. Elle met à l’honneur Rêve, la mascotte du projet : un chien doux et puissant, compagnon de vie et de voyage, qui incarne le lien entre l’humain, la nature et l’animal.
         </div>
         <div className="decorative-description">
-        Chaque NFT représente une œuvre unique basée sur des photographies de Rêve, habillées de textures naturelles et de variations visuelles. En plus de leur valeur artistique, ces NFTs peuvent donner accès à des avantages exclusifs : nuitées offertes, rencontres, goodies, et bien plus encore.
+          Chaque NFT représente une œuvre unique basée sur des photographies de Rêve, habillées de textures naturelles et de variations visuelles. En plus de leur valeur artistique, ces NFTs peuvent donner accès à des avantages exclusifs : nuitées offertes, rencontres, goodies, et bien plus encore.
         </div>
         <div className="decorative-description">
-        En achetant un NFT de cette collection, vous devenez acteur d’un projet éthique et durable, tout en participant à l’exploration des usages positifs du Web3.
+          En achetant un NFT de cette collection, vous devenez acteur d’un projet éthique et durable, tout en participant à l’exploration des usages positifs du Web3.
         </div>
         <div className="decorative-description">
-        Soutenez un mode de vie alternatif et responsable, en devenant membre de la communauté Nature & Gîtes.
+          Soutenez un mode de vie alternatif et responsable, en devenant membre de la communauté Nature & Gîtes.
         </div>
       </div>
 
@@ -180,25 +179,55 @@ function NFTPed1Content() {
         {isMintedLoading ? (
           <p>Chargement des NFT mintés...</p>
         ) : mintedCount > 0 ? (
-          Array.from({ length: mintedCount }, (_, index) => (
-            <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
-              <ItemERC721transfert 
-                tokenId={BigInt(index)}
-                priceInPol={pricesInPol[index] ?? null}
-                priceInEur={getNFTEuroPrice(projectName, index)}
-                contract={contract}
-                stripeMode={stripeMode}
-                previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
-                redirectPage={collectionPageRef}
-                contractType={contractType}
-                projectName={projectName}
-              />
-            </div>
-          ))
+          Array.from(
+            {
+              length: Math.min(itemsPerPage, mintedCount - currentPage * itemsPerPage),
+            },
+            (_, index) => {
+              const tokenIndex = currentPage * itemsPerPage + index;
+              return (
+                <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
+                  <ItemERC721transfert 
+                    tokenId={BigInt(tokenIndex)}
+                    priceInPol={pricesInPol[tokenIndex] ?? null}
+                    priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
+                    contract={contract}
+                    stripeMode={stripeMode}
+                    previewImage={`${collectionPageRef}/${nftImagesFolder}/${index.toString().padStart(2, '0')}.jpg`}
+                    redirectPage={collectionPageRef}
+                    contractType={contractType}
+                    projectName={projectName}
+                  />
+                </div>
+              );
+            }
+          )
         ) : (
           <p>Aucun NFT minté pour le moment.</p>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+            disabled={currentPage === 0}
+            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Précédent
+          </button>
+          <span className="mx-2">
+            Page {currentPage + 1} sur {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
+            disabled={currentPage >= totalPages - 1}
+            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Suivant
+          </button>
+        </div>
+      )}
 
       <div className="decorative-title">
         -- Mes NFTs --
