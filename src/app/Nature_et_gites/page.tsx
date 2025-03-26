@@ -15,6 +15,24 @@ import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
+import { FilterDropdowns } from "../components/FilterDropdowns";
+
+// Le fichier metadata est placé dans public/nature_et_gites/metadata.json
+// On le charge via fetch et on le typage via l'interface suivante :
+interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  dna: string;
+  edition: number;
+  date: number;
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
+  compiler: string;
+  editor: string;
+}
 
 const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
 const contract = getContract({
@@ -35,46 +53,33 @@ const artistProjectWebsitePrettyPrint = "Site en construction";
 const contractType = "erc721transfert";
 const projectName = "NATETGITES"; // défini dans .env et constant.tsx.
 
-// Interface pour typer le contenu du fichier metadata
-interface NFTMetadata {
-  name: string;
-  description: string;
-  image: string;
-  dna: string;
-  edition: number;
-  date: number;
-  attributes: {
-    trait_type: string;
-    value: string;
-  }[];
-  compiler: string;
-  editor: string;
-}
-
 function NFTPed1Content() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
   
-  // États pour les NFTs possédés par l'utilisateur
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-
-  // États pour les prix en POL
+  
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
-
-  // Pagination pour les NFTs à vendre
+  
   const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
-
+  
   const stripeMode: "test" | "live" = "live";
-
-  // État pour stocker les métadonnées chargées depuis public/nature_et_gites/metadata.json
+  
+  // Charger metadata depuis public/nature_et_gites/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);
-
+  useEffect(() => {
+    fetch("/nature_et_gites/metadata.json")
+      .then((res) => res.json())
+      .then((data: NFTMetadata[]) => setMetadataData(data))
+      .catch((err) => console.error("Erreur lors du chargement de metadata", err));
+  }, []);
+  
   // Récupération du nombre total de tokens mintés depuis le contrat
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
     contract: contract,
@@ -83,16 +88,8 @@ function NFTPed1Content() {
   });
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
   const totalPages = Math.ceil(mintedCount / itemsPerPage);
-
-  // Charger le fichier metadata depuis le dossier public
-  useEffect(() => {
-    fetch("/nature_et_gites/metadata.json")
-      .then((res) => res.json())
-      .then((data: NFTMetadata[]) => setMetadataData(data))
-      .catch((err) => console.error("Erreur lors du chargement de metadata", err));
-  }, []);
-
-  // Choisir une page aléatoire lors du premier chargement (quand mintedCount est connu)
+  
+  // Choisir une page aléatoire lors du premier chargement
   useEffect(() => {
     if (!hasRandomized && mintedCount > 0 && totalPages > 0) {
       const randomPage = Math.floor(Math.random() * totalPages);
@@ -100,7 +97,7 @@ function NFTPed1Content() {
       setHasRandomized(true);
     }
   }, [mintedCount, totalPages, hasRandomized]);
-
+  
   // Récupérer les NFTs possédés par l'utilisateur
   useEffect(() => {
     async function fetchNFTs() {
@@ -121,7 +118,7 @@ function NFTPed1Content() {
     }
     fetchNFTs();
   }, [smartAccount?.address]);
-
+  
   // Récupérer le taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
@@ -129,13 +126,13 @@ function NFTPed1Content() {
         const { rate } = await getPolEuroRate();
         setPolEurRate(rate);
       } catch (error) {
-        console.error("Erreur lors de la récupération du taux de conversion POL/EUR:", error);
+        console.error("Erreur lors du chargement du taux de conversion POL/EUR:", error);
       }
     }
     fetchConversionRate();
   }, []);
-
-  // Calculer et stocker les prix en POL pour chaque token
+  
+  // Calculer les prix en POL
   useEffect(() => {
     async function fetchPrices() {
       if (mintedCount > 0 && polEurRate !== null) {
@@ -149,41 +146,49 @@ function NFTPed1Content() {
     }
     fetchPrices();
   }, [mintedCount, polEurRate]);
-
-  // --- Filtres Dropdown ---
+  
+  // --- Filtres ---
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedTexture, setSelectedTexture] = useState<string>("");
   const [selectedReve, setSelectedReve] = useState<string>("");
 
-  // Filtrer les métadonnées pour les NFTs mintés (edition <= mintedCount)
+  // Filtrer les métadonnées dont l'edition est inférieure ou égale au mintedCount
   const mintedMetadata = useMemo(() => {
     return metadataData.filter((item) => item.edition <= mintedCount);
   }, [metadataData, mintedCount]);
 
-  // Options pour les filtres dérivées des métadonnées
+  // Options pour le filtre Catégorie
   const categoryOptions = useMemo((): string[] => {
     const opts = mintedMetadata.map((item) => {
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
-      return cat === "bg_or" ? "Or" : cat === "bg_argent" ? "Argent" : cat || "";
+      if (!cat) return "";
+      const normalized = cat.toLowerCase();
+      if (normalized === "bg_or") return "Or";
+      if (normalized === "bg_argent") return "Argent";
+      return cat;
     });
-    return Array.from(new Set(opts));
+    return Array.from(new Set(opts)).filter((opt) => opt !== "");
   }, [mintedMetadata]);
 
   const textureOptions = useMemo((): string[] => {
-    const opts = mintedMetadata.map((item) => item.attributes.find((a) => a.trait_type === "Texture")?.value || "");
-    return Array.from(new Set(opts));
+    const opts = mintedMetadata.map(
+      (item) => item.attributes.find((a) => a.trait_type === "Texture")?.value || ""
+    );
+    return Array.from(new Set(opts)).filter((opt) => opt !== "");
   }, [mintedMetadata]);
 
   const reveOptions = useMemo((): string[] => {
-    const opts = mintedMetadata.map((item) => item.attributes.find((a) => a.trait_type === "Reve")?.value || "");
-    return Array.from(new Set(opts));
+    const opts = mintedMetadata.map(
+      (item) => item.attributes.find((a) => a.trait_type === "Reve")?.value || ""
+    );
+    return Array.from(new Set(opts)).filter((opt) => opt !== "");
   }, [mintedMetadata]);
 
   // Filtrer les NFTs selon les filtres sélectionnés
   const filteredNFTs = useMemo(() => {
     return mintedMetadata.filter((item) => {
       const cat = item.attributes.find((a) => a.trait_type === "Or")?.value;
-      const category = cat === "bg_or" ? "Or" : cat === "bg_argent" ? "Argent" : cat;
+      const category = cat && cat.toLowerCase() === "bg_or" ? "Or" : cat && cat.toLowerCase() === "bg_argent" ? "Argent" : cat;
       const texture = item.attributes.find((a) => a.trait_type === "Texture")?.value;
       const reve = item.attributes.find((a) => a.trait_type === "Reve")?.value;
       const categoryMatch = selectedCategory === "" || category === selectedCategory;
@@ -268,53 +273,18 @@ function NFTPed1Content() {
 
       <div className="decorative-title">-- NFTs à vendre --</div>
 
-      {/* Dropdowns de filtres */}
-      <div className="flex flex-wrap gap-4 mb-4 justify-center">
-        <div className="relative">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="">All Categories</option>
-            {categoryOptions.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="relative">
-          <select
-            value={selectedTexture}
-            onChange={(e) => setSelectedTexture(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="">All Textures</option>
-            {textureOptions.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="relative">
-          <select
-            value={selectedReve}
-            onChange={(e) => setSelectedReve(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="">All Reve</option>
-            {reveOptions.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      {/* Composant de filtres */}
+      <FilterDropdowns
+        categoryOptions={categoryOptions}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        textureOptions={textureOptions}
+        selectedTexture={selectedTexture}
+        onTextureChange={setSelectedTexture}
+        reveOptions={reveOptions}
+        selectedReve={selectedReve}
+        onReveChange={setSelectedReve}
+      />
 
       {/* Pagination en haut */}
       {filteredTotalPages > 1 && (
@@ -330,7 +300,7 @@ function NFTPed1Content() {
           <p>Chargement des NFT mintés...</p>
         ) : filteredNFTs.length > 0 ? (
           displayedNFTs.map((item: NFTMetadata) => {
-            // item.edition correspond à tokenId + 1
+            // tokenIndex correspond à edition - 1
             const tokenIndex = item.edition - 1;
             return (
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
@@ -340,7 +310,9 @@ function NFTPed1Content() {
                   priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
                   contract={contract}
                   stripeMode={stripeMode}
-                  previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex.toString().padStart(4, "0")}.jpg`}
+                  previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex
+                    .toString()
+                    .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
                   contractType={contractType}
                   projectName={projectName}
