@@ -13,6 +13,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
+import { Pagination } from "../components/Pagination"; // Assurez-vous que le chemin est correct
 
 const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
 const contract = getContract({
@@ -25,13 +26,13 @@ const videoPresentationLink = "https://youtube.com/embed/tpnHZBySDPw?rel=0&modes
 const videoPresentationTitle = "Présentation Nature & Gîtes";
 const collectionName = "Nature & Gîtes - Edition originale";
 const collectionPageRef = "/nature_et_gites";
-const nftImagesFolder = "/nftImagesFolder";
+const nftImagesFolder = "/nftImages";
 const collectionImageSrc = "/Nature_et_Gites.jpg";
 const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
 const contractType = "erc721transfert";
-const projectName = "NATETGITES"; // define in .env and constant.tsx.
+const projectName = "NATETGITES"; // défini dans .env et constant.tsx.
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -42,14 +43,14 @@ function NFTPed1Content() {
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
-  
+
   // Pagination pour les NFTs mintés
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 20;
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const itemsPerPage = 21;
 
   const stripeMode: "test" | "live" = "live";
 
-  // Récupérer le nombre total de tokens mintés
+  // Récupération du nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
     contract: contract,
     method: "function totalMinted() view returns (uint256)",
@@ -58,7 +59,7 @@ function NFTPed1Content() {
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
   const totalPages = Math.ceil(mintedCount / itemsPerPage);
 
-  // Récupérer les NFTs de l'utilisateur
+  // Récupérer les NFTs possédés par l'utilisateur
   useEffect(() => {
     async function fetchNFTs() {
       if (!smartAccount?.address) return;
@@ -107,11 +108,15 @@ function NFTPed1Content() {
     fetchPrices();
   }, [mintedCount, polEurRate]);
 
+  // Déterminer l'intervalle des tokens à afficher selon la page
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, mintedCount);
+
   return (
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+          Paiement réussi ! Merci pour votre achat. Raffraîchissez la page pour voir votre NFT !
         </div>
       )}
       {paymentResult === "error" && (
@@ -123,12 +128,8 @@ function NFTPed1Content() {
         </div>
       )}
 
-      <div className="decorative-title">
-        -- Présentation de la collection --
-      </div>
-      <div className="decorative-subtitle">
-        Nature & Gîtes
-      </div>
+      <div className="decorative-title">-- Présentation de la collection --</div>
+      <div className="decorative-subtitle">Nature & Gîtes</div>
 
       <div className="mb-10">
         <MenuItem
@@ -171,69 +172,56 @@ function NFTPed1Content() {
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
 
-      <div className="decorative-title">
-        -- NFTs à vendre --
-      </div>
+      <div className="decorative-title">-- NFTs à vendre --</div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Pagination en haut */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         {isMintedLoading ? (
           <p>Chargement des NFT mintés...</p>
         ) : mintedCount > 0 ? (
-          Array.from(
-            {
-              length: Math.min(itemsPerPage, mintedCount - currentPage * itemsPerPage),
-            },
-            (_, index) => {
-              const tokenIndex = currentPage * itemsPerPage + index;
-              return (
-                <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
-                  <ItemERC721transfert 
-                    tokenId={BigInt(tokenIndex)}
-                    priceInPol={pricesInPol[tokenIndex] ?? null}
-                    priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
-                    contract={contract}
-                    stripeMode={stripeMode}
-                    previewImage={`${collectionPageRef}/${nftImagesFolder}/${index.toString().padStart(4, '0')}.jpg`}
-                    redirectPage={collectionPageRef}
-                    contractType={contractType}
-                    projectName={projectName}
-                  />
-                </div>
-              );
-            }
-          )
+          Array.from({ length: endIndex - startIndex }, (_, index) => {
+            const tokenIndex = startIndex + index;
+            return (
+              <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
+                <ItemERC721transfert 
+                  tokenId={BigInt(tokenIndex)}
+                  priceInPol={pricesInPol[tokenIndex] ?? null}
+                  priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
+                  contract={contract}
+                  stripeMode={stripeMode}
+                  previewImage={`${collectionPageRef}/${nftImagesFolder}/${index
+                    .toString()
+                    .padStart(4, "0")}.jpg`}
+                  redirectPage={collectionPageRef}
+                  contractType={contractType}
+                  projectName={projectName}
+                />
+              </div>
+            );
+          })
         ) : (
           <p>Aucun NFT minté pour le moment.</p>
         )}
       </div>
 
+      {/* Pagination en bas */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-4 mt-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-            disabled={currentPage === 0}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Précédent
-          </button>
-          
-          <span className="font-semibold text-white">
-            Page {currentPage + 1} sur {totalPages}
-          </span>
-          
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
-            disabled={currentPage >= totalPages - 1}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Suivant
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       )}
 
-      <div className="decorative-title">
-        -- Mes NFTs --
-      </div>
+      <div className="decorative-title">-- Mes NFTs --</div>
 
       {isLoadingNfts ? (
         <p>Chargement de vos NFTs...</p>
