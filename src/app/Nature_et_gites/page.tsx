@@ -207,9 +207,7 @@ function NFTPed1Content() {
                   priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
                   contract={contract}
                   stripeMode={stripeMode}
-                  previewImage={`${collectionPageRef}/${nftImagesFolder}/${index
-                    .toString()
-                    .padStart(4, "0")}.jpg`}
+                  previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex.toString().padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
                   contractType={contractType}
                   projectName={projectName}
