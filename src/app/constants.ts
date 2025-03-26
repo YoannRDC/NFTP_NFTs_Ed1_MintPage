@@ -87,10 +87,10 @@ export function getNFTEuroPrice( projectName: string, tokenId: number): number {
   }
 }
 
-// Fonction asynchrone pour obtenir le prix en POL en convertissant le prix en euros
-export async function getNFTPolPrice(projectName: string,tokenId: number): Promise<bigint> {
+export async function getNFTPolPriceInWei(projectName: string, tokenId: number): Promise<bigint> {
 	const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
 	const conversion = await convertEurToPOL(artcardEuroPrice);
-	// Conversion de conversion.amount (number) en bigint
-	return BigInt(conversion.amount);
-}
+	// conversion.amount est un nombre décimal, on le convertit en wei (BigInt) en multipliant par 1e18
+	return BigInt(Math.floor(conversion.amount * 1e18));
+  }
+  

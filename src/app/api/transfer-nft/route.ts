@@ -12,7 +12,7 @@ import {
   getProjectPublicKey,
   getProjectPrivateKeyEnvName,
   getNFTEuroPrice,
-  getNFTPolPrice
+  getNFTPolPriceInWei
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
@@ -91,14 +91,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Le destinataire de la transaction de paiement n'est pas le minter" }, { status: 400 });
     }
 
-    // Récupération du prix en euros et conversion en POL
-    const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
-    const artcardPolPrice = await getNFTPolPrice(projectName, tokenId);
-    const artcardPolWeiPrice = toWei(artcardPolPrice.toString());
+  // Récupération du prix en euros et conversion en POL (en wei)
+  const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
+  const artcardPolWeiPrice = await getNFTPolPriceInWei(projectName, tokenId);
 
     console.error("tokenId: ", tokenId);
     console.error("artcardEuroPrice: ", artcardEuroPrice);
-    console.error("artcardPolPrice: ", artcardPolPrice);
     console.error("paymentTx.value: ", paymentTx.value);
     console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
