@@ -45,7 +45,7 @@ function NFTPed1Content() {
   
   // Pagination pour les NFTs mintés
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 50;
+  const itemsPerPage = 20;
 
   const stripeMode: "test" | "live" = "live";
 
@@ -193,7 +193,7 @@ function NFTPed1Content() {
                     priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
                     contract={contract}
                     stripeMode={stripeMode}
-                    previewImage={`${collectionPageRef}/${nftImagesFolder}/${index.toString().padStart(2, '0')}.jpg`}
+                    previewImage={`${collectionPageRef}/${nftImagesFolder}/${index.toString().padStart(4, '0')}.jpg`}
                     redirectPage={collectionPageRef}
                     contractType={contractType}
                     projectName={projectName}
@@ -208,21 +208,23 @@ function NFTPed1Content() {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center items-center space-x-4 mt-4">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
             disabled={currentPage === 0}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             Précédent
           </button>
-          <span className="mx-2">
+          
+          <span className="font-semibold text-white">
             Page {currentPage + 1} sur {totalPages}
           </span>
+          
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
             disabled={currentPage >= totalPages - 1}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             Suivant
           </button>
