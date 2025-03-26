@@ -47,6 +47,7 @@ function NFTPed1Content() {
   // Pagination pour les NFTs mintés
   const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 21;
+  const [hasRandomized, setHasRandomized] = useState<boolean>(false);
 
   const stripeMode: "test" | "live" = "live";
 
@@ -58,6 +59,15 @@ function NFTPed1Content() {
   });
   const mintedCount = totalMinted ? parseInt(totalMinted.toString()) : 0;
   const totalPages = Math.ceil(mintedCount / itemsPerPage);
+
+  // Choisir une page aléatoire lors du premier chargement (quand mintedCount est connu)
+  useEffect(() => {
+    if (!hasRandomized && mintedCount > 0 && totalPages > 0) {
+      const randomPage = Math.floor(Math.random() * totalPages);
+      setCurrentPage(randomPage);
+      setHasRandomized(true);
+    }
+  }, [mintedCount, totalPages, hasRandomized]);
 
   // Récupérer les NFTs possédés par l'utilisateur
   useEffect(() => {

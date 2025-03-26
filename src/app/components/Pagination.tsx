@@ -7,11 +7,41 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function Pagination({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationProps) {
+export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  // Génère la liste des éléments à afficher dans la pagination.
+  // Si totalPages <= 8, on affiche toutes les pages.
+  // Sinon, on affiche :
+  // - La première page (index 0)
+  // - Des points de suspension si la première partie du bloc est omise
+  // - Un bloc de pages autour de la page courante (3 avant et 3 après)
+  // - Des points de suspension si la fin du bloc est omise
+  // - La dernière page (index totalPages - 1)
+  const getPaginationItems = (): (number | string)[] => {
+    if (totalPages <= 8) {
+      return Array.from({ length: totalPages }, (_, i) => i);
+    }
+    const items: (number | string)[] = [];
+    items.push(0); // première page
+
+    const left = Math.max(1, currentPage - 3);
+    const right = Math.min(totalPages - 2, currentPage + 3);
+
+    if (left > 1) {
+      items.push("...");
+    }
+    for (let i = left; i <= right; i++) {
+      items.push(i);
+    }
+    if (right < totalPages - 2) {
+      items.push("...");
+    }
+    items.push(totalPages - 1); // dernière page
+
+    return items;
+  };
+
+  const paginationItems = getPaginationItems();
+
   const handlePrev = () => {
     if (currentPage > 0) {
       onPageChange(currentPage - 1);
@@ -24,16 +54,10 @@ export function Pagination({
     }
   };
 
-  // Regrouper les numéros de pages par blocs de 10
-  const pageChunks: number[][] = [];
-  for (let i = 0; i < totalPages; i += 10) {
-    pageChunks.push(Array.from({ length: Math.min(10, totalPages - i) }, (_, j) => i + j));
-  }
-
   return (
     <div className="flex flex-col items-center justify-center mt-4 space-y-2">
-      {/* Ligne avec Bouton Précédent, numéros de pages (groupés) et Bouton Suivant */}
-      <div className="flex space-x-4">
+      {/* Ligne principale avec Précédent, les pages et Suivant */}
+      <div className="flex items-center space-x-4">
         <button
           onClick={handlePrev}
           disabled={currentPage === 0}
@@ -42,25 +66,29 @@ export function Pagination({
           Précédent
         </button>
 
-        {/* Blocs de numéros de pages avec retour à la ligne toutes les 10 pages */}
-        <div className="flex flex-col space-y-1">
-          {pageChunks.map((chunk, index) => (
-            <div key={index} className="flex space-x-1">
-              {chunk.map((page) => (
+        <div className="flex items-center space-x-1">
+          {paginationItems.map((item, index) => {
+            if (typeof item === "number") {
+              return (
                 <button
-                  key={page}
-                  onClick={() => onPageChange(page)}
-                  className={`px-1 py-1 rounded ${
-                    page === currentPage
-                      ? "bg-blue-600 text-white"
-                      : "underline hover:text-blue-500"
+                  key={index}
+                  onClick={() => onPageChange(item)}
+                  className={`px-2 py-1 rounded ${
+                    item === currentPage ? "bg-blue-600 text-white" : "underline hover:text-blue-500"
                   }`}
                 >
-                  {page + 1}
+                  {item + 1}
                 </button>
-              ))}
-            </div>
-          ))}
+              );
+            } else {
+              // Affiche les points de suspension
+              return (
+                <span key={index} className="px-2 py-1 text-white">
+                  {item}
+                </span>
+              );
+            }
+          })}
         </div>
 
         <button
