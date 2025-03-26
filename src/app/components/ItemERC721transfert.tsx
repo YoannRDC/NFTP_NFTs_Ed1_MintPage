@@ -1,8 +1,10 @@
 "use client";
+export const dynamic = "force-dynamic";
+
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   ConnectButton,
-  MediaRenderer,
   useActiveAccount,
   useReadContract,
 } from "thirdweb/react";
@@ -50,11 +52,13 @@ export default function ItemERC721transfert({
   // Récupération de l'adresse du minter via le mapping à partir du projectName
   const minterAddress = getProjectPublicKey(projectName);
 
-  // Détermine le statut du NFT : "Disponible" s'il appartient au minter, "Vendu" sinon
+  // Déterminer le statut du NFT : "Disponible" s'il appartient au minter, "Vendu" sinon
   let nftStatus = "Chargement...";
   if (!ownerLoading && owner) {
     nftStatus =
-      owner.toLowerCase() === minterAddress.toLowerCase() ? "Disponible" : "Vendu";
+      owner.toLowerCase() === minterAddress.toLowerCase()
+        ? "Disponible"
+        : "Vendu";
   }
 
   // Configuration des wallets
@@ -73,8 +77,8 @@ export default function ItemERC721transfert({
     throw new Error("Le prix en Euros (priceInEur) doit être défini.");
   }
 
-  // handlePurchase : effectue le paiement en crypto vers l'adresse du minter récupérée dynamiquement,
-  // vérifie la confirmation de la transaction et appelle ensuite l'API de transfert du NFT.
+  // handlePurchase : effectue le paiement en crypto vers l'adresse du minter,
+  // attend la confirmation et appelle l'API de transfert du NFT.
   const handlePurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
@@ -86,7 +90,7 @@ export default function ItemERC721transfert({
     }
     try {
       setIsProcessing(true);
-      // Transfert de la crypto vers l'adresse du minter
+      // Préparation de la transaction de paiement
       const transaction = prepareTransaction({
         to: minterAddress,
         chain: polygon,
@@ -100,11 +104,11 @@ export default function ItemERC721transfert({
 
       const paymentTxHash = receipt.transactionHash;
 
-      // Attendre 15 secondes avant d'appeler l'API de transfert du NFT
+      // Attente de 15 secondes avant d'appeler l'API de transfert
       await new Promise((resolve) => setTimeout(resolve, 15000));
       console.log("15 secondes écoulées, appel de l'API de transfert");
 
-      // Vérification de la transaction via eth_getTransactionByHash
+      // Vérification de la transaction
       const rpcRequest = getRpcClient({ client, chain: polygon });
       const paymentTx = await eth_getTransactionByHash(rpcRequest, {
         hash: paymentTxHash,
@@ -116,7 +120,7 @@ export default function ItemERC721transfert({
       }
       console.log("Transaction de paiement confirmée :", paymentTxHash);
 
-      // Appel de l'API pour transférer le NFT en passant le hash de la transaction de paiement
+      // Appel de l'API pour transférer le NFT
       const response = await fetch("/api/transfer-nft", {
         method: "POST",
         headers: {
@@ -151,36 +155,45 @@ export default function ItemERC721transfert({
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg">
             <p className="text-center text-black">
-              La transaction est en cours de traitement ...
+              La transaction est en cours de traitement...
             </p>
           </div>
         </div>
       )}
 
-      <div className="mt-10 flex justify-center" onClick={() => setIsFullscreen(true)} style={{ cursor: "pointer" }}>
-        <MediaRenderer
-          client={client}
+      {/* Image de prévisualisation avec Next.js Image, lazy loading et placeholder flou */}
+      <div
+        className="mt-10 flex justify-center cursor-pointer"
+        onClick={() => setIsFullscreen(true)}
+      >
+        <Image
           src={previewImage}
-          style={{ height: "auto", borderRadius: "10px" }}
+          alt="NFT Preview"
+          width={500}
+          height={500}
+          placeholder="blur"
+          blurDataURL={`${previewImage}?w=10&q=10`}
+          className="rounded-lg"
         />
       </div>
 
+      {/* Vue en plein écran lors du clic */}
       {isFullscreen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
           onClick={() => setIsFullscreen(false)}
         >
-          <img
+          <Image
             src={previewImage}
-            alt="NFT en plein écran"
+            alt="NFT Fullscreen"
+            width={800}
+            height={800}
             className="max-w-full max-h-full"
           />
         </div>
       )}
 
-      <div className="text-gray-500 mt-2 flex justify-center">
-        {nftStatus}
-      </div>
+      <div className="text-gray-500 mt-2 flex justify-center">{nftStatus}</div>
 
       {nftStatus === "Disponible" ? (
         <>
@@ -225,9 +238,7 @@ export default function ItemERC721transfert({
             )}
           </div>
         </>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -7,10 +7,8 @@ import youtube_logo from "@public/youtube_logo.png";
 import { accountAbstraction, client, nftpPubKey } from "./constants";
 import Link from "next/link";
 import MenuItem from "./components/MenuItem";
-import { useState } from "react";
 
 export default function Home() {
-  const [snapshotData, setSnapshotData] = useState<any[]>([]);
   const account = useActiveAccount();
   const isAdmin: boolean =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
