@@ -68,26 +68,20 @@ export function getProjectPrivateKeyEnvName(projectName: string): string {
 	return mapping.privateKeyEnv;
 }
 
-// *******
-// Artcards - Politique de prix par défaut pour le projet "ARTCARDS"
-// *******
-const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
-
 // Fonction pour calculer le prix en euros en fonction du tokenId et du projet
 export function getNFTEuroPrice( projectName: string, tokenId: number): number {
   const project = projectName.toUpperCase();
   
   if (project === "ARTCARDS") {
     // Politique de prix pour Artcards
+	const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
     return artCardEuroPrices[tokenId % artCardEuroPrices.length];
   } else if (project === "NATETGITES") {
-    // Exemple : politique de prix pour NatetGites
-    const natetgitesEuroPrices = [100, 120, 140, 160, 180];
-    return natetgitesEuroPrices[tokenId % natetgitesEuroPrices.length];
+    // Les 500 premiers NFTs coûtent 50e, les 100 suivants coutent 30e.
+	return tokenId < 500 ? 50 : 30;
   } else if (project === "NMMATHIEU") {
-    // Exemple : politique de prix pour NM Matthieu
-    const nmmathieuEuroPrices = [80, 90, 100, 110, 120];
-    return nmmathieuEuroPrices[tokenId % nmmathieuEuroPrices.length];
+    // Tous les NFTs coutent 30e
+    return 30;
   } else {
     throw new Error(`Aucune politique de prix définie pour le projet: ${projectName}`);
   }

@@ -13,6 +13,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
+import { Pagination } from "../components/Pagination";
 //import { Pagination } from "../components/Pagination"; // Assurez-vous que le chemin est correct
 
 const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
@@ -185,13 +186,13 @@ function NFTPed1Content() {
       <div className="decorative-title">-- NFTs à vendre --</div>
 
        {/* Pagination en haut */}
- {/*     {totalPages > 1 && (
+      {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
-      )} */}
+      )} 
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         {isMintedLoading ? (
@@ -221,13 +222,13 @@ function NFTPed1Content() {
       </div>
 
       {/* Pagination en bas */}
-{/*       {totalPages > 1 && (
+       {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
-      )} */}
+      )} 
 
       <div className="decorative-title">-- Mes NFTs --</div>
 

@@ -55,9 +55,9 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   };
 
   return (
-    <div className="flex flex-col items-center justify-center mt-4 space-y-2">
+    <div className="w-full max-w-full flex flex-col items-center justify-center mt-4 space-y-2">
       {/* Ligne principale avec Précédent, les pages et Suivant */}
-      <div className="flex items-center space-x-4">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           onClick={handlePrev}
           disabled={currentPage === 0}
@@ -66,7 +66,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           Précédent
         </button>
 
-        <div className="flex items-center space-x-1">
+        <div className="flex flex-wrap items-center justify-center gap-1">
           {paginationItems.map((item, index) => {
             if (typeof item === "number") {
               return (

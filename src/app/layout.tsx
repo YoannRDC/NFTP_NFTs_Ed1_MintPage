@@ -6,8 +6,8 @@ import { ThirdwebProvider } from "thirdweb/react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Account Abstraction examples | thirdweb",
-  description: "Account Abstraction examples using the thirdweb Connect SDK",
+  title: "AuthentArt.com",
+  description: "Discover NFT collections created by genuine artists and support real-life projects.",
 };
 
 export default function RootLayout({
