@@ -106,6 +106,12 @@ function Menu({ isAdmin }: MenuProps) {
           description="First NFT collection of NFT Propulsion."
           imageSrc="/nftp_ed1/logo_seul_11.png"
         />
+        <MenuItem
+          title="Nature & Gîtes - Edition originale"
+          href="/nature_et_gites"
+          description="Les NFTs de Nature & Gîtes."
+          imageSrc="/nature_et_gites/Nature_et_Gites.jpg"
+        />
         {/* Affichage conditionnel du MenuItem "Nicole Mathieu" */}
         {isAdmin && (
           <MenuItem
