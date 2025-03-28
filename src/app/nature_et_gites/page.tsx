@@ -69,7 +69,7 @@ function NFTPed1Content() {
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
 
-  const stripeMode: "test" | "live" = "test";
+  const stripeMode: "test" | "live" = "live";
 
   // Charger metadata depuis public/nature_et_gites/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);
