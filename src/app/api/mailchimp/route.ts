@@ -29,6 +29,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { email, listId } = body;
+    console.log("listId: ", listId);
+    console.log(" > Adding email: ", email);
     if (!email || !listId) {
       return NextResponse.json({ error: 'Email et listId sont requis' }, { status: 400 });
     }
