@@ -9,13 +9,12 @@ import youtube_logo from "@public/youtube_logo.png";
 import MenuItem from "./components/MenuItem";
 import { accountAbstraction, client, nftpPubKey } from "./constants";
 
-const LIST_ID_NFT_PROP = "c642fe82cc";
-
 export default function Home() {
   const account = useActiveAccount();
   const isAdmin: boolean =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
+  // Pour tester la récupération des membres via GET
   const [mailchimpData, setMailchimpData] = useState<any>(null);
   const [loadingMailchimp, setLoadingMailchimp] = useState(false);
   const [errorMailchimp, setErrorMailchimp] = useState<string | null>(null);
@@ -25,7 +24,7 @@ export default function Home() {
     setErrorMailchimp(null);
     try {
       // Remplacez "YOUR_LIST_ID" par l'ID de votre liste
-      const res = await fetch(`/api/mailchimp?listId=LIST_ID`);
+      const res = await fetch(`/api/mailchimp?listId=YOUR_LIST_ID`);
       const data = await res.json();
       if (res.ok) {
         setMailchimpData(data);
@@ -37,6 +36,39 @@ export default function Home() {
       setErrorMailchimp(error.message);
     }
     setLoadingMailchimp(false);
+  }
+
+  // Pour inscrire un nouvel email à la newsletter via POST
+  const [subscriptionEmail, setSubscriptionEmail] = useState("");
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
+  const [subscriptionSuccess, setSubscriptionSuccess] = useState<any>(null);
+
+  async function handleSubscribe() {
+    setSubscriptionLoading(true);
+    setSubscriptionError(null);
+    setSubscriptionSuccess(null);
+    try {
+      // Remplacez "YOUR_LIST_ID" par l'ID de votre liste ou définissez-le en constante
+      const res = await fetch("/api/mailchimp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: subscriptionEmail,
+          listId: "YOUR_LIST_ID",
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscriptionSuccess(data);
+        console.log("Inscription réussie:", data);
+      } else {
+        setSubscriptionError(data.error || "Erreur inconnue lors de l'inscription");
+      }
+    } catch (error: any) {
+      setSubscriptionError(error.message);
+    }
+    setSubscriptionLoading(false);
   }
 
   return (
@@ -70,28 +102,51 @@ export default function Home() {
           />
         </Link>
       </p>
-      
-      {/* Bouton pour appeler l'API Mailchimp */}
-      <div className="flex justify-center mb-10">
+
+      {/* Bouton pour appeler l'API Mailchimp en GET */}
+      <div className="flex flex-col items-center mb-10">
         <button
           onClick={handleMailchimpCall}
-          className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition"
+          className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition mb-4"
           disabled={loadingMailchimp}
         >
           {loadingMailchimp ? "Chargement..." : "Tester Mailchimp API"}
         </button>
-      </div>
-      
-      {errorMailchimp && (
-        <div className="text-center text-red-500 mb-4">{errorMailchimp}</div>
-      )}
-      {mailchimpData && (
-        <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
-          {JSON.stringify(mailchimpData, null, 2)}
-        </pre>
-      )}
+        {errorMailchimp && (
+          <div className="text-center text-red-500 mb-2">{errorMailchimp}</div>
+        )}
+        {mailchimpData && (
+          <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
+            {JSON.stringify(mailchimpData, null, 2)}
+          </pre>
+        )}
 
-      test
+        {/* Champ de saisie et bouton pour inscrire à la newsletter */}
+        <div className="flex flex-col items-center">
+          <input
+            type="email"
+            placeholder="Votre adresse email"
+            value={subscriptionEmail}
+            onChange={(e) => setSubscriptionEmail(e.target.value)}
+            className="px-4 py-2 border rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleSubscribe}
+            className="px-6 py-3 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
+            disabled={subscriptionLoading}
+          >
+            {subscriptionLoading ? "Inscription en cours..." : "S'inscrire à la newsletter"}
+          </button>
+          {subscriptionError && (
+            <div className="text-center text-red-500 mt-2">{subscriptionError}</div>
+          )}
+          {subscriptionSuccess && (
+            <div className="text-center text-green-500 mt-2">
+              Inscription réussie !
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Passage de isAdmin au composant Menu */}
       <Menu isAdmin={isAdmin} />
