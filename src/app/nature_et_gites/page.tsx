@@ -440,7 +440,15 @@ function NFTPed1Content() {
                   src={nft.metadata?.image || "/preview.gif"}
                   style={{ width: "100%", height: "auto", borderRadius: "10px" }}
                 />
-                <p className="font-semibold mt-2">{nft.metadata?.name || "NFT"}</p>
+                <p className="font-semibold mt-2 flex items-center justify-center">
+                  {nft.metadata?.name || "NFT"}
+                  <span
+                    title="Notez que le numéro affiché dans le nom du NFT est son ID plus 1."
+                    className="ml-2 cursor-help text-blue-500"
+                  >
+                    i
+                  </span>
+                </p>
               </div>
             ))
           ) : (
@@ -450,6 +458,7 @@ function NFTPed1Content() {
               </p>
             </div>
           )}
+
         </div>
       )}
 
