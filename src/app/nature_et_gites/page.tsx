@@ -444,7 +444,7 @@ function NFTPed1Content() {
                   {nft.metadata?.name || "NFT"}
                   <span
                     title="Notez que le numéro affiché dans le nom du NFT est son ID plus 1."
-                    className="ml-2 cursor-help text-blue-500"
+                    className="ml-2 cursor-help bg-gray-200 text-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs"
                   >
                     i
                   </span>
