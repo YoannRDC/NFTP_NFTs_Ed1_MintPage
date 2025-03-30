@@ -1,17 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
+import Link from "next/link";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
 import youtube_logo from "@public/youtube_logo.png";
-import { accountAbstraction, client, nftpPubKey } from "./constants";
-import Link from "next/link";
 import MenuItem from "./components/MenuItem";
+import { accountAbstraction, client, nftpPubKey } from "./constants";
+
+const LIST_ID_NFT_PROP = "c642fe82cc";
 
 export default function Home() {
   const account = useActiveAccount();
   const isAdmin: boolean =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
+
+  const [mailchimpData, setMailchimpData] = useState<any>(null);
+  const [loadingMailchimp, setLoadingMailchimp] = useState(false);
+  const [errorMailchimp, setErrorMailchimp] = useState<string | null>(null);
+
+  async function handleMailchimpCall() {
+    setLoadingMailchimp(true);
+    setErrorMailchimp(null);
+    try {
+      // Remplacez "YOUR_LIST_ID" par l'ID de votre liste
+      const res = await fetch(`/api/mailchimp?listId=LIST_ID`);
+      const data = await res.json();
+      if (res.ok) {
+        setMailchimpData(data);
+        console.log("Réponse Mailchimp:", data);
+      } else {
+        setErrorMailchimp(data.error || "Erreur inconnue");
+      }
+    } catch (error: any) {
+      setErrorMailchimp(error.message);
+    }
+    setLoadingMailchimp(false);
+  }
 
   return (
     <div className="py-20">
@@ -44,6 +70,26 @@ export default function Home() {
           />
         </Link>
       </p>
+      
+      {/* Bouton pour appeler l'API Mailchimp */}
+      <div className="flex justify-center mb-10">
+        <button
+          onClick={handleMailchimpCall}
+          className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition"
+          disabled={loadingMailchimp}
+        >
+          {loadingMailchimp ? "Chargement..." : "Tester Mailchimp API"}
+        </button>
+      </div>
+      
+      {errorMailchimp && (
+        <div className="text-center text-red-500 mb-4">{errorMailchimp}</div>
+      )}
+      {mailchimpData && (
+        <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
+          {JSON.stringify(mailchimpData, null, 2)}
+        </pre>
+      )}
 
       {/* Passage de isAdmin au composant Menu */}
       <Menu isAdmin={isAdmin} />

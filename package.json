@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@mailchimp/mailchimp_marketing": "^3.0.80",
 		"@stripe/react-stripe-js": "^3.1.1",
 		"@stripe/stripe-js": "^5.6.0",
 		"ccxt": "^4.4.64",
