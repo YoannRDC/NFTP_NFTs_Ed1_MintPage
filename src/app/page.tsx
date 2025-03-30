@@ -91,6 +91,8 @@ export default function Home() {
         </pre>
       )}
 
+      test
+
       {/* Passage de isAdmin au composant Menu */}
       <Menu isAdmin={isAdmin} />
       <Footer />
