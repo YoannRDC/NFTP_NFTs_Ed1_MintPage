@@ -23,8 +23,7 @@ export default function Home() {
     setLoadingMailchimp(true);
     setErrorMailchimp(null);
     try {
-      // Remplacez "YOUR_LIST_ID" par l'ID de votre liste
-      const res = await fetch(`/api/mailchimp?listId=YOUR_LIST_ID`);
+      const res = await fetch(`/api/mailchimp?listId=c642fe82cc`);
       const data = await res.json();
       if (res.ok) {
         setMailchimpData(data);
