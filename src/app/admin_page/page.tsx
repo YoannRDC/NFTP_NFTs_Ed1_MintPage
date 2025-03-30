@@ -26,7 +26,7 @@ const contractsInfo = {
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
-    metadataURI: "", // Ajouter l'URI si nécessaire
+    metadataURI: "",
     chainId: 80002,
     contractType: "erc1155drop" as const,
   },
@@ -39,29 +39,24 @@ const contractsInfo = {
   },
 };
 
-// Définition d'un type pour les clés de contractsInfo
 type ContractKey = keyof typeof contractsInfo;
 
-// Connexion aux contrats
 const nftpNftsEd1Contract = getContract({
   client,
   chain: defineChain(contractsInfo.nftpNftsEd1.chainId),
   address: contractsInfo.nftpNftsEd1.address,
 });
-
 const fragChroEd1Contract = getContract({
   client,
   chain: defineChain(contractsInfo.fragChroEd1.chainId),
   address: contractsInfo.fragChroEd1.address,
 });
-
 const artcardsContract = getContract({
   client,
   chain: defineChain(contractsInfo.artcards.chainId),
   address: contractsInfo.artcards.address,
 });
 
-// Objet pour associer une clé à son contrat
 const contractObjects: { [key in ContractKey]: any } = {
   nftpNftsEd1: nftpNftsEd1Contract,
   fragChroEd1: fragChroEd1Contract,
@@ -72,60 +67,94 @@ const AdminPage: React.FC = () => {
   const account = useActiveAccount();
   const [snapshotData, setSnapshotData] = useState<any[]>([]);
   const [erc1155Tokens, setErc1155Tokens] = useState<bigint[]>([]);
-  // On restreint le type ici aux clés définies dans ContractKey
   const [selectedContractKey, setSelectedContractKey] =
     useState<ContractKey>("nftpNftsEd1");
   const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
-  // Nouveau state pour le nombre de tokens à réclamer
   const [numberToClaim, setNumberToClaim] = useState("1");
+
+  // États pour Mailchimp
+  const [mailchimpData, setMailchimpData] = useState<any>(null);
+  const [loadingMailchimp, setLoadingMailchimp] = useState(false);
+  const [errorMailchimp, setErrorMailchimp] = useState<string | null>(null);
+  const [subscriptionEmail, setSubscriptionEmail] = useState("");
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
+  const [subscriptionSuccess, setSubscriptionSuccess] = useState<any>(null);
 
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
-  const wallets = [
-    inAppWallet({
-      auth: { options: ["google", "email", "passkey", "phone"] },
-    }),
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("io.rabby"),
-    createWallet("io.zerion.wallet"),
-  ];
-
-  // Récupérer le contrat et son type à partir de la clé sélectionnée
+  // Récupération du contrat sélectionné
   const selectedContract = contractObjects[selectedContractKey];
   const selectedContractType = contractsInfo[selectedContractKey].contractType;
 
-  // Hook pour envoyer la transaction via useSendTransaction
-  const {
-    mutate: sendTransaction,
-    status,
-    error: claimError,
-  } = useSendTransaction();
+  // Fonction Mailchimp GET
+  async function handleMailchimpCall() {
+    setLoadingMailchimp(true);
+    setErrorMailchimp(null);
+    try {
+      const res = await fetch(`/api/mailchimp?listId=c642fe82cc`);
+      const data = await res.json();
+      if (res.ok) {
+        setMailchimpData(data);
+        console.log("Réponse Mailchimp:", data);
+      } else {
+        setErrorMailchimp(data.error || "Erreur inconnue");
+      }
+    } catch (error: any) {
+      setErrorMailchimp(error.message);
+    }
+    setLoadingMailchimp(false);
+  }
 
-  // Fonction déclenchée lors du clic sur le bouton Claim
+  // Fonction Mailchimp POST pour inscription
+  async function handleSubscribe() {
+    setSubscriptionLoading(true);
+    setSubscriptionError(null);
+    setSubscriptionSuccess(null);
+    try {
+      const res = await fetch("/api/mailchimp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: subscriptionEmail,
+          listId: "c642fe82cc",
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscriptionSuccess(data);
+        console.log("Inscription réussie:", data);
+      } else {
+        setSubscriptionError(
+          data.error || "Erreur inconnue lors de l'inscription"
+        );
+      }
+    } catch (error: any) {
+      setSubscriptionError(error.message);
+    }
+    setSubscriptionLoading(false);
+  }
+
+  // Fonctions et effets pour les contrats existants
+  const { mutate: sendTransaction, status, error: claimError } =
+    useSendTransaction();
+
   const handleClaim = () => {
     if (!account?.address) {
       console.error("Aucun compte connecté");
       return;
     }
-    // Conversion du nombre de claim en BigInt
     const claimNumber = BigInt(parseInt(numberToClaim));
-    // Récupération de l'adresse du minter via le mapping (pour le projet "ARTCARDS")
     const minterAddress = getProjectPublicKey("ARTCARDS");
-    // Construction de la transaction via claimTo de l'extension ERC721
     const transaction = claimTo({
       contract: selectedContract,
       to: minterAddress,
       quantity: claimNumber,
     });
-    // Envoi de la transaction
     sendTransaction(transaction);
   };
 
-  // Fonction pour récupérer le nextTokenIdToMint (de type bigint)
-  // et créer la liste des token IDs disponibles (de 0 à nextTokenId - 1)
   const fetchNextTokenId = async () => {
     try {
       const data: bigint = await readContract({
@@ -147,7 +176,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // useEffect : dès que le contrat sélectionné est de type erc1155drop, on récupère automatiquement les token IDs
   useEffect(() => {
     if (selectedContractType === "erc1155drop") {
       fetchNextTokenId();
@@ -163,11 +191,66 @@ const AdminPage: React.FC = () => {
       <div className="m-10">
         <ConnectButton
           client={client}
-          wallets={wallets}
+          wallets={[
+            inAppWallet({ auth: { options: ["google", "email", "passkey", "phone"] } }),
+            // Autres wallets…
+          ]}
           connectModal={{ size: "compact" }}
           locale="fr_FR"
         />
       </div>
+
+      {isAdmin && (
+        // Section Mailchimp
+        <div className="flex flex-col items-center mb-10 border p-4 rounded">
+          <h2 className="text-xl font-bold mb-4">Mailchimp Management</h2>
+
+          <button
+            onClick={handleMailchimpCall}
+            className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition mb-4"
+            disabled={loadingMailchimp}
+          >
+            {loadingMailchimp ? "Chargement..." : "Tester Mailchimp API"}
+          </button>
+          {errorMailchimp && (
+            <div className="text-center text-red-500 mb-2">{errorMailchimp}</div>
+          )}
+          {mailchimpData && (
+            <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
+              {JSON.stringify(mailchimpData, null, 2)}
+            </pre>
+          )}
+
+          <div className="flex flex-col items-center">
+            <input
+              type="email"
+              placeholder="Votre adresse email"
+              value={subscriptionEmail}
+              onChange={(e) => setSubscriptionEmail(e.target.value)}
+              className="px-4 py-2 border rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleSubscribe}
+              className="px-6 py-3 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
+              disabled={subscriptionLoading}
+            >
+              {subscriptionLoading
+                ? "Inscription en cours..."
+                : "S'inscrire à la newsletter"}
+            </button>
+            {subscriptionError && (
+              <div className="text-center text-red-500 mt-2">
+                {subscriptionError}
+              </div>
+            )}
+            {subscriptionSuccess && (
+              <div className="text-center text-green-500 mt-2">
+                Inscription réussie !
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {isAdmin && (
         <div className="my-4">
@@ -204,7 +287,6 @@ const AdminPage: React.FC = () => {
               contract={selectedContract}
               contractType={selectedContractType}
             />
-            {/* Affichage du champ et du bouton Claim uniquement pour les contrats erc721transfert */}
             {selectedContractType === "erc721transfert" && (
               <div className="mt-4">
                 <label htmlFor="numberToClaim" className="mr-2 font-bold">
@@ -218,11 +300,10 @@ const AdminPage: React.FC = () => {
                   className="border p-2 rounded"
                   min="1"
                 />
-                
                 <button
                   onClick={handleClaim}
                   disabled={status === "pending"}
-                  className="ml-2 px-4 py-2 bg-green-500 text-white rounded"
+                  className="ml-2 px-4 py-2 bg-green-500 rounded"
                 >
                   {status === "pending" ? "Claiming..." : "Claim"}
                 </button>
