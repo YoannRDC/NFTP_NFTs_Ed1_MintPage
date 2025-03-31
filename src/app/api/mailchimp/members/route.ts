@@ -12,7 +12,10 @@ export async function GET(request: Request) {
   const listId = searchParams.get('listId');
 
   if (!listId) {
-    return NextResponse.json({ error: 'Le paramètre listId est requis' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Le paramètre listId est requis' },
+      { status: 400 }
+    );
   }
 
   try {
@@ -55,10 +58,43 @@ export async function POST(request: Request) {
     return NextResponse.json(response);
   } catch (error: any) {
     console.error("Erreur lors de l'ajout du membre :", error);
-    // Si l'erreur possède une réponse plus détaillée, la logger
     if (error.response) {
       console.error("Détails de l'erreur Mailchimp :", await error.response.text());
     }
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// PATCH : Met à jour les informations d'un membre et ses tags
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { listId, subscriberHash, email_address, merge_fields, tags } = body;
+
+    if (!listId || !subscriberHash || !email_address) {
+      return NextResponse.json(
+        { error: 'Les paramètres listId, subscriberHash et email_address sont requis.' },
+        { status: 400 }
+      );
+    }
+
+    // Mise à jour des informations du membre (email et merge_fields)
+    const updateResponse = await mailchimp.lists.updateListMember(listId, subscriberHash, {
+      email_address,
+      merge_fields,
+    });
+
+    // Récupérer les tags actuels du membre
+    const currentTagsResponse = await mailchimp.lists.getListMemberTags(listId, subscriberHash);
+    const currentTags = currentTagsResponse.tags || [];
+
+    // Mise à jour des tags du membre.
+    // tags doit être un tableau d'objets, par exemple : 
+    // [{ name: "Tag1", status: "active" }, { name: "Tag2", status: "inactive" }]
+    const tagResponse = await mailchimp.lists.updateListMemberTags(listId, subscriberHash, { tags });
+
+    return NextResponse.json({ updateResponse, currentTags, tagResponse });
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

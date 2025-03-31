@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import md5 from "blueimp-md5";
+import { MAILCHIMP_LIST_ID } from "../constants";
 
 type MemberData = {
   email_address: string;
@@ -21,8 +22,6 @@ type MemberData = {
 type Tag = {
   name: string;
 };
-
-const LIST_ID = "c642fe82cc"; // Remplacez par votre listId Mailchimp
 
 const MailchimpUpdateAccount: React.FC = () => {
   const account = useActiveAccount();
@@ -55,7 +54,7 @@ const MailchimpUpdateAccount: React.FC = () => {
     if (!account?.address) return;
     setLoading(true);
     setError(null);
-    fetch(`/api/mailchimp/members?listId=${LIST_ID}`)
+    fetch(`/api/mailchimp/members?listId=${MAILCHIMP_LIST_ID}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.members) {
@@ -98,7 +97,7 @@ const MailchimpUpdateAccount: React.FC = () => {
 
   // Récupérer les tags disponibles via l'endpoint dédié
   useEffect(() => {
-    fetch(`/api/mailchimp/tags?listId=${LIST_ID}`)
+    fetch(`/api/mailchimp/tags?listId=${MAILCHIMP_LIST_ID}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.tags) {
@@ -129,7 +128,7 @@ const MailchimpUpdateAccount: React.FC = () => {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          listId: LIST_ID,
+          listId: MAILCHIMP_LIST_ID,
           subscriberHash,
           email_address: formData.email_address,
           merge_fields: formData.merge_fields,
