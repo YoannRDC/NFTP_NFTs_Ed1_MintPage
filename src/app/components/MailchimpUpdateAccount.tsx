@@ -18,6 +18,10 @@ type MemberData = {
   tags?: Array<{ name: string; status: string }>;
 };
 
+type Tag = {
+  name: string;
+};
+
 const LIST_ID = "c642fe82cc"; // Remplacez par votre listId Mailchimp
 
 const MailchimpUpdateAccount: React.FC = () => {
@@ -42,8 +46,9 @@ const MailchimpUpdateAccount: React.FC = () => {
     },
   });
 
-  // État pour les tags, affiché sous forme de chaîne séparée par des virgules
-  const [tags, setTags] = useState<string>("");
+  // État pour stocker les tags disponibles et ceux sélectionnés
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Récupérer les données du membre via l'endpoint GET (filtrage sur le champ WALLET)
   useEffect(() => {
@@ -75,11 +80,11 @@ const MailchimpUpdateAccount: React.FC = () => {
                 COMPANY: member.merge_fields.COMPANY || "",
               },
             });
-            // Initialisation des tags s'ils existent
-            setTags(
+            // Initialisation des tags si disponibles dans les données du membre
+            setSelectedTags(
               member.tags
-                ? member.tags.map((tag: any) => tag.name).join(", ")
-                : ""
+                ? member.tags.map((tag: any) => tag.name)
+                : []
             );
           }
         }
@@ -91,6 +96,22 @@ const MailchimpUpdateAccount: React.FC = () => {
       .finally(() => setLoading(false));
   }, [account?.address]);
 
+  // Récupérer les tags disponibles via l'endpoint dédié
+  useEffect(() => {
+    fetch(`/api/mailchimp/tags?listId=${LIST_ID}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.tags) {
+          setAvailableTags(data.tags);
+        } else {
+          setAvailableTags([]);
+        }
+      })
+      .catch((err) =>
+        console.error("Erreur lors de la récupération des tags disponibles :", err)
+      );
+  }, []);
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -99,12 +120,11 @@ const MailchimpUpdateAccount: React.FC = () => {
     try {
       // Calculer le subscriber hash (MD5 de l'email en minuscules)
       const subscriberHash = md5(formData.email_address.toLowerCase());
-      // Convertir la chaîne de tags en tableau
-      const tagsArray = tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0)
-        .map((name) => ({ name, status: "active" }));
+      // Pour chaque tag disponible, définir le status selon que l'utilisateur l'a sélectionné
+      const tagsArray = availableTags.map((tag) => ({
+        name: tag.name,
+        status: selectedTags.includes(tag.name) ? "active" : "inactive",
+      }));
       const res = await fetch(`/api/mailchimp/members/update`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -151,10 +171,13 @@ const MailchimpUpdateAccount: React.FC = () => {
           Mon compte
         </button>
       ) : (
-        <form onSubmit={handleUpdate} className="flex flex-col space-y-4">
+        <form
+          onSubmit={handleUpdate}
+          className="flex flex-col space-y-4 min-w-[600px] whitespace-nowrap text-black"
+        >
           {/* WALLET en lecture seule */}
           <div>
-            <label className="block font-bold">Wallet</label>
+            <label className="block font-bold text-white">Wallet</label>
             <input
               type="text"
               value={formData.merge_fields.WALLET}
@@ -164,7 +187,7 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* EMAIL en lecture seule */}
           <div>
-            <label className="block font-bold">Email</label>
+            <label className="block font-bold text-white">Email</label>
             <input
               type="email"
               value={formData.email_address}
@@ -174,14 +197,17 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* FNAME */}
           <div>
-            <label className="block font-bold">Prénom (FNAME)</label>
+            <label className="block font-bold text-white">Prénom</label>
             <input
               type="text"
               value={formData.merge_fields.FNAME}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, FNAME: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    FNAME: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
@@ -189,14 +215,17 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* LNAME */}
           <div>
-            <label className="block font-bold">Nom de famille (LNAME)</label>
+            <label className="block font-bold text-white">Nom de famille</label>
             <input
               type="text"
               value={formData.merge_fields.LNAME}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, LNAME: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    LNAME: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
@@ -204,14 +233,17 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* ADDRESS */}
           <div>
-            <label className="block font-bold">Adresse (ADDRESS)</label>
+            <label className="block font-bold text-white">Adresse postale</label>
             <input
               type="text"
               value={formData.merge_fields.ADDRESS}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, ADDRESS: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    ADDRESS: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
@@ -219,14 +251,17 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* PHONE */}
           <div>
-            <label className="block font-bold">Téléphone (PHONE)</label>
+            <label className="block font-bold text-white">Téléphone</label>
             <input
               type="text"
               value={formData.merge_fields.PHONE}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, PHONE: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    PHONE: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
@@ -234,14 +269,17 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* BIRTHDAY */}
           <div>
-            <label className="block font-bold">Birthday</label>
+            <label className="block font-bold text-white">Birthday</label>
             <input
               type="text"
               value={formData.merge_fields.BIRTHDAY}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, BIRTHDAY: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    BIRTHDAY: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
@@ -249,28 +287,45 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* COMPANY */}
           <div>
-            <label className="block font-bold">Company</label>
+            <label className="block font-bold text-white">Company</label>
             <input
               type="text"
               value={formData.merge_fields.COMPANY}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  merge_fields: { ...formData.merge_fields, COMPANY: e.target.value },
+                  merge_fields: {
+                    ...formData.merge_fields,
+                    COMPANY: e.target.value,
+                  },
                 })
               }
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* TAGS */}
+          {/* TAGS sous forme de cases à cocher */}
           <div>
-            <label className="block font-bold">Tags (séparés par des virgules)</label>
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="border px-4 py-2 w-full"
-            />
+            <label className="block font-bold text-white">Tags</label>
+            {availableTags.map((tag) => (
+              <div key={tag.name} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`tag-${tag.name}`}
+                  checked={selectedTags.includes(tag.name)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedTags((prev) => [...prev, tag.name]);
+                    } else {
+                      setSelectedTags((prev) =>
+                        prev.filter((t) => t !== tag.name)
+                      );
+                    }
+                  }}
+                  className="mr-2"
+                />
+                <label htmlFor={`tag-${tag.name}`}>{tag.name}</label>
+              </div>
+            ))}
           </div>
           <button
             type="submit"
@@ -280,7 +335,9 @@ const MailchimpUpdateAccount: React.FC = () => {
             {loading ? "Mise à jour..." : "Enregistrer"}
           </button>
           {error && <div className="text-red-500">{error}</div>}
-          {updateSuccess && <div className="text-green-500">{updateSuccess}</div>}
+          {updateSuccess && (
+            <div className="text-green-500">{updateSuccess}</div>
+          )}
         </form>
       )}
     </div>
