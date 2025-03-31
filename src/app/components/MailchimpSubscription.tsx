@@ -62,10 +62,10 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
   }
 
   return (
-    <div className="flex flex-col items-center mb-10 border p-4 rounded">
+    <div className="flex flex-col items-center mb-10 p-4 rounded">
       <h2 className="text-xl font-bold mb-4">Mailchimp Management</h2>
 
-      <button
+{/*       <button
         onClick={handleMailchimpCall}
         className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition mb-4"
         disabled={loadingMailchimp}
@@ -79,7 +79,7 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
         <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
           {JSON.stringify(mailchimpData, null, 2)}
         </pre>
-      )}
+      )} */}
 
       <div className="flex flex-row items-center justify-center">
         <input
