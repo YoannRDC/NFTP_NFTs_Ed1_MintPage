@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import md5 from "blueimp-md5";
-import { MAILCHIMP_LIST_ID } from "../constants";
 
 type MemberData = {
   email_address: string;
@@ -16,7 +15,10 @@ type MemberData = {
     BIRTHDAY: string;
     COMPANY: string;
   };
+  tags?: Array<{ name: string; status: string }>;
 };
+
+const LIST_ID = "c642fe82cc"; // Remplacez par votre listId Mailchimp
 
 const MailchimpUpdateAccount: React.FC = () => {
   const account = useActiveAccount();
@@ -40,12 +42,15 @@ const MailchimpUpdateAccount: React.FC = () => {
     },
   });
 
-  // Récupérer les données du membre via l'endpoint GET (filtrage sur WALLET)
+  // État pour les tags, affiché sous forme de chaîne séparée par des virgules
+  const [tags, setTags] = useState<string>("");
+
+  // Récupérer les données du membre via l'endpoint GET (filtrage sur le champ WALLET)
   useEffect(() => {
     if (!account?.address) return;
     setLoading(true);
     setError(null);
-    fetch(`/api/mailchimp/members?listId=${MAILCHIMP_LIST_ID}`)
+    fetch(`/api/mailchimp/members?listId=${LIST_ID}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.members) {
@@ -70,6 +75,12 @@ const MailchimpUpdateAccount: React.FC = () => {
                 COMPANY: member.merge_fields.COMPANY || "",
               },
             });
+            // Initialisation des tags s'ils existent
+            setTags(
+              member.tags
+                ? member.tags.map((tag: any) => tag.name).join(", ")
+                : ""
+            );
           }
         }
       })
@@ -86,22 +97,29 @@ const MailchimpUpdateAccount: React.FC = () => {
     setError(null);
     setUpdateSuccess(null);
     try {
-      // Calcul du subscriber hash à partir de l'email (en minuscule)
+      // Calculer le subscriber hash (MD5 de l'email en minuscules)
       const subscriberHash = md5(formData.email_address.toLowerCase());
+      // Convertir la chaîne de tags en tableau
+      const tagsArray = tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0)
+        .map((name) => ({ name, status: "active" }));
       const res = await fetch(`/api/mailchimp/members/update`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          listId: MAILCHIMP_LIST_ID,
+          listId: LIST_ID,
           subscriberHash,
           email_address: formData.email_address,
           merge_fields: formData.merge_fields,
+          tags: tagsArray,
         }),
       });
       const data = await res.json();
       if (res.ok) {
         setUpdateSuccess("Compte mis à jour avec succès !");
-        setMemberData(data);
+        setMemberData(data.updateResponse || data);
       } else {
         setError(data.error || "Erreur lors de la mise à jour.");
       }
@@ -133,8 +151,8 @@ const MailchimpUpdateAccount: React.FC = () => {
           Mon compte
         </button>
       ) : (
-        <form onSubmit={handleUpdate} className="flex flex-col space-y-4 min-w-[600px] whitespace-nowrap text-black">
-          {/* WALLET en readonly */}
+        <form onSubmit={handleUpdate} className="flex flex-col space-y-4">
+          {/* WALLET en lecture seule */}
           <div>
             <label className="block font-bold">Wallet</label>
             <input
@@ -144,7 +162,7 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* EMAIL en readonly */}
+          {/* EMAIL en lecture seule */}
           <div>
             <label className="block font-bold">Email</label>
             <input
@@ -241,6 +259,16 @@ const MailchimpUpdateAccount: React.FC = () => {
                   merge_fields: { ...formData.merge_fields, COMPANY: e.target.value },
                 })
               }
+              className="border px-4 py-2 w-full"
+            />
+          </div>
+          {/* TAGS */}
+          <div>
+            <label className="block font-bold">Tags (séparés par des virgules)</label>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
               className="border px-4 py-2 w-full"
             />
           </div>
