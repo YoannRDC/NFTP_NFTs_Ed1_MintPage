@@ -14,6 +14,7 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
+import MailchimpSubscription from "../components/MailchimpSubscription"; // Import du composant
 
 // Définition des informations de chaque contrat
 const contractsInfo = {
@@ -72,15 +73,6 @@ const AdminPage: React.FC = () => {
   const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
   const [numberToClaim, setNumberToClaim] = useState("1");
 
-  // États pour Mailchimp
-  const [mailchimpData, setMailchimpData] = useState<any>(null);
-  const [loadingMailchimp, setLoadingMailchimp] = useState(false);
-  const [errorMailchimp, setErrorMailchimp] = useState<string | null>(null);
-  const [subscriptionEmail, setSubscriptionEmail] = useState("");
-  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
-  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
-  const [subscriptionSuccess, setSubscriptionSuccess] = useState<any>(null);
-
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
@@ -88,55 +80,7 @@ const AdminPage: React.FC = () => {
   const selectedContract = contractObjects[selectedContractKey];
   const selectedContractType = contractsInfo[selectedContractKey].contractType;
 
-  // Fonction Mailchimp GET
-  async function handleMailchimpCall() {
-    setLoadingMailchimp(true);
-    setErrorMailchimp(null);
-    try {
-      const res = await fetch(`/api/mailchimp?listId=c642fe82cc`);
-      const data = await res.json();
-      if (res.ok) {
-        setMailchimpData(data);
-        console.log("Réponse Mailchimp:", data);
-      } else {
-        setErrorMailchimp(data.error || "Erreur inconnue");
-      }
-    } catch (error: any) {
-      setErrorMailchimp(error.message);
-    }
-    setLoadingMailchimp(false);
-  }
-
-  // Fonction Mailchimp POST pour inscription
-  async function handleSubscribe() {
-    setSubscriptionLoading(true);
-    setSubscriptionError(null);
-    setSubscriptionSuccess(null);
-    try {
-      const res = await fetch("/api/mailchimp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: subscriptionEmail,
-          listId: "c642fe82cc",
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSubscriptionSuccess(data);
-        console.log("Inscription réussie:", data);
-      } else {
-        setSubscriptionError(
-          data.error || "Erreur inconnue lors de l'inscription"
-        );
-      }
-    } catch (error: any) {
-      setSubscriptionError(error.message);
-    }
-    setSubscriptionLoading(false);
-  }
-
-  // Fonctions et effets pour les contrats existants
+  // Fonctions et effets pour les contrats existants…
   const { mutate: sendTransaction, status, error: claimError } =
     useSendTransaction();
 
@@ -192,65 +136,14 @@ const AdminPage: React.FC = () => {
         <ConnectButton
           client={client}
           wallets={[
-            inAppWallet({ auth: { options: ["google", "email", "passkey", "phone"] } }),
-            // Autres wallets…
+            inAppWallet({
+              auth: { options: ["google", "email", "passkey", "phone"] },
+            }),
           ]}
           connectModal={{ size: "compact" }}
           locale="fr_FR"
         />
       </div>
-
-      {isAdmin && (
-        // Section Mailchimp
-        <div className="flex flex-col items-center mb-10 border p-4 rounded">
-          <h2 className="text-xl font-bold mb-4">Mailchimp Management</h2>
-
-          <button
-            onClick={handleMailchimpCall}
-            className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition mb-4"
-            disabled={loadingMailchimp}
-          >
-            {loadingMailchimp ? "Chargement..." : "Tester Mailchimp API"}
-          </button>
-          {errorMailchimp && (
-            <div className="text-center text-red-500 mb-2">{errorMailchimp}</div>
-          )}
-          {mailchimpData && (
-            <pre className="bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-64">
-              {JSON.stringify(mailchimpData, null, 2)}
-            </pre>
-          )}
-
-          <div className="flex flex-col items-center justify-center h-full">
-            <input
-              type="email"
-              placeholder="Votre adresse email"
-              value={subscriptionEmail}
-              onChange={(e) => setSubscriptionEmail(e.target.value)}
-              className="mr-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={handleSubscribe}
-              className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
-              disabled={subscriptionLoading}
-            >
-              {subscriptionLoading
-                ? "Inscription en cours..."
-                : "S'inscrire à la newsletter"}
-            </button>
-            {subscriptionError && (
-              <div className="text-center text-red-500 mt-2">
-                {subscriptionError}
-              </div>
-            )}
-            {subscriptionSuccess && (
-              <div className="text-center text-green-500 mt-2">
-                Inscription réussie !
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {isAdmin && (
         <div className="my-4">

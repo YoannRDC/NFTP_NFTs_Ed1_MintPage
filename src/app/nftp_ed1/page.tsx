@@ -13,6 +13,7 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
+import MailchimpSubscription from "../components/MailchimpSubscription";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
 const NFT_PRICE_EUR = 19; // Prix fixe en Euros
@@ -55,22 +56,6 @@ function NFTPed1Content() {
 
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
-
-  // Works but useless as POL price is set in claim conditions.
-/*   useEffect(() => {
-    async function fetchConversion() {
-      try {
-        const result = await convertEurToPOL(NFT_PRICE_EUR);
-        setConversionResult(result);
-        console.log("Last upadte EUR->POL price:", new Date(result.datetime).toLocaleString());
-      } catch (error) {
-        console.error("Erreur lors de la conversion EUR vers POL :", error);
-      }
-    }
-    fetchConversion();
-    const interval = setInterval(fetchConversion, 60000);
-    return () => clearInterval(interval);
-  }, []); */
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
@@ -144,6 +129,10 @@ function NFTPed1Content() {
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
+
+      <div>
+        <MailchimpSubscription listId="c642fe82cc" />
+      </div>
       
       <div className="decorative-title">
         -- NFTs à vendre --
