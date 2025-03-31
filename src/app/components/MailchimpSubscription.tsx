@@ -22,7 +22,7 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
         console.log("listId:", listId)
         console.log("subscriptionEmail:", subscriptionEmail)
         console.log("account?.address:", account?.address)
-      const res = await fetch("/api/mailchimp", {
+      const res = await fetch("/api/mailchimp/members", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
