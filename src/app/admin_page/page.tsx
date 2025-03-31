@@ -10,11 +10,11 @@ import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
 import ClaimConditionForm from "../components/ClaimConditionForm";
 import { client, nftpPubKey, getProjectPublicKey } from "../constants";
-import { createWallet, inAppWallet } from "thirdweb/wallets";
+import { inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
-import MailchimpSubscription from "../components/MailchimpSubscription";
+import MailchimpAccount from "../components/MailchimpAccount";
 
 const contractsInfo = {
   nftpNftsEd1: {
@@ -188,7 +188,7 @@ const AdminPage: React.FC = () => {
       )}
 
       {isAdmin && (
-        <MailchimpSubscription listId="c642fe82cc" />
+        <MailchimpAccount />
       )}
 
       {isAdmin && (
