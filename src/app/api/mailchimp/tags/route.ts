@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import mailchimp from '@mailchimp/mailchimp_marketing';
+import { NextResponse } from "next/server";
+import mailchimp from "@mailchimp/mailchimp_marketing";
 
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY as string,
@@ -18,16 +18,8 @@ export async function GET(request: Request) {
   }
 
   try {
-
-    console.log("GET: ", `/lists/${listId}/tag-search`);
-    // Utiliser l'endpoint tag-search de Mailchimp pour récupérer les tags disponibles.
-    // En passant un nom vide, on récupère tous les tags.
-    const response = await mailchimp.request({
-      method: "GET",
-      path: `/lists/${listId}/tag-search`,
-      query: { name: "" },
-    });
-    // La réponse devrait contenir une propriété "tags" avec un tableau de tags.
+    // Utilise la méthode tagSearch avec un nom vide pour récupérer tous les tags
+    const response = await mailchimp.lists.tagSearch(listId, { name: "" });
     return NextResponse.json(response);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
