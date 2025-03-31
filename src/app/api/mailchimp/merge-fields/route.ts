@@ -12,10 +12,7 @@ export async function GET(request: Request) {
   const listId = searchParams.get('listId');
 
   if (!listId) {
-    return NextResponse.json(
-      { error: 'Le paramètre listId est requis' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Le paramètre listId est requis' }, { status: 400 });
   }
 
   try {
@@ -23,9 +20,6 @@ export async function GET(request: Request) {
     console.log("Merge fields response:", response);
     return NextResponse.json(response);
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
