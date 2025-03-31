@@ -43,14 +43,39 @@ export async function POST(request: Request) {
       );
     }
     
-    // Ajout du membre dans la liste
-    const addResponse = await mailchimp.lists.addListMember(listId, {
-      email_address: email,
-      status: 'subscribed', // ou "pending" pour un double opt-in
-      merge_fields: {
-        WALLET: walletAddress,
-      },
-    });
+    // Tenter d'ajouter le membre dans la liste
+    let addResponse;
+    try {
+      addResponse = await mailchimp.lists.addListMember(listId, {
+        email_address: email,
+        status: 'subscribed', // ou "pending" pour un double opt-in
+        merge_fields: {
+          WALLET: walletAddress,
+        },
+      });
+    } catch (error: any) {
+      // Si l'erreur indique que le membre existe déjà, on récupère les infos du membre existant
+      if (error.response) {
+        const errorText = await error.response.text();
+        let errorJson;
+        try {
+          errorJson = JSON.parse(errorText);
+        } catch (parseError) {
+          errorJson = {};
+        }
+        if (errorJson.title && errorJson.title === "Member Exists") {
+          const subscriberHash = md5(email.toLowerCase());
+          const existingMember = await mailchimp.lists.getListMember(listId, subscriberHash);
+          const existingWallet = existingMember.merge_fields.WALLET || "inconnu";
+          return NextResponse.json(
+            { error: `Cet email est déjà utilisé avec le compte ${existingWallet}` },
+            { status: 400 }
+          );
+        }
+      }
+      // Pour les autres erreurs, relancer l'exception
+      throw error;
+    }
     
     // Calcul du subscriber hash (MD5 de l'email en minuscules)
     const subscriberHash = md5(email.toLowerCase());
@@ -116,4 +141,4 @@ export async function PATCH(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}															   
+}
