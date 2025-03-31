@@ -30,30 +30,35 @@ export async function POST(request: Request) {
     const { email, listId, walletAddress } = body;
     console.log("listId:", listId);
     console.log(" > email:", email);
-    console.log(" > walletAddress:", walletAddress); // Correction ici
-
+    console.log(" > walletAddress:", walletAddress);
+    
     if (!email || !listId) {
-      return NextResponse.json({ error: 'Email et listId sont requis' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email et listId sont requis' },
+        { status: 400 }
+      );
     }
 
     const response = await mailchimp.lists.addListMember(listId, {
       email_address: email,
-      status: 'subscribed', // Ou "pending" pour un double opt-in
+      status: 'subscribed', // ou "pending" pour un double opt-in
       merge_fields: {
-        WALLET: walletAddress, // Assurez-vous que ce merge field existe bien dans Mailchimp
+        WALLET: walletAddress,
       },
     });
-
-    console.log("addListMember response:", response);
     
-    // Certains appels API peuvent ne pas retourner de corps ; dans ce cas, on renvoie un message par défaut
-    if (!response) {
+    // Si la réponse est vide, renvoyer un objet JSON par défaut
+    if (!response || Object.keys(response).length === 0) {
       return NextResponse.json({ message: "Utilisateur ajouté avec succès." });
     }
     
     return NextResponse.json(response);
   } catch (error: any) {
-    console.log("error:", error);
+    console.error("Erreur lors de l'ajout du membre :", error);
+    // Si l'erreur possède une réponse plus détaillée, la logger
+    if (error.response) {
+      console.error("Détails de l'erreur Mailchimp :", await error.response.text());
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
