@@ -18,6 +18,8 @@ export async function GET(request: Request) {
   }
 
   try {
+
+    console.log("GET: ", `/lists/${listId}/tag-search`);
     // Utiliser l'endpoint tag-search de Mailchimp pour récupérer les tags disponibles.
     // En passant un nom vide, on récupère tous les tags.
     const response = await mailchimp.request({
