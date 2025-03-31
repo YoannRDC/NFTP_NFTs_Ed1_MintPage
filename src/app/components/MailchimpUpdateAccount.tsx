@@ -133,7 +133,7 @@ const MailchimpUpdateAccount: React.FC = () => {
           Mon compte
         </button>
       ) : (
-        <form onSubmit={handleUpdate} className="flex flex-col space-y-4">
+        <form onSubmit={handleUpdate} className="flex flex-col space-y-4 min-w-[300px] min-h-[200px]">
           {/* WALLET en readonly */}
           <div>
             <label className="block font-bold">Wallet</label>
