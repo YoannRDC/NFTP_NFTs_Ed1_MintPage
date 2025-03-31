@@ -221,7 +221,7 @@ const AdminPage: React.FC = () => {
             </pre>
           )}
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <input
               type="email"
               placeholder="Votre adresse email"
