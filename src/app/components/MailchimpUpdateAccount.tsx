@@ -304,9 +304,9 @@ const MailchimpUpdateAccount: React.FC = () => {
           </div>
           {/* TAGS sous forme de cases à cocher */}
           <div>
-            <label className="block font-bold text-white">Tags</label>
+            <label className="block font-bold text-white">Abonnements</label>
             {availableTags.map((tag) => (
-              <div key={tag.name} className="flex items-center">
+              <div key={tag.name} className="flex items-center text-white">
                 <input
                   type="checkbox"
                   id={`tag-${tag.name}`}

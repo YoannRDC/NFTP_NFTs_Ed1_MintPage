@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mailchimp from '@mailchimp/mailchimp_marketing';
+import md5 from 'blueimp-md5';
 
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY as string,
@@ -41,8 +42,9 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const response = await mailchimp.lists.addListMember(listId, {
+    
+    // Ajout du membre dans la liste
+    const addResponse = await mailchimp.lists.addListMember(listId, {
       email_address: email,
       status: 'subscribed', // ou "pending" pour un double opt-in
       merge_fields: {
@@ -50,12 +52,29 @@ export async function POST(request: Request) {
       },
     });
     
-    // Si la réponse est vide, renvoyer un objet JSON par défaut
-    if (!response || Object.keys(response).length === 0) {
-      return NextResponse.json({ message: "Utilisateur ajouté avec succès." });
-    }
+    // Calcul du subscriber hash (MD5 de l'email en minuscules)
+    const subscriberHash = md5(email.toLowerCase());
     
-    return NextResponse.json(response);
+    // Récupérer tous les tags disponibles pour la liste via tagSearch (en passant un nom vide)
+    const tagSearchResponse = await mailchimp.lists.tagSearch(listId, { name: "" });
+    const allTags = tagSearchResponse.tags || [];
+    
+    // Préparer le tableau des tags avec le status "active" pour chacun
+    const tagsArray = allTags.map((tag: any) => ({
+      name: tag.name,
+      status: "active",
+    }));
+    
+    // Mettre à jour les tags du membre pour qu'il soit abonné à tous les tags
+    const updateTagsResponse = await mailchimp.lists.updateListMemberTags(listId, subscriberHash, { tags: tagsArray });
+    
+    // Combiner les réponses (ajout et mise à jour des tags) et renvoyer le résultat
+    const combinedResponse = {
+      addResponse,
+      updateTagsResponse,
+    };
+    
+    return NextResponse.json(combinedResponse);
   } catch (error: any) {
     console.error("Erreur lors de l'ajout du membre :", error);
     if (error.response) {
@@ -97,4 +116,4 @@ export async function PATCH(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
+}															   

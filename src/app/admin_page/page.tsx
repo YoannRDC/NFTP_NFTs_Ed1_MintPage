@@ -104,7 +104,6 @@ const AdminPage: React.FC = () => {
     fetchMergeFields();
   }, []);
 
-  // Nouvel appel pour récupérer les tags disponibles via l'endpoint dédié
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -202,20 +201,6 @@ const AdminPage: React.FC = () => {
           ) : (
             <p>Aucun merge field trouvé.</p>
           )}
-        </div>
-      )}
-
-      {/* Affichage de la liste des tags disponibles */}
-      {isAdmin && availableTags.length > 0 && (
-        <div className="my-4 p-4 border rounded w-full max-w-md">
-          <h2 className="text-xl font-bold mb-2">Tags disponibles</h2>
-          <ul>
-            {availableTags.map((tag) => (
-              <li key={tag.name}>
-                <span className="font-bold">{tag.name}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
 
