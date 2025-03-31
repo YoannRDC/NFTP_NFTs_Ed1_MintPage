@@ -12,14 +12,20 @@ export async function GET(request: Request) {
   const listId = searchParams.get('listId');
 
   if (!listId) {
-    return NextResponse.json({ error: 'Le paramètre listId est requis' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Le paramètre listId est requis' },
+      { status: 400 }
+    );
   }
 
   try {
     const response = await mailchimp.lists.getListMembersInfo(listId);
     return NextResponse.json(response);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -28,22 +34,28 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { email, listId, walletAddress } = body;
-    console.log("listId: ", listId);
-    console.log(" > email: ", email);
-    console.log(" > walletAddress: ", listId);
+    console.log("listId:", listId);
+    console.log(" > email:", email);
+    console.log(" > walletAddress:", walletAddress);
     if (!email || !listId) {
-      return NextResponse.json({ error: 'Email et listId sont requis' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email et listId sont requis' },
+        { status: 400 }
+      );
     }
     const response = await mailchimp.lists.addListMember(listId, {
       email_address: email,
       status: 'subscribed', // Ou "pending" si vous souhaitez un double opt-in
       merge_fields: {
-        // Utilisez le tag défini dans Mailchimp pour votre champ personnalisé
+        // Assurez-vous que le merge field "WALLET" est bien configuré dans Mailchimp
         WALLET: walletAddress,
       },
     });
     return NextResponse.json(response);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 }
