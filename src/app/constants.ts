@@ -3,6 +3,8 @@ import { polygon } from "thirdweb/chains";
 import { SmartWalletOptions } from "thirdweb/wallets";
 import { convertEurToPOL } from "./utils/conversion";
 
+export const MAILCHIMP_LIST_ID="c642fe82cc";
+
 const clientId = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 if (!clientId) {
 	throw new Error("No client ID provided");
