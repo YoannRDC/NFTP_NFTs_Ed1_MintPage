@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST : Ajoute un membre dans la liste (email, listId et walletAddress dans le body)
+// POST : Ajoute un membre dans la liste et l'abonne à tous les tags par défaut
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -54,26 +54,23 @@ export async function POST(request: Request) {
         },
       });
     } catch (error: any) {
-      // Si l'erreur indique que le membre existe déjà, on récupère les infos du membre existant
-      if (error.response) {
-        const errorText = await error.response.text();
-        let errorJson;
+      let errorDetail: any = {};
+      if (error.response && typeof error.response.json === 'function') {
         try {
-          errorJson = JSON.parse(errorText);
+          errorDetail = await error.response.json();
         } catch (parseError) {
-          errorJson = {};
-        }
-        if (errorJson.title && errorJson.title === "Member Exists") {
-          const subscriberHash = md5(email.toLowerCase());
-          const existingMember = await mailchimp.lists.getListMember(listId, subscriberHash);
-          const existingWallet = existingMember.merge_fields.WALLET || "inconnu";
-          return NextResponse.json(
-            { error: `Cet email est déjà utilisé avec le compte ${existingWallet}` },
-            { status: 400 }
-          );
+          errorDetail = {};
         }
       }
-      // Pour les autres erreurs, relancer l'exception
+      if (errorDetail?.title && errorDetail.title === "Member Exists") {
+        const subscriberHash = md5(email.toLowerCase());
+        const existingMember = await mailchimp.lists.getListMember(listId, subscriberHash);
+        const existingWallet = existingMember.merge_fields.WALLET || "inconnu";
+        return NextResponse.json(
+          { error: `Cet email est déjà utilisé avec le compte ${existingWallet}` },
+          { status: 400 }
+        );
+      }
       throw error;
     }
     
@@ -102,8 +99,9 @@ export async function POST(request: Request) {
     return NextResponse.json(combinedResponse);
   } catch (error: any) {
     console.error("Erreur lors de l'ajout du membre :", error);
-    if (error.response) {
-      console.error("Détails de l'erreur Mailchimp :", await error.response.text());
+    if (error.response && typeof error.response.json === 'function') {
+      const errorDetail = await error.response.json();
+      console.error("Détails de l'erreur Mailchimp :", errorDetail);
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -133,8 +131,6 @@ export async function PATCH(request: Request) {
     const currentTags = currentTagsResponse.tags || [];
 
     // Mise à jour des tags du membre.
-    // tags doit être un tableau d'objets, par exemple : 
-    // [{ name: "Tag1", status: "active" }, { name: "Tag2", status: "inactive" }]
     const tagResponse = await mailchimp.lists.updateListMemberTags(listId, subscriberHash, { tags });
 
     return NextResponse.json({ updateResponse, currentTags, tagResponse });
