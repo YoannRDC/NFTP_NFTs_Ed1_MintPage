@@ -16,6 +16,8 @@ import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 import MailchimpAccount from "../components/MailchimpAccount";
 
+const MAILCHIMP_LIST_ID = "c642fe82cc"; // Votre listId Mailchimp
+
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
@@ -74,6 +76,8 @@ const AdminPage: React.FC = () => {
 
   // État pour stocker les merge fields récupérés depuis Mailchimp
   const [mergeFields, setMergeFields] = useState<any[]>([]);
+  // Nouvel état pour stocker les tags disponibles
+  const [availableTags, setAvailableTags] = useState<any[]>([]);
 
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
@@ -87,10 +91,9 @@ const AdminPage: React.FC = () => {
     const fetchMergeFields = async () => {
       try {
         const res = await fetch(
-          `/api/mailchimp/merge-fields?listId=c642fe82cc`
+          `/api/mailchimp/merge-fields?listId=${MAILCHIMP_LIST_ID}`
         );
         const data = await res.json();
-        // Supposons que la réponse contienne une propriété "merge_fields"
         if (data.merge_fields) {
           setMergeFields(data.merge_fields);
         } else {
@@ -101,6 +104,24 @@ const AdminPage: React.FC = () => {
       }
     };
     fetchMergeFields();
+  }, []);
+
+  // Nouvel appel pour récupérer les tags disponibles via l'endpoint dédié
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await fetch(`/api/mailchimp/tags?listId=${MAILCHIMP_LIST_ID}`);
+        const data = await res.json();
+        if (data.tags) {
+          setAvailableTags(data.tags);
+        } else {
+          setAvailableTags([]);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des tags disponibles :", error);
+      }
+    };
+    fetchTags();
   }, []);
 
   // Fonctions et effets pour les contrats existants…
@@ -176,8 +197,7 @@ const AdminPage: React.FC = () => {
             <ul>
               {mergeFields.map((field, index) => (
                 <li key={field.tag || index}>
-                  <span className="font-bold">{field.name}</span> (Tag:{" "}
-                  {field.tag}) - Type: {field.type}
+                  <span className="font-bold">{field.name}</span> (Tag: {field.tag}) - Type: {field.type}
                 </li>
               ))}
             </ul>
@@ -187,9 +207,21 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && (
-        <MailchimpAccount />
+      {/* Affichage de la liste des tags disponibles */}
+      {isAdmin && availableTags.length > 0 && (
+        <div className="my-4 p-4 border rounded w-full max-w-md">
+          <h2 className="text-xl font-bold mb-2">Tags disponibles</h2>
+          <ul>
+            {availableTags.map((tag) => (
+              <li key={tag.name}>
+                <span className="font-bold">{tag.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+
+      {isAdmin && <MailchimpAccount />}
 
       {isAdmin && (
         <div className="my-4">
