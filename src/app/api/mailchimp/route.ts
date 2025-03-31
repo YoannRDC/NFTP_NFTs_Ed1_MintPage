@@ -1,4 +1,3 @@
-// src/app/api/mailchimp/route.ts
 import { NextResponse } from 'next/server';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
@@ -24,11 +23,11 @@ export async function GET(request: Request) {
   }
 }
 
-// POST : Ajoute un membre dans la liste (email et listId dans le body)
+// POST : Ajoute un membre dans la liste (email, listId et walletAddress dans le body)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, listId } = body;
+    const { email, listId, walletAddress } = body;
     console.log("listId: ", listId);
     console.log(" > Adding email: ", email);
     if (!email || !listId) {
@@ -37,6 +36,10 @@ export async function POST(request: Request) {
     const response = await mailchimp.lists.addListMember(listId, {
       email_address: email,
       status: 'subscribed', // Ou "pending" si vous souhaitez un double opt-in
+      merge_fields: {
+        // Utilisez le tag défini dans Mailchimp pour votre champ personnalisé
+        WALLET: walletAddress,
+      },
     });
     return NextResponse.json(response);
   } catch (error: any) {
