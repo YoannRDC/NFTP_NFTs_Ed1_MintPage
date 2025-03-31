@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         const existingMember = await mailchimp.lists.getListMember(listId, subscriberHash);
         const existingWallet = existingMember.merge_fields.WALLET || "inconnu";
         return NextResponse.json(
-          { error: `Cet email est déjà utilisé avec le compte ${existingWallet}` },
+          { error: `Cet email est déjà utilisé. Wallet ${existingWallet}` },
           { status: 400 }
         );
       } catch (innerError: any) {
