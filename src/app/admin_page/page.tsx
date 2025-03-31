@@ -14,9 +14,8 @@ import { createWallet, inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
-import MailchimpSubscription from "../components/MailchimpSubscription"; // Import du composant
+import MailchimpSubscription from "../components/MailchimpSubscription";
 
-// Définition des informations de chaque contrat
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
@@ -73,12 +72,36 @@ const AdminPage: React.FC = () => {
   const [selectedERC1155Token, setSelectedERC1155Token] = useState<bigint>(0n);
   const [numberToClaim, setNumberToClaim] = useState("1");
 
+  // État pour stocker les merge fields récupérés depuis Mailchimp
+  const [mergeFields, setMergeFields] = useState<any[]>([]);
+
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
   // Récupération du contrat sélectionné
   const selectedContract = contractObjects[selectedContractKey];
   const selectedContractType = contractsInfo[selectedContractKey].contractType;
+
+  // Récupération des merge fields via l'endpoint dédié
+  useEffect(() => {
+    const fetchMergeFields = async () => {
+      try {
+        const res = await fetch(
+          `/api/mailchimp/merge-fields?listId=c642fe82cc`
+        );
+        const data = await res.json();
+        // Supposons que la réponse contienne une propriété "merge_fields"
+        if (data.merge_fields) {
+          setMergeFields(data.merge_fields);
+        } else {
+          setMergeFields([]);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des merge fields:", error);
+      }
+    };
+    fetchMergeFields();
+  }, []);
 
   // Fonctions et effets pour les contrats existants…
   const { mutate: sendTransaction, status, error: claimError } =
@@ -144,6 +167,29 @@ const AdminPage: React.FC = () => {
           locale="fr_FR"
         />
       </div>
+
+      {/* Affichage de la liste des merge fields */}
+      {isAdmin && (
+        <div className="my-4 p-4 border rounded w-full max-w-md">
+          <h2 className="text-xl font-bold mb-2">Liste des merge fields</h2>
+          {mergeFields.length > 0 ? (
+            <ul>
+              {mergeFields.map((field, index) => (
+                <li key={field.tag || index}>
+                  <span className="font-bold">{field.name}</span> (Tag:{" "}
+                  {field.tag}) - Type: {field.type}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Aucun merge field trouvé.</p>
+          )}
+        </div>
+      )}
+
+      {isAdmin && (
+        <MailchimpSubscription listId="c642fe82cc" />
+      )}
 
       {isAdmin && (
         <div className="my-4">
