@@ -43,6 +43,8 @@ export async function POST(request: Request) {
         WALLET: walletAddress, // Assurez-vous que ce merge field existe bien dans Mailchimp
       },
     });
+
+    console.log("addListMember response:", response);
     
     // Certains appels API peuvent ne pas retourner de corps ; dans ce cas, on renvoie un message par défaut
     if (!response) {
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
     
     return NextResponse.json(response);
   } catch (error: any) {
+    console.log("error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
