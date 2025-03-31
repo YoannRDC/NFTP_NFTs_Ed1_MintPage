@@ -13,7 +13,7 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
-import MailchimpSubscription from "../components/MailchimpSubscription";
+import MailchimpAccount from "../components/MailchimpAccount";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
 const NFT_PRICE_EUR = 19; // Prix fixe en Euros
@@ -131,7 +131,7 @@ function NFTPed1Content() {
       </Link>
 
       <div>
-        <MailchimpSubscription listId="c642fe82cc" />
+        <MailchimpAccount />
       </div>
       
       <div className="decorative-title">

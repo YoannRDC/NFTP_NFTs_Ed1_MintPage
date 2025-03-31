@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     
     if (!email || !listId) {
       return NextResponse.json(
-        { error: 'Email et listId sont requis' },
+        { error: 'Email requis' },
         { status: 400 }
       );
     }

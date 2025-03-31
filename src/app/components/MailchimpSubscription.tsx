@@ -12,16 +12,14 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
   const [subscriptionEmail, setSubscriptionEmail] = useState("");
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
-  const [subscriptionSuccess, setSubscriptionSuccess] = useState<any>(null);
 
   async function handleSubscribe() {
     setSubscriptionLoading(true);
     setSubscriptionError(null);
-    setSubscriptionSuccess(null);
     try {
-        console.log("listId:", listId)
-        console.log("subscriptionEmail:", subscriptionEmail)
-        console.log("account?.address:", account?.address)
+      console.log("listId:", listId);
+      console.log("subscriptionEmail:", subscriptionEmail);
+      console.log("account?.address:", account?.address);
       const res = await fetch("/api/mailchimp/members", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,8 +31,8 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
       });
       const data = await res.json();
       if (res.ok) {
-        setSubscriptionSuccess(data);
-        console.log("Inscription réussie:", data);
+        // Au lieu d'afficher un message sous le formulaire, redirige la page avec le paramètre "subscriptionResult=success"
+        window.location.href = window.location.pathname + "?subscriptionResult=success";
       } else {
         setSubscriptionError(
           data.error || "Erreur inconnue lors de l'inscription"
@@ -61,19 +59,12 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
           className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
           disabled={subscriptionLoading}
         >
-          {subscriptionLoading
-            ? "Inscription en cours..."
-            : "S'inscrire à la newsletter"}
+          {subscriptionLoading ? "Inscription en cours..." : "Créer un compte"}
         </button>
       </div>
       {subscriptionError && (
         <div className="text-center text-red-500 mt-2">
           {subscriptionError}
-        </div>
-      )}
-      {subscriptionSuccess && (
-        <div className="text-center text-green-500 mt-2">
-          Inscription réussie !
         </div>
       )}
     </div>
