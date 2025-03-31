@@ -11,6 +11,10 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { listId, subscriberHash, email_address, merge_fields } = body;
 
+    console.log("subscriberHash: ", subscriberHash);
+    console.log("email_address: ", email_address);
+    console.log("merge_fields: ", merge_fields);
+
     if (!listId || !subscriberHash || !email_address) {
       return NextResponse.json(
         { error: 'Les paramètres listId, subscriberHash et email_address sont requis.' },
