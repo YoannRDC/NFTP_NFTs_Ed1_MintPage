@@ -82,7 +82,7 @@ function NFTPed1Content() {
     <div className="flex flex-col items-center">
       {paymentResult === "success" && (
         <div className="my-4 p-4 border-2 border-green-500 text-green-600 rounded">
-          Paiement réussi ! Merci pour votre achat. Raffraichissez la page pour voir votre NFT !
+          Paiement réussi ! Merci pour votre achat.
         </div>
       )}
       {paymentResult === "error" && (
