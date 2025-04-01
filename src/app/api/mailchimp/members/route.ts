@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     if (!email || !listId || !walletAddress) {
       return NextResponse.json(
-        { error: 'Email, listId et walletAddress sont requis' },
+        { error: 'Connecter un wallet pour créer le compte.' },
         { status: 400 }
       );
     }
