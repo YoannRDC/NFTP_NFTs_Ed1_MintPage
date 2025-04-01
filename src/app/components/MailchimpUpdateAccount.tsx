@@ -13,7 +13,7 @@ type MemberData = {
     LNAME: string;
     ADDRESS: string;
     PHONE: string;
-    ANNIV: string;
+    ANNIV: string; // Identifiant mis à jour (au lieu de ANNIVERSAIRE)
     COMPANY: string;
   };
   tags?: Array<{ name: string; status: string }>;
@@ -31,7 +31,7 @@ const MailchimpUpdateAccount: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
 
-  // État pour l'affichage des info-bulles (tooltips)
+  // États pour afficher les tooltips
   const [showWalletInfo, setShowWalletInfo] = useState<boolean>(false);
   const [showEmailInfo, setShowEmailInfo] = useState<boolean>(false);
 
@@ -49,7 +49,7 @@ const MailchimpUpdateAccount: React.FC = () => {
     },
   });
 
-  // Pour les tags disponibles et sélectionnés
+  // Tags disponibles et sélectionnés
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -118,20 +118,10 @@ const MailchimpUpdateAccount: React.FC = () => {
     setError(null);
     setUpdateSuccess(null);
     try {
-      // Conversion du champ ANNIVERSAIRE du format DD/MM/YYYY vers MM/DD/YYYY
-      const inputAnniversaire = formData.merge_fields.ANNIV;
-      let formattedAnniversaire = inputAnniversaire;
-      const parts = inputAnniversaire.split("/");
-      if (parts.length === 3) {
-        const [day, month, year] = parts;
-        formattedAnniversaire = `${month}/${day}/${year}`;
-      }
-      const merge_fields = {
-        ...formData.merge_fields,
-        ANNIV: formattedAnniversaire,
-      };
+      // Le format de la date est déjà au format YYYY-MM-DD (exemple: 1986-12-03)
+      const merge_fields = formData.merge_fields;
 
-      // Calcul du subscriber hash
+      // Calcul du subscriber hash (MD5 de l'email en minuscules)
       const subscriberHash = md5(formData.email_address.toLowerCase());
 
       // Préparation des tags
@@ -190,7 +180,7 @@ const MailchimpUpdateAccount: React.FC = () => {
           onSubmit={handleUpdate}
           className="flex flex-col space-y-4 min-w-[600px] whitespace-nowrap text-black"
         >
-          {/* WALLET en lecture seule + info-bulle */}
+          {/* WALLET en lecture seule avec info-bulle */}
           <div>
             <label className="block font-bold text-white">Wallet</label>
             <div className="relative">
@@ -198,7 +188,7 @@ const MailchimpUpdateAccount: React.FC = () => {
                 type="text"
                 value={formData.merge_fields.WALLET}
                 readOnly
-                className="border px-4 py-2 w-full bg-gray-100 pr-10"
+                className="border px-4 py-2 w-full bg-gray-200 pr-10"
               />
               <button
                 type="button"
@@ -214,7 +204,7 @@ const MailchimpUpdateAccount: React.FC = () => {
               )}
             </div>
           </div>
-          {/* EMAIL en lecture seule + info-bulle */}
+          {/* EMAIL en lecture seule avec info-bulle */}
           <div>
             <label className="block font-bold text-white">Email</label>
             <div className="relative">
@@ -222,7 +212,7 @@ const MailchimpUpdateAccount: React.FC = () => {
                 type="email"
                 value={formData.email_address}
                 readOnly
-                className="border px-4 py-2 w-full bg-gray-100 pr-10"
+                className="border px-4 py-2 w-full bg-gray-200 pr-10"
               />
               <button
                 type="button"
@@ -310,7 +300,7 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* ANNIVERSAIRE */}
+          {/* ANNIV */}
           <div>
             <label className="block font-bold text-white">Anniversaire</label>
             <input
@@ -325,9 +315,9 @@ const MailchimpUpdateAccount: React.FC = () => {
                   },
                 })
               }
-              placeholder="DD/MM/YYYY"
-              pattern="^(0[1-9]|[12]\d|3[01])/(0[1-9]|1[0-2])/\d{4}$"
-              title="Format: DD/MM/YYYY"
+              placeholder="YYYY-MM-DD"
+              pattern="^\d{4}-\d{2}-\d{2}$"
+              title="Format: YYYY-MM-DD"
               className="border px-4 py-2 w-full"
             />
           </div>
@@ -349,7 +339,7 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* TAGS sous forme de cases à cocher */}
+          {/* TAGS */}
           <div>
             <label className="block font-bold text-white">Abonnements</label>
             {availableTags.map((tag) => (
