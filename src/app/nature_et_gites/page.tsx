@@ -14,6 +14,7 @@ import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
+import MailchimpAccount from "../components/MailchimpAccount";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -315,6 +316,10 @@ function NFTPed1Content() {
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link>
+
+      <div>
+        <MailchimpAccount />
+      </div>
 
       <div className="decorative-title mb-4">-- NFTs à vendre --</div>
 
