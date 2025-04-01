@@ -48,7 +48,6 @@ const MailchimpAccount: React.FC = () => {
   }, [account?.address, subscriptionResult]);
 
   if (loading) return <div>Chargement...</div>;
-  if (!account?.address) return <div>Veuillez connecter votre wallet.</div>;
 
   return (
     <div>
