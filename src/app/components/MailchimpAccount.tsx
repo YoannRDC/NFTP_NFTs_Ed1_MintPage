@@ -15,18 +15,12 @@ const MailchimpAccount: React.FC = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    if (subscriptionResult === "success") {
-      // Attendre 15 secondes avant de considérer l'utilisateur comme souscrit
-      const timer = setTimeout(() => {
-        setIsSubscribed(true);
-        setLoading(false);
-      }, 15000);
-      return () => clearTimeout(timer);
-    }
     if (!account?.address) {
       setLoading(false);
+      console.log("no account found")
       return;
     }
+    console.log("account.address.toLowerCase(): ", account.address.toLowerCase())
     setLoading(true);
     fetch(`/api/mailchimp/members?listId=${MAILCHIMP_LIST_ID}`)
       .then((res) => res.json())
@@ -38,6 +32,7 @@ const MailchimpAccount: React.FC = () => {
               m.merge_fields.WALLET &&
               m.merge_fields.WALLET.toLowerCase() === account.address.toLowerCase()
           );
+          console.log("member: ", member)
           setIsSubscribed(!!member);
         }
       })
