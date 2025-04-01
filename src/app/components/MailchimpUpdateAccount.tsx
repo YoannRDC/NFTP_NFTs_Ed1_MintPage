@@ -219,7 +219,7 @@ const MailchimpUpdateAccount: React.FC = () => {
                 </button>
                 {showEmailInfo && (
                   <div className="absolute left-0 z-10 mt-1 p-2 bg-white text-black text-xs border border-gray-300 rounded">
-                    Pour changer l'email, contacter le support.
+                    Pour changer l’email, contacter le support.
                   </div>
                 )}
               </div>
