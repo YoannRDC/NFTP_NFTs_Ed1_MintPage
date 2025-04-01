@@ -13,7 +13,7 @@ type MemberData = {
     LNAME: string;
     ADDRESS: string;
     PHONE: string;
-    ANNIV: string; // Champ personnalisé au format DD/MM/YYYY
+    ANNIVERSAIRE: string; // Champ personnalisé au format DD/MM/YYYY dans le formulaire
     COMPANY: string;
   };
   tags?: Array<{ name: string; status: string }>;
@@ -30,8 +30,9 @@ const MailchimpUpdateAccount: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
+  const [showEmailInfo, setShowEmailInfo] = useState<boolean>(false);
 
-  // Formulaire avec les données à mettre à jour
+  // Données du formulaire
   const [formData, setFormData] = useState<MemberData>({
     email_address: "",
     merge_fields: {
@@ -40,16 +41,16 @@ const MailchimpUpdateAccount: React.FC = () => {
       LNAME: "",
       ADDRESS: "",
       PHONE: "",
-      ANNIV: "",
+      ANNIVERSAIRE: "",
       COMPANY: "",
     },
   });
 
-  // État pour stocker les tags disponibles et ceux sélectionnés
+  // Pour les tags disponibles et sélectionnés
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  // Récupérer les données du membre via l'endpoint GET (filtrage sur le champ WALLET)
+  // Récupération des données du membre
   useEffect(() => {
     if (!account?.address) return;
     setLoading(true);
@@ -75,14 +76,11 @@ const MailchimpUpdateAccount: React.FC = () => {
                 LNAME: member.merge_fields.LNAME || "",
                 ADDRESS: member.merge_fields.ADDRESS || "",
                 PHONE: member.merge_fields.PHONE || "",
-                ANNIV: member.merge_fields.ANNIV || "",
+                ANNIVERSAIRE: member.merge_fields.ANNIVERSAIRE || "",
                 COMPANY: member.merge_fields.COMPANY || "",
               },
             });
-            // Initialisation des tags si disponibles dans les données du membre
-            setSelectedTags(
-              member.tags ? member.tags.map((tag: any) => tag.name) : []
-            );
+            setSelectedTags(member.tags ? member.tags.map((tag: any) => tag.name) : []);
           }
         }
       })
@@ -93,7 +91,7 @@ const MailchimpUpdateAccount: React.FC = () => {
       .finally(() => setLoading(false));
   }, [account?.address]);
 
-  // Récupérer les tags disponibles via l'endpoint dédié
+  // Récupération des tags disponibles
   useEffect(() => {
     fetch(`/api/mailchimp/tags?listId=${MAILCHIMP_LIST_ID}`)
       .then((res) => res.json())
@@ -115,13 +113,28 @@ const MailchimpUpdateAccount: React.FC = () => {
     setError(null);
     setUpdateSuccess(null);
     try {
-      // Calculer le subscriber hash (MD5 de l'email en minuscules)
+      // Conversion du champ ANNIVERSAIRE du format DD/MM/YYYY vers MM/DD/YYYY attendu par Mailchimp
+      const inputAnniversaire = formData.merge_fields.ANNIVERSAIRE;
+      let formattedAnniversaire = inputAnniversaire;
+      const parts = inputAnniversaire.split("/");
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        formattedAnniversaire = `${month}/${day}/${year}`;
+      }
+      const merge_fields = {
+        ...formData.merge_fields,
+        ANNIVERSAIRE: formattedAnniversaire,
+      };
+
+      // Calcul du subscriber hash
       const subscriberHash = md5(formData.email_address.toLowerCase());
-      // Pour chaque tag disponible, définir le status selon que l'utilisateur l'a sélectionné
+
+      // Préparation des tags
       const tagsArray = availableTags.map((tag) => ({
         name: tag.name,
         status: selectedTags.includes(tag.name) ? "active" : "inactive",
       }));
+
       const res = await fetch(`/api/mailchimp/members/update`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -129,7 +142,7 @@ const MailchimpUpdateAccount: React.FC = () => {
           listId: MAILCHIMP_LIST_ID,
           subscriberHash,
           email_address: formData.email_address,
-          merge_fields: formData.merge_fields,
+          merge_fields,
           tags: tagsArray,
         }),
       });
@@ -188,15 +201,29 @@ const MailchimpUpdateAccount: React.FC = () => {
           {/* EMAIL en lecture seule avec info */}
           <div>
             <label className="block font-bold text-white">Email</label>
-            <input
-              type="email"
-              value={formData.email_address}
-              readOnly
-              className="border px-4 py-2 w-full bg-gray-100"
-            />
-            <small className="text-xs text-gray-500">
-              ℹ️ Pour changer l’email, contacter le support.
-            </small>
+            <div className="flex items-center">
+              <input
+                type="email"
+                value={formData.email_address}
+                readOnly
+                className="border px-4 py-2 bg-gray-100"
+                style={{ maxWidth: "calc(100% - 40px)" }}
+              />
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowEmailInfo(!showEmailInfo)}
+                  className="ml-2 flex items-center justify-center w-6 h-6 bg-white text-black rounded-full border border-gray-300"
+                >
+                  i
+                </button>
+                {showEmailInfo && (
+                  <div className="absolute left-0 z-10 mt-1 p-2 bg-white text-black text-xs border border-gray-300 rounded">
+                    Pour changer l'email, contacter le support.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           {/* FNAME */}
           <div>
@@ -270,18 +297,18 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* ANNIVERSAIRE avec format imposé */}
+          {/* ANNIVERSAIRE avec vérification du format */}
           <div>
             <label className="block font-bold text-white">Anniversaire</label>
             <input
               type="text"
-              value={formData.merge_fields.ANNIV}
+              value={formData.merge_fields.ANNIVERSAIRE}
               onChange={(e) =>
                 setFormData({
                   ...formData,
                   merge_fields: {
                     ...formData.merge_fields,
-                    ANNIV: e.target.value,
+                    ANNIVERSAIRE: e.target.value,
                   },
                 })
               }
