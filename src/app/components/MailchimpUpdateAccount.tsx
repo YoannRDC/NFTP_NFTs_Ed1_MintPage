@@ -13,7 +13,7 @@ type MemberData = {
     LNAME: string;
     ADDRESS: string;
     PHONE: string;
-    BIRTHDAY: string;
+    ANNIV: string; // Champ personnalisé au format DD/MM/YYYY
     COMPANY: string;
   };
   tags?: Array<{ name: string; status: string }>;
@@ -40,7 +40,7 @@ const MailchimpUpdateAccount: React.FC = () => {
       LNAME: "",
       ADDRESS: "",
       PHONE: "",
-      BIRTHDAY: "",
+      ANNIV: "",
       COMPANY: "",
     },
   });
@@ -75,15 +75,13 @@ const MailchimpUpdateAccount: React.FC = () => {
                 LNAME: member.merge_fields.LNAME || "",
                 ADDRESS: member.merge_fields.ADDRESS || "",
                 PHONE: member.merge_fields.PHONE || "",
-                BIRTHDAY: member.merge_fields.BIRTHDAY || "",
+                ANNIV: member.merge_fields.ANNIV || "",
                 COMPANY: member.merge_fields.COMPANY || "",
               },
             });
             // Initialisation des tags si disponibles dans les données du membre
             setSelectedTags(
-              member.tags
-                ? member.tags.map((tag: any) => tag.name)
-                : []
+              member.tags ? member.tags.map((tag: any) => tag.name) : []
             );
           }
         }
@@ -181,10 +179,13 @@ const MailchimpUpdateAccount: React.FC = () => {
               type="text"
               value={formData.merge_fields.WALLET}
               readOnly
-              className="border px-4 py-2 w-full"
+              className="border px-4 py-2 w-full bg-gray-100"
             />
+            <small className="text-xs text-gray-500">
+              Ce champ est non modifiable
+            </small>
           </div>
-          {/* EMAIL en lecture seule */}
+          {/* EMAIL en lecture seule avec info */}
           <div>
             <label className="block font-bold text-white">Email</label>
             <input
@@ -193,6 +194,9 @@ const MailchimpUpdateAccount: React.FC = () => {
               readOnly
               className="border px-4 py-2 w-full bg-gray-100"
             />
+            <small className="text-xs text-gray-500">
+              ℹ️ Pour changer l'email, contacter le support.
+            </small>
           </div>
           {/* FNAME */}
           <div>
@@ -266,21 +270,24 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full"
             />
           </div>
-          {/* BIRTHDAY */}
+          {/* ANNIVERSAIRE avec format imposé */}
           <div>
-            <label className="block font-bold text-white">Birthday</label>
+            <label className="block font-bold text-white">Anniversaire</label>
             <input
               type="text"
-              value={formData.merge_fields.BIRTHDAY}
+              value={formData.merge_fields.ANNIV}
               onChange={(e) =>
                 setFormData({
                   ...formData,
                   merge_fields: {
                     ...formData.merge_fields,
-                    BIRTHDAY: e.target.value,
+                    ANNIV: e.target.value,
                   },
                 })
               }
+              placeholder="DD/MM/YYYY"
+              pattern="^(0[1-9]|[12]\d|3[01])/(0[1-9]|1[0-2])/\d{4}$"
+              title="Format: DD/MM/YYYY"
               className="border px-4 py-2 w-full"
             />
           </div>
