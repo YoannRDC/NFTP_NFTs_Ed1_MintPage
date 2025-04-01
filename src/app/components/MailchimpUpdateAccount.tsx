@@ -195,7 +195,7 @@ const MailchimpUpdateAccount: React.FC = () => {
               className="border px-4 py-2 w-full bg-gray-100"
             />
             <small className="text-xs text-gray-500">
-              ℹ️ Pour changer l'email, contacter le support.
+              ℹ️ Pour changer l’email, contacter le support.
             </small>
           </div>
           {/* FNAME */}
