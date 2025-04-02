@@ -45,29 +45,23 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
   }
 
   return (
-    <div className="flex flex-col items-center m-10 p-4 rounded">
-      <div className="flex flex-row items-center justify-center">
-        <input
-          type="email"
-          placeholder="Votre adresse email"
-          value={subscriptionEmail}
-          onChange={(e) => setSubscriptionEmail(e.target.value)}
-          className="mr-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-        />
-        <button
-          onClick={handleSubscribe}
-          className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
-          disabled={subscriptionLoading}
-        >
-          {subscriptionLoading ? "Inscription en cours..." : "Créer mon compte"}
-        </button>
-      </div>
-      {subscriptionError && (
-        <div className="text-center text-red-500 mt-2">
-          {subscriptionError}
-        </div>
-      )}
+    <div className="flex flex-col sm:flex-row items-center justify-center">
+      <input
+        type="email"
+        placeholder="Votre adresse email"
+        value={subscriptionEmail}
+        onChange={(e) => setSubscriptionEmail(e.target.value)}
+        className="w-full sm:w-auto mr-0 sm:mr-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+      />
+      <button
+        onClick={handleSubscribe}
+        className="mt-4 sm:mt-0 px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
+        disabled={subscriptionLoading}
+      >
+        {subscriptionLoading ? "Inscription en cours..." : "Créer mon compte"}
+      </button>
     </div>
+
   );
 };
 
