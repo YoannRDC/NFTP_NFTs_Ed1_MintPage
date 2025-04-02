@@ -313,9 +313,9 @@ function NFTPed1Content() {
         <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
       </div>
 
-      <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
+{/*       <Link className="text-sm text-gray-400 mb-5" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
-      </Link>
+      </Link> */}
 
       <div>
         <MailchimpAccount />
