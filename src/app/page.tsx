@@ -113,6 +113,12 @@ function Menu({ isAdmin }: MenuProps) {
           description="Les NFTs de Nature & Gîtes."
           imageSrc="/nature_et_gites/Nature_et_Gites.jpg"
         />
+        <MenuItem
+          title="Art Cards"
+          href="/artcards"
+          description="52 œuvres uniques qui entrelacent les quatre symboles d'un jeu de 52 cartes."
+          imageSrc="/artcards/ArtCards.gif"
+        />
         {isAdmin && (
           <MenuItem
             title="Nicole Mathieu"
