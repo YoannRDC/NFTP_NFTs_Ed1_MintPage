@@ -14,8 +14,8 @@ export default function MenuItem({ title, href, description, imageSrc }: MenuIte
       href={href}
       className="flex flex-row items-center border border-zinc-800 p-4 rounded-lg hover:bg-zinc-900 transition-colors hover:border-zinc-700"
     >
-      {/* ✅ Image à gauche */}
-      <div className="w-24 h-24 overflow-hidden rounded-lg mr-4 relative">
+      {/* Image à gauche */}
+      <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg mr-4 relative">
         <Image 
           src={imageSrc} 
           alt={title} 
@@ -25,9 +25,7 @@ export default function MenuItem({ title, href, description, imageSrc }: MenuIte
         />
       </div>
 
-
-
-      {/* ✅ Texte à droite */}
+      {/* Texte à droite */}
       <article>
         <h2 className="text-lg font-semibold mb-2">{title}</h2>
         <p className="text-sm text-zinc-400">{description}</p>
