@@ -14,6 +14,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import ItemERC721drop from "../components/ItemERC721drop";
 import { defineChain, getContract } from "thirdweb";
 import MailchimpAccount from "../components/MailchimpAccount";
+import InfoBolckchain from "../components/InfoBolckchain";
 
 //const NFT_DEFAULT_PRICE_POL = 49; // Prix initial (fixe) en POL (au cas où, mais non utilisé pour le calcul)
 const NFT_PRICE_EUR = 19; // Prix fixe en Euros
@@ -21,13 +22,13 @@ const TOTAL_SUPPLY = 100; // Informatif (affiché x/TOTAL_SUPPLY)
 const DISPLAYED_NFT_PRICE_POL = 99; // Informative: Price is set via Claim conditions.  
 
 // NFTP contracts
-const nftpNftsEd1Address = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
+const contractAddress = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
 
 // connect to your contract
 const nftpNftsEd1Contract = getContract({
   client,
   chain: defineChain(137),
-  address: nftpNftsEd1Address,
+  address: contractAddress,
 });
 
 const videoPresentationLink="https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
@@ -40,6 +41,7 @@ const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
 const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721drop";
 const projectName="NFTPED1";
+const blockchain = "Polygon";
 
 // useless in this context:
 const tokenId= 0n;
@@ -136,6 +138,10 @@ function NFTPed1Content() {
       
       <div className="decorative-title">
         -- NFTs à vendre --
+      </div>
+
+      <div>
+        <InfoBolckchain chainName={blockchain} contractAddress={contractAddress} />
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">

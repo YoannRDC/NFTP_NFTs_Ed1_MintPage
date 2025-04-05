@@ -15,6 +15,7 @@ import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
+import InfoBolckchain from "../components/InfoBolckchain";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -52,6 +53,7 @@ const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
 const contractType = "erc721transfert";
 const projectName = "NATETGITES"; // défini dans .env et constant.tsx.
+const blockchain = "Polygon"
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -319,6 +321,10 @@ function NFTPed1Content() {
 
       <div>
         <MailchimpAccount />
+      </div>
+
+      <div>
+        <InfoBolckchain chainName={blockchain} contractAddress={contractAddress} />
       </div>
 
       <div className="decorative-title mb-4">-- NFTs à vendre --</div>

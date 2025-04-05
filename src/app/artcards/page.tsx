@@ -13,6 +13,7 @@ import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
+import InfoBolckchain from "../components/InfoBolckchain";
 
 const contractAddress = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
 const contract = getContract({
@@ -31,6 +32,7 @@ const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const contractType = "erc721transfert";
 const projectName = "ARTCARDS" // define in .env and constant.tsx.
+const blockchain = "Polygon";
 
 // Composant principal
 function NFTPed1Content() {
@@ -173,6 +175,10 @@ function NFTPed1Content() {
         -- NFTs à vendre --
       </div>
 
+      <div>
+        <InfoBolckchain chainName={blockchain} contractAddress={contractAddress} />
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isMintedLoading ? (
           <p>Chargement des NFT mintés...</p>

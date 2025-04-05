@@ -45,7 +45,7 @@ const MailchimpSubscription: React.FC<MailchimpSubscriptionProps> = ({ listId })
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center">
+    <div className="flex flex-col sm:flex-row items-center justify-center mt-10">
       <input
         type="email"
         placeholder="Votre adresse email"
