@@ -351,8 +351,8 @@ function NFTPed1Content() {
 
       <div className="decorative-title mb-4">-- NFTs à vendre --</div>
 
-      <div className="text-gray-500 mt-2 flex justify-center">
-        {soldCount}/{mintedCount} NFT vendu
+      <div className="text-gray-500 mt-2 mb-10 flex justify-center">
+        {soldCount} / {mintedCount} NFT vendu
       </div>
 
       {/* Dropdowns de filtres */}
