@@ -16,7 +16,7 @@ const InfoBlockchain: React.FC<InfoBlockchainProps> = ({
   };
 
   return (
-    <div style={{ margin: "20px 0", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ maxWidth: "100%", overflowX: "hidden" }}>
       <button
         onClick={toggleOpen}
         style={{
