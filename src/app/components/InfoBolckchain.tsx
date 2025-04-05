@@ -16,19 +16,20 @@ const InfoBolckchain: React.FC<InfoBolckchainProps> = ({
   };
 
   return (
-    <div style={{ width: "300px" }}>
+    <div style={{ margin: "20px 0" }}>
       <button
         onClick={toggleOpen}
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          width: "100%",
-          padding: "8px",
+          width: "250px",
+          padding: "10px 15px",
+          backgroundColor: "transparent",
+          color: "#fff",
+          border: "none",
           cursor: "pointer",
-          backgroundColor: "#f5f5f5",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
+          fontSize: "16px",
         }}
       >
         <span>Informations Blockchain</span>
@@ -40,15 +41,13 @@ const InfoBolckchain: React.FC<InfoBolckchainProps> = ({
       {isOpen && (
         <div
           style={{
-            marginTop: "8px",
-            padding: "8px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: "#fafafa",
+            marginTop: "5px",
+            color: "#fff",
+            lineHeight: 1.5,
           }}
         >
-          <p>Blockchain: {chainName}</p>
-          <p>Adresse du contrat: {contractAddress}</p>
+          <p style={{ margin: 0 }}>Blockchain: {chainName}</p>
+          <p style={{ margin: 0 }}>Adresse du contrat: {contractAddress}</p>
         </div>
       )}
     </div>
