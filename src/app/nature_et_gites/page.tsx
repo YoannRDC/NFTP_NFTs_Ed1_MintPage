@@ -15,7 +15,7 @@ import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
-import InfoBolckchain from "../components/InfoBolckchain";
+import InfoBlockchain from "../components/InfoBlockchain";
 import { projectMappings } from "../constants";
 import { getNFTBalance } from "../utils/FetchBlockchainData";
 
@@ -346,7 +346,7 @@ function NFTPed1Content() {
       </div>
 
       <div>
-        <InfoBolckchain chainName={blockchain} contractAddress={contractAddress} />
+        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
       </div>
 
       <div className="decorative-title mb-4">-- NFTs à vendre --</div>

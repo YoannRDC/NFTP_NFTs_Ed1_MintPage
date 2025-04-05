@@ -5,7 +5,7 @@ interface InfoBolckchainProps {
   contractAddress: string;
 }
 
-const InfoBolckchain: React.FC<InfoBolckchainProps> = ({
+const InfoBlockchain: React.FC<InfoBolckchainProps> = ({
   chainName,
   contractAddress,
 }) => {
@@ -47,11 +47,21 @@ const InfoBolckchain: React.FC<InfoBolckchainProps> = ({
           }}
         >
           <p style={{ margin: 0 }}>Blockchain: {chainName}</p>
-          <p style={{ margin: 0 }}>Adresse du contrat: {contractAddress}</p>
+          <p style={{ margin: 0 }}>
+            Adresse du contrat:{" "}
+            <a
+              href={`https://polygonscan.com/address/${contractAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#fff", textDecoration: "underline" }}
+            >
+              {contractAddress}
+            </a>
+          </p>
         </div>
       )}
     </div>
   );
 };
 
-export default InfoBolckchain;
+export default InfoBlockchain;
