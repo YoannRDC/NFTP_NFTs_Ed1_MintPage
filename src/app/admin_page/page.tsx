@@ -77,6 +77,11 @@ const AdminPage: React.FC = () => {
   // Nouvel état pour stocker les tags disponibles
   const [availableTags, setAvailableTags] = useState<any[]>([]);
 
+  // Nouveaux états pour le bouton d'appel à l'API set-claim-conditions-birthday-cakes
+  const [settingConditions, setSettingConditions] = useState(false);
+  const [conditionsResult, setConditionsResult] = useState<any>(null);
+  const [conditionsError, setConditionsError] = useState<string | null>(null);
+
   const isAdmin =
     account?.address?.toLowerCase() === nftpPubKey.toLowerCase();
 
@@ -169,6 +174,27 @@ const AdminPage: React.FC = () => {
     }
   }, [selectedContractType]);
 
+  // Fonction d'appel à l'API pour définir les claim conditions des Birthday Cakes
+  const handleSetClaimConditions = async () => {
+    setSettingConditions(true);
+    setConditionsError(null);
+    setConditionsResult(null);
+    try {
+      const res = await fetch("/api/set-claim-conditions-birthday-cakes", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setConditionsError(data.error || "Erreur inconnue");
+      } else {
+        setConditionsResult(data);
+      }
+    } catch (err: any) {
+      setConditionsError(err.message);
+    }
+    setSettingConditions(false);
+  };
+
   return (
     <div className="flex flex-col items-center">
       <div className="decorative-title">-- Admin Page --</div>
@@ -185,6 +211,28 @@ const AdminPage: React.FC = () => {
           locale="fr_FR"
         />
       </div>
+
+      {/* Bouton pour définir les claim conditions des Birthday Cakes */}
+      {isAdmin && (
+        <div className="my-4">
+          <p>!! Bouton pour définir les claim conditions des Birthday Cakes !! triggers automatically</p>
+          <button
+            onClick={handleSetClaimConditions}
+            disabled={settingConditions}
+            className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-transform transform hover:scale-105"
+          >
+            {settingConditions ? "Setting Conditions..." : "Set Claim Conditions for Birthday Cakes"}
+          </button>
+          {conditionsResult && (
+            <pre className="mt-2 p-2 bg-gray-100 text-black">
+              {JSON.stringify(conditionsResult, null, 2)}
+            </pre>
+          )}
+          {conditionsError && (
+            <p className="mt-2 text-red-500">Erreur: {conditionsError}</p>
+          )}
+        </div>
+      )}
 
       {/* Affichage de la liste des merge fields */}
       {isAdmin && (
