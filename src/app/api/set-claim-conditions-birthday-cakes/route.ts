@@ -1,4 +1,4 @@
-// app/api/setClaimConditions/route.ts
+// src/app/api/set-claim-conditions-birthday-cakes/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import {
   createThirdwebClient,
@@ -43,10 +43,11 @@ export async function POST(req: NextRequest) {
 
     // Création du compte temporaire à partir de la clé privée
     const account = privateKeyToAccount({ client, privateKey: PRIVATE_KEY });
+    console.log("Compte temporaire utilisé :", account.address);
 
     // Constante représentant la valeur "unlimited" pour un uint256
     const UNLIMITED = BigInt(
-      "9999999999"
+      "10000000000000"
     );
 
     // Préparation de la metadata pour l'allowList
@@ -82,15 +83,16 @@ export async function POST(req: NextRequest) {
     const results: { tokenId: bigint; transactionHash: string }[] = [];
 
     // Boucle sur les tokenIds de 0 à 122
-    for (let tokenId = 0; tokenId <= 3; tokenId++) {
+    for (let tokenId = 0; tokenId <= 5; tokenId++) {
       console.log(`Définition des conditions de claim pour tokenId: ${tokenId}`);
       // Conversion de tokenId en bigint pour respecter le type attendu
       const tokenIdBig = BigInt(tokenId);
 
-      const transaction = prepareContractCall({
-          contract: nftContract,
-          method: "function setClaimConditions(uint256 _tokenId, (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)[] _conditions, bool _resetClaimEligibility)",
-          params: [tokenIdBig, conditions, resetClaimEligibility],
+      const transaction = await prepareContractCall({
+        contract: nftContract,
+        method:
+          "function setClaimConditions(uint256 _tokenId, (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)[] _conditions, bool _resetClaimEligibility)",
+        params: [tokenIdBig, conditions, resetClaimEligibility],
       });
 
       const { transactionHash } = await sendTransaction({
@@ -104,9 +106,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Convertir les BigInt en string pour la sérialisation JSON
+    const serializedResults = results.map((item) => ({
+      tokenId: item.tokenId.toString(),
+      transactionHash: item.transactionHash,
+    }));
+
     return NextResponse.json({
       message: "Claim conditions définies pour tous les tokens",
-      results,
+      results: serializedResults,
     });
   } catch (error: any) {
     console.error("Erreur lors de la définition des claim conditions :", error);
