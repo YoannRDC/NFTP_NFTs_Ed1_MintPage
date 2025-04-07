@@ -37,6 +37,13 @@ const contractsInfo = {
     chainId: 137,
     contractType: "erc721transfert" as const,
   },
+  birthdayCakes: {
+    address: "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf",
+    metadataURI:
+      "ipfs://QmRVt3U9TqGZVBSJbis48YTVLb1smqXGo7jztAQBGnKmrh",
+    chainId: 137,
+    contractType: "erc1155drop" as const,
+  }
 };
 
 type ContractKey = keyof typeof contractsInfo;
@@ -56,11 +63,17 @@ const artcardsContract = getContract({
   chain: defineChain(contractsInfo.artcards.chainId),
   address: contractsInfo.artcards.address,
 });
+const birthdayCakesContract = getContract({
+  client,
+  chain: defineChain(contractsInfo.birthdayCakes.chainId),
+  address: contractsInfo.birthdayCakes.address,
+});
 
 const contractObjects: { [key in ContractKey]: any } = {
   nftpNftsEd1: nftpNftsEd1Contract,
   fragChroEd1: fragChroEd1Contract,
   artcards: artcardsContract,
+  birthdayCakes: birthdayCakesContract,
 };
 
 const AdminPage: React.FC = () => {
