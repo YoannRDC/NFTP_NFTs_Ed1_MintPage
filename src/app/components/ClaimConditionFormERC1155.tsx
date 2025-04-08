@@ -7,10 +7,26 @@ import { ContractOptions } from "thirdweb";
 import { nftpPubKey } from "../constants";
 import { useActiveAccount } from "thirdweb/react";
 
+import { ethers } from "ethers";
+import { MerkleTree } from "merkletreejs";
+import keccak256 from "keccak256";
+
 interface ClaimConditionFormERC1155Props {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: { address: string; maxClaimable: string; price: string }[];
   tokenId: bigint;
+}
+
+// Fonction pour calculer le Merkle root à partir de l'overrideList
+function computeMerkleRoot(allowList: { address: string; maxClaimable: string; price: string }[]): `0x${string}` {
+  if (allowList.length === 0) {
+    return "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
+  }
+  const leaves = allowList.map(item =>
+    keccak256(item.address.toLowerCase() + item.maxClaimable + item.price)
+  );
+  const tree = new MerkleTree(leaves, keccak256, { sort: true });
+  return "0x" + tree.getRoot().toString('hex') as `0x${string}`;
 }
 
 export default function ClaimConditionFormERC1155({
@@ -108,30 +124,30 @@ export default function ClaimConditionFormERC1155({
     setOverrideList(updatedList);
   };
 
-  // Envoi de la transaction pour mettre à jour la condition de claim
   const handleSubmit = async () => {
-    if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
+    if (
+      !smartAccount ||
+      smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()
+    ) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
     try {
-      // Construction de l'objet condition en respectant la signature attendue par le contrat ERC1155
+      // Calcul du Merkle root à partir de l'overrideList
+      const computedMerkleRoot = computeMerkleRoot(overrideList);
+  
       const condition = {
-        // startTimestamp en secondes (BigInt)
         startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
         maxClaimableSupply: BigInt(maxClaimableSupply),
         supplyClaimed: 0n,
         quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
-        // Calcul du merkleRoot : ici on utilise la valeur par défaut (assertion pour le typage littéral)
-        merkleRoot:
-          "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
-        // Conversion précise du prix en wei à l'aide d'ethers
+        merkleRoot: computedMerkleRoot,
+        // Conversion précise du prix en wei à l'aide d'ethers (ou toWei, si c'est une fonction équivalente)
         pricePerToken: toWei(price),
         currency: currency,
         metadata: metadata,
-        overrideList,
       };
-
+  
       const transaction = prepareContractCall({
         contract,
         method:
