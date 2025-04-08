@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     // Exemple : envoi de la transaction pour tokenIds de 0 à 5 (adapter selon vos besoins)
     const results: { tokenId: bigint; transactionHash: string }[] = [];
 																				  
-    for (let tokenIdNum = 0; tokenIdNum <= 2; tokenIdNum++) {
+    for (let tokenIdNum = 0; tokenIdNum <= 70; tokenIdNum++) {
       console.log(`Définition des conditions de claim pour tokenId: ${tokenIdNum}`);
       const tokenIdBig = BigInt(tokenIdNum);
 
