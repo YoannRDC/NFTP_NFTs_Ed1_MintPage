@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     // Exemple : envoi de la transaction pour tokenIds de 0 à 5 (adapter selon vos besoins)
     const results: { tokenId: bigint; transactionHash: string }[] = [];
 																				  
-    for (let tokenIdNum = 0; tokenIdNum <= 70; tokenIdNum++) {
+    for (let tokenIdNum = 3; tokenIdNum <= 70; tokenIdNum++) {
       const tokenIdBig = BigInt(tokenIdNum);
       console.log(`Définition des conditions de claim pour tokenId: ${tokenIdNum}`);
       const transaction = setClaimConditions({
@@ -101,9 +101,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("Erreur lors de la définition des claim conditions :", error);
+    const fullError = {
+      message: error.message,
+      // Vous pouvez inclure d'autres propriétés utiles si nécessaire (par exemple error.stack)
+      stack: error.stack,
+    };
     return new NextResponse(
-      JSON.stringify({ error: "Internal server error: " + error.toString() }),
+      JSON.stringify({ error: fullError }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+
 }
