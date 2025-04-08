@@ -6,7 +6,6 @@ import { prepareContractCall, toWei } from "thirdweb";
 import { ContractOptions } from "thirdweb";
 import { nftpPubKey } from "../constants";
 import { useActiveAccount } from "thirdweb/react";
-import { ethers } from "ethers";
 
 interface ClaimConditionFormERC1155Props {
   contract: ContractOptions<[], `0x${string}`>;
@@ -35,7 +34,6 @@ export default function ClaimConditionFormERC1155({
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
   const [metadata, setMetadata] = useState("");
 
-  // MàJ de l'overrideList si initialOverrides change
   useEffect(() => {
     if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
@@ -82,12 +80,11 @@ export default function ClaimConditionFormERC1155({
         setStartDate(date.toISOString().slice(0, 16));
       }
       setMetadata(claimData.metadata || "");
-      // Si votre contrat renvoie une overrideList, l'intégrer ici si besoin :
-      // setOverrideList(claimData.overrideList || []);
+      // Utilisation d'une assertion de type pour récupérer éventuellement overrideList
+      setOverrideList((claimData as any).overrideList || []);
     }
   }, [claimData]);
 
-  // Fonctions de gestion de l'overrideList
   const addAddress = () => {
     setOverrideList([
       ...overrideList,
@@ -132,9 +129,7 @@ export default function ClaimConditionFormERC1155({
         pricePerToken: toWei(price),
         currency: currency,
         metadata: metadata,
-        // Si votre contrat accepte explicitement overrideList dans la condition, 
-        // ajoutez-le ici. Sinon, la gestion de l'overrideList peut être effectuée via un Merkle tree.
-        overrideList,  // Par exemple, si le contrat a été adapté pour recevoir overrideList.
+        overrideList,
       };
 
       const transaction = prepareContractCall({
@@ -243,7 +238,6 @@ export default function ClaimConditionFormERC1155({
         />
       </div>
 
-      {/* Gestion de l'overrideList pour l'UI */}
       {overrideList.map((entry, index) => (
         <div
           key={index}
