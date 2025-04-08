@@ -337,7 +337,6 @@ const AdminPage: React.FC = () => {
 
       {isAdmin && selectedContractType === "erc1155drop" && (
         <div className="erc1155-section mt-10">
-          <h2 className="text-xl font-bold">Tokens ERC1155 (fragChroEd1)</h2>
           {erc1155Tokens.length > 0 && (
             <div className="mt-4">
               <label htmlFor="erc1155-select" className="mr-2 font-bold">
