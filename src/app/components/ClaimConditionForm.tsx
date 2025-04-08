@@ -27,7 +27,7 @@ export default function ClaimConditionForm({ contract, initialOverrides = [], co
   const [metadata, setMetadata] = useState(""); // ex: ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0
 
   useEffect(() => {
-    if (initialOverrides.length > 0) {
+    if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
     }
   }, [initialOverrides]);
