@@ -8,7 +8,6 @@ import {
 } from "thirdweb/react";
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
-import ClaimConditionForm from "../components/ClaimConditionFormERC1155";
 import { client, nftpPubKey, getProjectPublicKey, MAILCHIMP_LIST_ID } from "../constants";
 import { inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";

@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useReadContract, useSendTransaction } from "thirdweb/react";
-import { prepareContractCall } from "thirdweb";
+import { prepareContractCall, toWei } from "thirdweb";
 import { ContractOptions } from "thirdweb";
 import { nftpPubKey } from "../constants";
 import { useActiveAccount } from "thirdweb/react";
+import { ethers } from "ethers";
 
 interface ClaimConditionFormERC1155Props {
   contract: ContractOptions<[], `0x${string}`>;
-  initialOverrides?: any[];
+  initialOverrides?: { address: string; maxClaimable: string; price: string }[];
   tokenId: bigint;
 }
 
@@ -21,44 +22,43 @@ export default function ClaimConditionFormERC1155({
   const smartAccount = useActiveAccount();
   const { mutate: sendTransaction } = useSendTransaction();
 
-  // États pour les champs du formulaire
+  // États pour l'overrideList
   const [overrideList, setOverrideList] = useState<
     { address: string; maxClaimable: string; price: string }[]
-  >([]);
+  >(initialOverrides);
+
+  // États pour les autres champs du formulaire
   const [maxClaimableSupply, setMaxClaimableSupply] = useState("");
   const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("");
-  const [currencyAddress, setCurrencyAddress] = useState("");
+  const [currency, setCurrency] = useState("");
   const [price, setPrice] = useState("");
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().slice(0, 16)
-  );
+  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
   const [metadata, setMetadata] = useState("");
 
-  // MàJ de overrideList depuis initialOverrides (si fourni)
+  // MàJ de l'overrideList si initialOverrides change
   useEffect(() => {
     if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
     }
   }, [initialOverrides]);
 
-  // Appel pour récupérer le conditionId actif via getActiveClaimConditionId
+  // Récupération du conditionId actif pour le token via getActiveClaimConditionId
   const {
     data: activeConditionData,
     isPending: isActivePending,
     error: activeError,
   } = useReadContract({
     contract,
-    method:
-      "function getActiveClaimConditionId(uint256 _tokenId) view returns (uint256)",
+    method: "function getActiveClaimConditionId(uint256 _tokenId) view returns (uint256)",
     params: [tokenId],
   });
 
-  // Détermine le conditionId à utiliser (on le convertit en bigint)
+  // Utilisation du conditionId récupéré ; s'il n'est pas trouvé, on utilise 0n par défaut
   const conditionId: bigint = activeConditionData
     ? BigInt(activeConditionData.toString())
     : 0n;
 
-  // Appel pour récupérer les données de la condition (préremplit les champs)
+  // Lecture des données de la condition via getClaimConditionById
   const {
     data: claimData,
     isPending: isClaimPending,
@@ -70,23 +70,24 @@ export default function ClaimConditionFormERC1155({
     params: [tokenId, conditionId],
   });
 
-  // Dès que claimData est disponible, on met à jour les états du formulaire.
+  // Dès que claimData est disponible, préremplit les champs du formulaire
   useEffect(() => {
     if (claimData) {
       setMaxClaimableSupply(claimData.maxClaimableSupply.toString());
       setMaxClaimablePerWallet(claimData.quantityLimitPerWallet.toString());
-      setCurrencyAddress(claimData.currency);
+      setCurrency(claimData.currency);
       setPrice(claimData.pricePerToken.toString());
       if (claimData.startTimestamp) {
         const date = new Date(Number(claimData.startTimestamp) * 1000);
         setStartDate(date.toISOString().slice(0, 16));
       }
       setMetadata(claimData.metadata || "");
-      // Si votre contrat retourne aussi une overrideList, l'intégrer ici si nécessaire :
+      // Si votre contrat renvoie une overrideList, l'intégrer ici si besoin :
       // setOverrideList(claimData.overrideList || []);
     }
   }, [claimData]);
 
+  // Fonctions de gestion de l'overrideList
   const addAddress = () => {
     setOverrideList([
       ...overrideList,
@@ -110,28 +111,30 @@ export default function ClaimConditionFormERC1155({
     setOverrideList(updatedList);
   };
 
+  // Envoi de la transaction pour mettre à jour la condition de claim
   const handleSubmit = async () => {
-    if (
-      !smartAccount ||
-      smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()
-    ) {
+    if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
     try {
-      // Construction de l'objet condition conforme à la signature attendue.
+      // Construction de l'objet condition en respectant la signature attendue par le contrat ERC1155
       const condition = {
-        startTimestamp: BigInt(
-          Math.floor(new Date(startDate).getTime() / 1000)
-        ),
+        // startTimestamp en secondes (BigInt)
+        startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
         maxClaimableSupply: BigInt(maxClaimableSupply),
         supplyClaimed: 0n,
         quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
+        // Calcul du merkleRoot : ici on utilise la valeur par défaut (assertion pour le typage littéral)
         merkleRoot:
           "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
-        pricePerToken: BigInt(Math.floor(parseFloat(price) * 1e18)),
-        currency: currencyAddress,
+        // Conversion précise du prix en wei à l'aide d'ethers
+        pricePerToken: toWei(price),
+        currency: currency,
         metadata: metadata,
+        // Si votre contrat accepte explicitement overrideList dans la condition, 
+        // ajoutez-le ici. Sinon, la gestion de l'overrideList peut être effectuée via un Merkle tree.
+        // overrideList,  // Par exemple, si le contrat a été adapté pour recevoir overrideList.
       };
 
       const transaction = prepareContractCall({
@@ -154,12 +157,11 @@ export default function ClaimConditionFormERC1155({
         Définir les conditions de Claim (ERC1155)
       </h2>
 
-      {(isActivePending || isClaimPending) && (
-        <p>Chargement des conditions...</p>
-      )}
+      {(isActivePending || isClaimPending) && <p>Chargement des conditions...</p>}
       {(activeError || claimError) && (
         <p className="text-red-500">
-          Erreur: {(activeError && activeError.message) ||
+          Erreur:{" "}
+          {(activeError && activeError.message) ||
             (claimError && claimError.message)}
         </p>
       )}
@@ -197,8 +199,8 @@ export default function ClaimConditionFormERC1155({
         <input
           type="text"
           placeholder="Currency Address"
-          value={currencyAddress}
-          onChange={(e) => setCurrencyAddress(e.target.value)}
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
           className="w-full p-2 bg-gray-800 rounded text-white"
         />
       </div>
@@ -241,7 +243,7 @@ export default function ClaimConditionFormERC1155({
         />
       </div>
 
-      {/* Gestion de overrideList pour l'UI */}
+      {/* Gestion de l'overrideList pour l'UI */}
       {overrideList.map((entry, index) => (
         <div
           key={index}
@@ -255,7 +257,9 @@ export default function ClaimConditionFormERC1155({
               type="text"
               placeholder="Adresse"
               value={entry.address}
-              onChange={(e) => handleChange(index, "address", e.target.value)}
+              onChange={(e) =>
+                handleChange(index, "address", e.target.value)
+              }
               className="p-2 bg-gray-700 rounded text-white"
             />
           </div>
@@ -281,7 +285,9 @@ export default function ClaimConditionFormERC1155({
               type="text"
               placeholder="Price (en ETH/MATIC)"
               value={entry.price}
-              onChange={(e) => handleChange(index, "price", e.target.value)}
+              onChange={(e) =>
+                handleChange(index, "price", e.target.value)
+              }
               className="p-2 bg-gray-700 rounded text-white"
             />
           </div>

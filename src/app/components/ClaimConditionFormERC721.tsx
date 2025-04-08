@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { setClaimConditions as setClaimConditionsERC721 } from "thirdweb/extensions/erc721";
+import { setClaimConditions } from "thirdweb/extensions/erc721";
 import { ContractOptions, sendTransaction } from "thirdweb";
 import { useActiveAccount } from "thirdweb/react";
 import { nftpPubKey } from "../constants";
@@ -66,7 +66,7 @@ export default function ClaimConditionFormERC721({
     }
 
     try {
-      const transaction = setClaimConditionsERC721({
+      const transaction = setClaimConditions({
         contract,
         phases: [
           {
