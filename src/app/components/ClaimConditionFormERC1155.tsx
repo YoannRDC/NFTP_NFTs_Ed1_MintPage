@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { setClaimConditions } from "thirdweb/extensions/erc1155";
 import { ContractOptions, sendTransaction } from "thirdweb";
-import { useActiveAccount } from "thirdweb/react";
+import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { nftpPubKey } from "../constants";
 
 interface ClaimConditionFormERC1155Props {
@@ -27,10 +27,54 @@ export default function ClaimConditionFormERC1155({
   // États pour les champs généraux du formulaire
   const [maxClaimableSupply, setMaxClaimableSupply] = useState("");
   const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("");
-  const [currencyAddress, setCurrencyAddress] = useState("");
+  const [currency, setCurrency] = useState("");
   const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
   const [metadata, setMetadata] = useState("");
+
+    // Récupération du conditionId actif pour le token via getActiveClaimConditionId
+    const {
+      data: activeConditionData,
+      isPending: isActivePending,
+      error: activeError,
+    } = useReadContract({
+      contract,
+      method: "function getActiveClaimConditionId(uint256 _tokenId) view returns (uint256)",
+      params: [tokenId],
+    });
+  
+    // Utilisation du conditionId récupéré ; s'il n'est pas trouvé, on utilise 0n par défaut
+    const conditionId: bigint = activeConditionData
+      ? BigInt(activeConditionData.toString())
+      : 0n;
+  
+    // Lecture des données de la condition via getClaimConditionById (sans overrideList)
+    const {
+      data: claimData,
+      isPending: isClaimPending,
+      error: claimError,
+    } = useReadContract({
+      contract,
+      method:
+        "function getClaimConditionById(uint256 _tokenId, uint256 _conditionId) view returns ((uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata) condition)",
+      params: [tokenId, conditionId],
+    });
+  
+    // Préremplissage des champs dès que claimData est disponible (sans overrideList)
+    useEffect(() => {
+      if (claimData) {
+        setMaxClaimableSupply(claimData.maxClaimableSupply.toString());
+        setMaxClaimablePerWallet(claimData.quantityLimitPerWallet.toString());
+        setCurrency(claimData.currency);
+        setPrice(claimData.pricePerToken.toString());
+        if (claimData.startTimestamp) {
+          const date = new Date(Number(claimData.startTimestamp) * 1000);
+          setStartDate(date.toISOString().slice(0, 16));
+        }
+        setMetadata(claimData.metadata || "");
+        // Ne pas mettre overrideList depuis claimData puisque nous voulons utiliser uniquement les entrées saisies via le formulaire.
+      }
+    }, [claimData]);
 
   // Mise à jour de l'overrideList si des valeurs initiales sont fournies
   useEffect(() => {
@@ -73,7 +117,7 @@ export default function ClaimConditionFormERC1155({
           {
             maxClaimableSupply: BigInt(maxClaimableSupply),
             maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-            currencyAddress,
+            currencyAddress:currency,
             price: parseFloat(price),
             startTime: new Date(startDate),
             overrideList,
@@ -121,8 +165,8 @@ export default function ClaimConditionFormERC1155({
         <input
           type="text"
           placeholder="Currency Address"
-          value={currencyAddress}
-          onChange={(e) => setCurrencyAddress(e.target.value)}
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
           className="w-full p-2 bg-gray-800 rounded text-white"
         />
       </div>
