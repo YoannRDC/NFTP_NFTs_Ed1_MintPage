@@ -134,7 +134,7 @@ export default function ClaimConditionFormERC1155({
         metadata: metadata,
         // Si votre contrat accepte explicitement overrideList dans la condition, 
         // ajoutez-le ici. Sinon, la gestion de l'overrideList peut être effectuée via un Merkle tree.
-        // overrideList,  // Par exemple, si le contrat a été adapté pour recevoir overrideList.
+        overrideList,  // Par exemple, si le contrat a été adapté pour recevoir overrideList.
       };
 
       const transaction = prepareContractCall({
