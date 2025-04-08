@@ -29,20 +29,41 @@ export default function ClaimConditionFormERC1155({
   const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("");
   const [currencyAddress, setCurrencyAddress] = useState("");
   const [price, setPrice] = useState("");
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
   const [metadata, setMetadata] = useState("");
 
-  // Mise à jour de overrideList depuis initialOverrides (si fourni)
+  // MàJ de overrideList depuis initialOverrides (si fourni)
   useEffect(() => {
     if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
     }
   }, [initialOverrides]);
 
-  // Utilisation de useReadContract pour récupérer la condition de claim via getClaimConditionById.
-  // On utilise conditionId en tant que bigint grâce à "0n".
-  const conditionId: bigint = 0n;
-  const { data: claimData, isPending, error } = useReadContract({
+  // Appel pour récupérer le conditionId actif via getActiveClaimConditionId
+  const {
+    data: activeConditionData,
+    isPending: isActivePending,
+    error: activeError,
+  } = useReadContract({
+    contract,
+    method:
+      "function getActiveClaimConditionId(uint256 _tokenId) view returns (uint256)",
+    params: [tokenId],
+  });
+
+  // Détermine le conditionId à utiliser (on le convertit en bigint)
+  const conditionId: bigint = activeConditionData
+    ? BigInt(activeConditionData.toString())
+    : 0n;
+
+  // Appel pour récupérer les données de la condition (préremplit les champs)
+  const {
+    data: claimData,
+    isPending: isClaimPending,
+    error: claimError,
+  } = useReadContract({
     contract,
     method:
       "function getClaimConditionById(uint256 _tokenId, uint256 _conditionId) view returns ((uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata) condition)",
@@ -67,7 +88,10 @@ export default function ClaimConditionFormERC1155({
   }, [claimData]);
 
   const addAddress = () => {
-    setOverrideList([...overrideList, { address: "", maxClaimable: "1", price: "0" }]);
+    setOverrideList([
+      ...overrideList,
+      { address: "", maxClaimable: "1", price: "0" },
+    ]);
   };
 
   const removeAddress = (index: number) => {
@@ -87,18 +111,24 @@ export default function ClaimConditionFormERC1155({
   };
 
   const handleSubmit = async () => {
-    if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
+    if (
+      !smartAccount ||
+      smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()
+    ) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
     try {
-      // Construction de l'objet condition conforme à la signature du contrat.
+      // Construction de l'objet condition conforme à la signature attendue.
       const condition = {
-        startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
+        startTimestamp: BigInt(
+          Math.floor(new Date(startDate).getTime() / 1000)
+        ),
         maxClaimableSupply: BigInt(maxClaimableSupply),
         supplyClaimed: 0n,
         quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
-        merkleRoot: "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
+        merkleRoot:
+          "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
         pricePerToken: BigInt(Math.floor(parseFloat(price) * 1e18)),
         currency: currencyAddress,
         metadata: metadata,
@@ -120,13 +150,24 @@ export default function ClaimConditionFormERC1155({
 
   return (
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white mt-6">
-      <h2 className="text-xl font-semibold mb-4">Définir les conditions de Claim (ERC1155)</h2>
-      
-      {isPending && <p>Chargement des conditions...</p>}
-      {error && <p className="text-red-500">Erreur: {error.message}</p>}
+      <h2 className="text-xl font-semibold mb-4">
+        Définir les conditions de Claim (ERC1155)
+      </h2>
+
+      {(isActivePending || isClaimPending) && (
+        <p>Chargement des conditions...</p>
+      )}
+      {(activeError || claimError) && (
+        <p className="text-red-500">
+          Erreur: {(activeError && activeError.message) ||
+            (claimError && claimError.message)}
+        </p>
+      )}
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-300">Max Claimable Supply</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Max Claimable Supply
+        </label>
         <input
           type="text"
           placeholder="Max Claimable Supply"
@@ -137,7 +178,9 @@ export default function ClaimConditionFormERC1155({
       </div>
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-300">Max Claimable Per Wallet</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Max Claimable Per Wallet
+        </label>
         <input
           type="text"
           placeholder="Max Claimable Per Wallet"
@@ -148,7 +191,9 @@ export default function ClaimConditionFormERC1155({
       </div>
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-300">Currency Address</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Currency Address
+        </label>
         <input
           type="text"
           placeholder="Currency Address"
@@ -159,7 +204,9 @@ export default function ClaimConditionFormERC1155({
       </div>
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-300">Price (en ETH/MATIC)</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Price (en ETH/MATIC)
+        </label>
         <input
           type="text"
           placeholder="Price (en ETH/MATIC)"
@@ -170,7 +217,9 @@ export default function ClaimConditionFormERC1155({
       </div>
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-300">Start Date</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Start Date
+        </label>
         <input
           type="datetime-local"
           value={startDate}
@@ -180,7 +229,9 @@ export default function ClaimConditionFormERC1155({
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-300">Metadata URI</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Metadata URI
+        </label>
         <input
           type="text"
           placeholder="Metadata URI"
@@ -190,11 +241,16 @@ export default function ClaimConditionFormERC1155({
         />
       </div>
 
-      {/* Gestion de overrideList pour l'UI (non inclus dans le struct envoyé) */}
+      {/* Gestion de overrideList pour l'UI */}
       {overrideList.map((entry, index) => (
-        <div key={index} className="flex flex-col gap-2 mb-4 bg-gray-800 p-3 rounded-lg">
+        <div
+          key={index}
+          className="flex flex-col gap-2 mb-4 bg-gray-800 p-3 rounded-lg"
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-300">Adresse</label>
+            <label className="block text-sm font-medium text-gray-300">
+              Adresse
+            </label>
             <input
               type="text"
               placeholder="Adresse"
@@ -204,17 +260,23 @@ export default function ClaimConditionFormERC1155({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300">Max Claimable</label>
+            <label className="block text-sm font-medium text-gray-300">
+              Max Claimable
+            </label>
             <input
               type="text"
               placeholder="Max Claimable"
               value={entry.maxClaimable}
-              onChange={(e) => handleChange(index, "maxClaimable", e.target.value)}
+              onChange={(e) =>
+                handleChange(index, "maxClaimable", e.target.value)
+              }
               className="p-2 bg-gray-700 rounded text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300">Price (en ETH/MATIC)</label>
+            <label className="block text-sm font-medium text-gray-300">
+              Price (en ETH/MATIC)
+            </label>
             <input
               type="text"
               placeholder="Price (en ETH/MATIC)"
