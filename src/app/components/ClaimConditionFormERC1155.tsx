@@ -6,7 +6,6 @@ import { prepareContractCall, toWei } from "thirdweb";
 import { ContractOptions } from "thirdweb";
 import { nftpPubKey } from "../constants";
 import { useActiveAccount } from "thirdweb/react";
-
 import { ethers } from "ethers";
 import { MerkleTree } from "merkletreejs";
 import keccak256 from "keccak256";
@@ -17,16 +16,19 @@ interface ClaimConditionFormERC1155Props {
   tokenId: bigint;
 }
 
-// Fonction pour calculer le Merkle root à partir de l'overrideList
-function computeMerkleRoot(allowList: { address: string; maxClaimable: string; price: string }[]): `0x${string}` {
+// Fonction pour calculer le Merkle root à partir des entrées du formulaire
+function computeMerkleRoot(
+  allowList: { address: string; maxClaimable: string; price: string }[]
+): `0x${string}` {
   if (allowList.length === 0) {
     return "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
   }
+  // Concatène les valeurs de chaque entrée : adaptez la logique de concaténation selon vos besoins précis
   const leaves = allowList.map(item =>
     keccak256(item.address.toLowerCase() + item.maxClaimable + item.price)
   );
   const tree = new MerkleTree(leaves, keccak256, { sort: true });
-  return "0x" + tree.getRoot().toString('hex') as `0x${string}`;
+  return ("0x" + tree.getRoot().toString("hex")) as `0x${string}`;
 }
 
 export default function ClaimConditionFormERC1155({
@@ -37,7 +39,7 @@ export default function ClaimConditionFormERC1155({
   const smartAccount = useActiveAccount();
   const { mutate: sendTransaction } = useSendTransaction();
 
-  // États pour l'overrideList
+  // États pour la gestion de l'overrideList (pour l'UI uniquement)
   const [overrideList, setOverrideList] = useState<
     { address: string; maxClaimable: string; price: string }[]
   >(initialOverrides);
@@ -50,6 +52,7 @@ export default function ClaimConditionFormERC1155({
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
   const [metadata, setMetadata] = useState("");
 
+  // Si initialOverrides change, on met à jour overrideList (pour l'UI)
   useEffect(() => {
     if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
@@ -72,7 +75,7 @@ export default function ClaimConditionFormERC1155({
     ? BigInt(activeConditionData.toString())
     : 0n;
 
-  // Lecture des données de la condition via getClaimConditionById
+  // Lecture des données de la condition via getClaimConditionById (sans overrideList)
   const {
     data: claimData,
     isPending: isClaimPending,
@@ -84,7 +87,7 @@ export default function ClaimConditionFormERC1155({
     params: [tokenId, conditionId],
   });
 
-  // Dès que claimData est disponible, préremplit les champs du formulaire
+  // Préremplissage des champs dès que claimData est disponible (sans overrideList)
   useEffect(() => {
     if (claimData) {
       setMaxClaimableSupply(claimData.maxClaimableSupply.toString());
@@ -96,11 +99,11 @@ export default function ClaimConditionFormERC1155({
         setStartDate(date.toISOString().slice(0, 16));
       }
       setMetadata(claimData.metadata || "");
-      // Utilisation d'une assertion de type pour récupérer éventuellement overrideList
-      setOverrideList((claimData as any).overrideList || []);
+      // Ne pas mettre overrideList depuis claimData puisque nous voulons utiliser uniquement les entrées saisies via le formulaire.
     }
   }, [claimData]);
 
+  // Fonctions de gestion de l'overrideList (UI)
   const addAddress = () => {
     setOverrideList([
       ...overrideList,
@@ -124,6 +127,7 @@ export default function ClaimConditionFormERC1155({
     setOverrideList(updatedList);
   };
 
+  // Envoi de la transaction pour mettre à jour la condition de claim
   const handleSubmit = async () => {
     if (
       !smartAccount ||
@@ -133,21 +137,20 @@ export default function ClaimConditionFormERC1155({
       return;
     }
     try {
-      // Calcul du Merkle root à partir de l'overrideList
+      // Calcul du Merkle root à partir de l'overrideList saisie via le formulaire
       const computedMerkleRoot = computeMerkleRoot(overrideList);
-  
+
       const condition = {
         startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
         maxClaimableSupply: BigInt(maxClaimableSupply),
         supplyClaimed: 0n,
         quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
         merkleRoot: computedMerkleRoot,
-        // Conversion précise du prix en wei à l'aide d'ethers (ou toWei, si c'est une fonction équivalente)
         pricePerToken: toWei(price),
         currency: currency,
         metadata: metadata,
       };
-  
+
       const transaction = prepareContractCall({
         contract,
         method:
@@ -254,6 +257,7 @@ export default function ClaimConditionFormERC1155({
         />
       </div>
 
+      {/* Affichage de l'overrideList pour l'UI */}
       {overrideList.map((entry, index) => (
         <div
           key={index}
