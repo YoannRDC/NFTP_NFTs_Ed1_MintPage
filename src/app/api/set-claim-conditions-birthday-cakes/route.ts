@@ -100,9 +100,13 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("Erreur lors de la définition des claim conditions :", error);
-    return NextResponse.json(
-      { error: "Internal server error: " + error.message },
-      { status: 500 }
-    );
+    const fullError = {
+      message: error.message,
+      stack: error.stack,
+    };
+    return new NextResponse(JSON.stringify({ error: fullError }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
