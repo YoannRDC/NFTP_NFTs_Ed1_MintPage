@@ -16,6 +16,8 @@ import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 import MailchimpAccount from "../components/MailchimpAccount";
 
+// Note: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0" contient {"name":"Public (With Allowlist) phase"} et peut être utilisé part tous les contrat.
+
 const contractsInfo = {
   nftpNftsEd1: {
     address: "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9",
@@ -26,21 +28,21 @@ const contractsInfo = {
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
-    metadataURI: "",
+    metadataURI: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 80002,
     contractType: "erc1155drop" as const,
   },
   artcards: {
     address: "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47",
     metadataURI:
-      "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0",
+      "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0", // TBC
     chainId: 137,
     contractType: "erc721transfert" as const,
   },
   birthdayCakes: {
     address: "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf",
     metadataURI:
-      "ipfs://QmRVt3U9TqGZVBSJbis48YTVLb1smqXGo7jztAQBGnKmrh",
+      "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
     contractType: "erc1155drop" as const,
   }
@@ -161,7 +163,7 @@ const AdminPage: React.FC = () => {
   const fetchNextTokenId = async () => {
     try {
       const data: bigint = await readContract({
-        contract: fragChroEd1Contract,
+        contract: selectedContract,
         method: "function nextTokenIdToMint() view returns (uint256)",
         params: [],
       });
@@ -185,7 +187,7 @@ const AdminPage: React.FC = () => {
     } else {
       setErc1155Tokens([]);
     }
-  }, [selectedContractType]);
+  }, [selectedContractType, selectedContract]);
 
   // Fonction d'appel à l'API pour définir les claim conditions des Birthday Cakes
   const handleSetClaimConditions = async () => {
