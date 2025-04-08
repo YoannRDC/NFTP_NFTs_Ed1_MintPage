@@ -6,10 +6,26 @@ import {
   getContract,
   prepareContractCall,
   sendTransaction,
-  toWei,
+		
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { polygon } from "thirdweb/chains";
+import { MerkleTree } from "merkletreejs";
+import keccak256 from "keccak256";
+
+
+// Fonction pour calculer le Merkle root à partir d'une liste d'allowList
+function computeMerkleRoot(
+  allowList: { address: string; maxClaimable: string; price: string }[]
+): `0x${string}` {
+  if (allowList.length === 0) {
+    return "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
+  }
+  const leaves = allowList.map(item =>
+    keccak256(item.address.toLowerCase() + item.maxClaimable + item.price)
+  );
+  const tree = new MerkleTree(leaves, keccak256, { sort: true });
+  return ("0x" + tree.getRoot().toString("hex")) as `0x${string}`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +33,7 @@ export async function POST(req: NextRequest) {
     const CONTRACT_ADDRESS = "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf";
     const THIRDWEB_API_SECRET_KEY = process.env.THIRDWEB_API_SECRET_KEY;
     const PRIVATE_KEY = process.env.PRIVATE_KEY_BIRTHDAY_CAKES;
-    // Par défaut, on utilise la chaîne Polygon (id 137)
+    // On utilise la chaîne Polygon (id 137)
     const CHAIN_ID = process.env.CHAIN_ID || "137";
 
     if (!CONTRACT_ADDRESS || !THIRDWEB_API_SECRET_KEY || !PRIVATE_KEY) {
@@ -27,71 +43,81 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Création du client Thirdweb via la secret key
+    // Création du client Thirdweb
     const client = createThirdwebClient({ secretKey: THIRDWEB_API_SECRET_KEY });
-    console.log("Client créé avec l'id :", client.clientId);
+    console.log("Client créé avec l'id:", client.clientId);
 
-    // Définition de la chaîne
+								
     const chain = defineChain(Number(CHAIN_ID));
 
-    // Récupération du contrat NFT sur la chaîne spécifiée
+															   
     const nftContract = getContract({
       client,
       chain,
       address: CONTRACT_ADDRESS,
     });
 
-    // Création du compte temporaire à partir de la clé privée
+																  
     const account = privateKeyToAccount({ client, privateKey: PRIVATE_KEY });
-    console.log("Compte temporaire utilisé :", account.address);
+    console.log("Compte temporaire utilisé:", account.address);
 
-    // Constante représentant la valeur "unlimited" pour un uint256
-    const UNLIMITED = BigInt(
-      "10000000000000"
-    );
+    // Valeurs statiques à utiliser pour définir les conditions
+    const maxClaimableSupply = "1000000";
+								  
+													 
+														   
+    const maxClaimablePerWallet = "1000000";
+    const currency = "";
+		   
+															   
+						 
+							
+			   
+    const price = "50"; // en POL
+    const startDate = "2025-04-08T16:40:00"; // format ISO
+    const metadata = "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0";
 
-    // Préparation de la metadata pour l'allowList
-    const allowListMetadata = JSON.stringify({
-      allowList: [
-        {
-          address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
-          maxClaimable: 10,
-          price: "0",
-          currencyAddress: "0x0000000000000000000000000000000000000000",
-        },
-      ],
-    });
-
-    // Définition des claim conditions avec les types attendus (bigint pour les valeurs numériques)
-    const conditions = [
+    // AllowList avec un seul élément
+    const allowList = [
       {
-        startTimestamp: BigInt(Math.floor(Date.now() / 1000)), // timestamp en secondes
-        maxClaimableSupply: UNLIMITED, // valeur "unlimited"
-        supplyClaimed: 0n, // aucun NFT déjà claimé
-        quantityLimitPerWallet: UNLIMITED, // pas de limite par wallet
-        merkleRoot:
-          "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
-        pricePerToken: toWei("100"), // 100 POL converti en wei (bigint)
-        currency: "0x0000000000000000000000000000000000000000",
-        metadata: allowListMetadata, // informations d'allowList encodées en JSON
+        address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
+        maxClaimable: "1000000",
+        price: "0",
       },
     ];
 
+    // Calcul du Merkle root à partir de la allowList
+    const computedMerkleRoot = computeMerkleRoot(allowList);
+    console.log("Merkle Root calculé:", computedMerkleRoot);
+
+    // Construction du tableau de conditions (un seul objet dans le tableau)
+    const conditions = [
+      {
+        startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
+        maxClaimableSupply: BigInt(maxClaimableSupply),
+        supplyClaimed: 0n,
+        quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
+        merkleRoot: computedMerkleRoot,
+        // Conversion de price (saisie en POL) en wei, puis en BigInt
+        pricePerToken: BigInt(Math.floor(parseFloat(price) * 1e18)),
+        currency: currency,
+        metadata: metadata,
+      },
+    ];
+	  						 
     const resetClaimEligibility = true;
 
-    // Tableau pour collecter les résultats de chaque transaction
+    // Exemple : envoi de la transaction pour tokenIds de 0 à 5 (adapter selon vos besoins)
     const results: { tokenId: bigint; transactionHash: string }[] = [];
 
-    // Boucle sur les tokenIds de 0 à 122
-    for (let tokenId = 0; tokenId <= 5; tokenId++) {
-      console.log(`Définition des conditions de claim pour tokenId: ${tokenId}`);
-      // Conversion de tokenId en bigint pour respecter le type attendu
-      const tokenIdBig = BigInt(tokenId);
+																				  
+    for (let tokenIdNum = 0; tokenIdNum <= 2; tokenIdNum++) {
+      console.log(`Définition des conditions de claim pour tokenId: ${tokenIdNum}`);
+      const tokenIdBig = BigInt(tokenIdNum);
 
-      const transaction = await prepareContractCall({
+      const transaction = prepareContractCall({
         contract: nftContract,
-        method:
-          "function setClaimConditions(uint256 _tokenId, (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)[] _conditions, bool _resetClaimEligibility)",
+        method: "function setClaimConditions(uint256 _tokenId, (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)[] _conditions, bool _resetClaimEligibility)",
         params: [tokenIdBig, conditions, resetClaimEligibility],
       });
 
@@ -101,12 +127,9 @@ export async function POST(req: NextRequest) {
       });
 
       results.push({ tokenId: tokenIdBig, transactionHash });
-      console.log(
-        `Transaction envoyée pour tokenId ${tokenId}: ${transactionHash}`
-      );
+      console.log(`Transaction envoyée pour tokenId ${tokenIdNum}: ${transactionHash}`);
     }
 
-    // Convertir les BigInt en string pour la sérialisation JSON
     const serializedResults = results.map((item) => ({
       tokenId: item.tokenId.toString(),
       transactionHash: item.transactionHash,

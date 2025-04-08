@@ -228,46 +228,6 @@ const AdminPage: React.FC = () => {
         />
       </div>
 
-      {/* Bouton pour définir les claim conditions des Birthday Cakes */}
-      {isAdmin && (
-        <div className="my-4">
-          <p>!! Bouton pour définir les claim conditions des Birthday Cakes !! triggers automatically</p>
-          <button
-            onClick={handleSetClaimConditions}
-            disabled={settingConditions}
-            className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-transform transform hover:scale-105"
-          >
-            {settingConditions ? "Setting Conditions..." : "Set Claim Conditions for Birthday Cakes"}
-          </button>
-          {conditionsResult && (
-            <pre className="mt-2 p-2 bg-gray-100 text-black">
-              {JSON.stringify(conditionsResult, null, 2)}
-            </pre>
-          )}
-          {conditionsError && (
-            <p className="mt-2 text-red-500">Erreur: {conditionsError}</p>
-          )}
-        </div>
-      )}
-
-      {/* Affichage de la liste des merge fields */}
-      {isAdmin && (
-        <div className="my-4 p-4 border rounded w-full max-w-md">
-          <h2 className="text-xl font-bold mb-2">Liste des merge fields</h2>
-          {mergeFields.length > 0 ? (
-            <ul>
-              {mergeFields.map((field, index) => (
-                <li key={field.tag || index}>
-                  <span className="font-bold">{field.name}</span> (Tag: {field.tag}) - Type: {field.type}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Aucun merge field trouvé.</p>
-          )}
-        </div>
-      )}
-
       {isAdmin && <MailchimpAccount />}
 
       {isAdmin && (
@@ -334,6 +294,28 @@ const AdminPage: React.FC = () => {
             )}
           </>
         )}
+
+      {/* Bouton pour définir les claim conditions des Birthday Cakes */}
+      {isAdmin && selectedContractKey === "birthdayCakes" && (
+        <div className="my-4">
+          <p>!! Bouton pour définir les claim conditions des Birthday Cakes !! triggers automatically</p>
+          <button
+            onClick={handleSetClaimConditions}
+            disabled={settingConditions}
+            className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-transform transform hover:scale-105"
+          >
+            {settingConditions ? "Setting Conditions..." : "Set Claim Conditions for Birthday Cakes"}
+          </button>
+          {conditionsResult && (
+            <pre className="mt-2 p-2 bg-gray-100 text-black">
+              {JSON.stringify(conditionsResult, null, 2)}
+            </pre>
+          )}
+          {conditionsError && (
+            <p className="mt-2 text-red-500">Erreur: {conditionsError}</p>
+          )}
+        </div>
+      )}
 
       {isAdmin && selectedContractType === "erc1155drop" && (
         <div className="erc1155-section mt-10">
