@@ -1,36 +1,70 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { setClaimConditions as setClaimConditionsERC721 } from "thirdweb/extensions/erc721";
-import { setClaimConditions as setClaimConditionsERC1155 } from "thirdweb/extensions/erc1155";
-import { ContractOptions, sendTransaction } from "thirdweb";
-import { useActiveAccount } from "thirdweb/react";
+import { useReadContract, useSendTransaction } from "thirdweb/react";
+import { prepareContractCall } from "thirdweb";
+import { ContractOptions } from "thirdweb";
 import { nftpPubKey } from "../constants";
+import { useActiveAccount } from "thirdweb/react";
 
-interface ClaimConditionFormProps {
+interface ClaimConditionFormERC1155Props {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert"; // nouveau paramètre
-  tokenId?: bigint;
+  tokenId: bigint;
 }
 
-export default function ClaimConditionForm({ contract, initialOverrides = [], contractType, tokenId }: ClaimConditionFormProps) {
+export default function ClaimConditionFormERC1155({
+  contract,
+  initialOverrides = [],
+  tokenId,
+}: ClaimConditionFormERC1155Props) {
   const smartAccount = useActiveAccount();
-  const [overrideList, setOverrideList] = useState<{ address: string; maxClaimable: string; price: string }[]>([]);
+  const { mutate: sendTransaction } = useSendTransaction();
 
-  // Champs généraux avec des valeurs par défaut
+  // États pour les champs du formulaire
+  const [overrideList, setOverrideList] = useState<
+    { address: string; maxClaimable: string; price: string }[]
+  >([]);
   const [maxClaimableSupply, setMaxClaimableSupply] = useState("");
   const [maxClaimablePerWallet, setMaxClaimablePerWallet] = useState("");
   const [currencyAddress, setCurrencyAddress] = useState("");
   const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
-  const [metadata, setMetadata] = useState(""); // ex: ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0
+  const [metadata, setMetadata] = useState("");
 
+  // Mise à jour de overrideList depuis initialOverrides (si fourni)
   useEffect(() => {
     if (initialOverrides?.length > 0) {
       setOverrideList(initialOverrides);
     }
   }, [initialOverrides]);
+
+  // Utilisation de useReadContract pour récupérer la condition de claim via getClaimConditionById.
+  // On utilise conditionId en tant que bigint grâce à "0n".
+  const conditionId: bigint = 0n;
+  const { data: claimData, isPending, error } = useReadContract({
+    contract,
+    method:
+      "function getClaimConditionById(uint256 _tokenId, uint256 _conditionId) view returns ((uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata) condition)",
+    params: [tokenId, conditionId],
+  });
+
+  // Dès que claimData est disponible, on met à jour les états du formulaire.
+  useEffect(() => {
+    if (claimData) {
+      setMaxClaimableSupply(claimData.maxClaimableSupply.toString());
+      setMaxClaimablePerWallet(claimData.quantityLimitPerWallet.toString());
+      setCurrencyAddress(claimData.currency);
+      setPrice(claimData.pricePerToken.toString());
+      if (claimData.startTimestamp) {
+        const date = new Date(Number(claimData.startTimestamp) * 1000);
+        setStartDate(date.toISOString().slice(0, 16));
+      }
+      setMetadata(claimData.metadata || "");
+      // Si votre contrat retourne aussi une overrideList, l'intégrer ici si nécessaire :
+      // setOverrideList(claimData.overrideList || []);
+    }
+  }, [claimData]);
 
   const addAddress = () => {
     setOverrideList([...overrideList, { address: "", maxClaimable: "1", price: "0" }]);
@@ -42,73 +76,54 @@ export default function ClaimConditionForm({ contract, initialOverrides = [], co
     setOverrideList(updatedList);
   };
 
-  const handleChange = (index: number, field: "address" | "maxClaimable" | "price", value: string) => {
+  const handleChange = (
+    index: number,
+    field: "address" | "maxClaimable" | "price",
+    value: string
+  ) => {
     const updatedList = [...overrideList];
     updatedList[index][field] = value;
     setOverrideList(updatedList);
   };
 
   const handleSubmit = async () => {
-    console.log("smartAccount.address.toLowerCase():", smartAccount!.address.toLowerCase());
-    console.log("nftpPubKey.toLowerCase():", nftpPubKey.toLowerCase());
-    console.log("contractType:", contractType);
     if (!smartAccount || smartAccount.address.toLowerCase() !== nftpPubKey.toLowerCase()) {
       alert("Seul l'administrateur peut effectuer cette action.");
       return;
     }
-
     try {
-      let transaction;
-      if (contractType === "erc721drop" || contractType === "erc721transfert") {
-        transaction = setClaimConditionsERC721({
-          contract: contract,
-          phases: [
-            {
-              maxClaimableSupply: BigInt(maxClaimableSupply),
-              maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-              currencyAddress,
-              price: parseFloat(price),
-              startTime: new Date(startDate),
-              overrideList,
-              metadata,
-            },
-          ],
-        });
-      } else if (contractType === "erc1155drop") {
-        if (tokenId === undefined) {
-          alert("Le tokenId est requis pour un contrat ERC1155.");
-          return;
-        }
-        transaction = setClaimConditionsERC1155({
-          contract: contract,
-          tokenId: tokenId,
-          phases: [
-            {
-              maxClaimableSupply: BigInt(maxClaimableSupply),
-              maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-              currencyAddress,
-              price: parseFloat(price),
-              startTime: new Date(startDate),
-              overrideList,
-              metadata,
-            },
-          ],
-        });
-      } else {
-        throw new Error("Unsupported contract type");
-      }
+      // Construction de l'objet condition conforme à la signature du contrat.
+      const condition = {
+        startTimestamp: BigInt(Math.floor(new Date(startDate).getTime() / 1000)),
+        maxClaimableSupply: BigInt(maxClaimableSupply),
+        supplyClaimed: 0n,
+        quantityLimitPerWallet: BigInt(maxClaimablePerWallet),
+        merkleRoot: "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`,
+        pricePerToken: BigInt(Math.floor(parseFloat(price) * 1e18)),
+        currency: currencyAddress,
+        metadata: metadata,
+      };
 
-      await sendTransaction({ transaction, account: smartAccount });
+      const transaction = prepareContractCall({
+        contract,
+        method:
+          "function setClaimConditions(uint256 _tokenId, (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)[] _conditions, bool _resetClaimEligibility)",
+        params: [tokenId, [condition], false],
+      });
+      sendTransaction(transaction);
       alert("✅ Conditions mises à jour avec succès !");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("❌ Erreur lors de la mise à jour des conditions.");
+      alert("❌ Erreur lors de la mise à jour des conditions: " + error.message);
     }
   };
 
   return (
     <div className="p-4 border border-gray-700 rounded-lg bg-gray-900 text-white mt-6">
-      <h2 className="text-xl font-semibold mb-4">Définir les conditions de Claim</h2>
+      <h2 className="text-xl font-semibold mb-4">Définir les conditions de Claim (ERC1155)</h2>
+      
+      {isPending && <p>Chargement des conditions...</p>}
+      {error && <p className="text-red-500">Erreur: {error.message}</p>}
 
       <div className="mb-2">
         <label className="block text-sm font-medium text-gray-300">Max Claimable Supply</label>
@@ -175,6 +190,7 @@ export default function ClaimConditionForm({ contract, initialOverrides = [], co
         />
       </div>
 
+      {/* Gestion de overrideList pour l'UI (non inclus dans le struct envoyé) */}
       {overrideList.map((entry, index) => (
         <div key={index} className="flex flex-col gap-2 mb-4 bg-gray-800 p-3 rounded-lg">
           <div>
@@ -198,10 +214,10 @@ export default function ClaimConditionForm({ contract, initialOverrides = [], co
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300">Prix (en ETH/MATIC)</label>
+            <label className="block text-sm font-medium text-gray-300">Price (en ETH/MATIC)</label>
             <input
               type="text"
-              placeholder="Prix (en ETH/MATIC)"
+              placeholder="Price (en ETH/MATIC)"
               value={entry.price}
               onChange={(e) => handleChange(index, "price", e.target.value)}
               className="p-2 bg-gray-700 rounded text-white"

@@ -8,13 +8,15 @@ import {
 } from "thirdweb/react";
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
-import ClaimConditionForm from "../components/ClaimConditionForm";
+import ClaimConditionForm from "../components/ClaimConditionFormERC1155";
 import { client, nftpPubKey, getProjectPublicKey, MAILCHIMP_LIST_ID } from "../constants";
 import { inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 import MailchimpAccount from "../components/MailchimpAccount";
+import ClaimConditionFormERC721 from "../components/ClaimConditionFormERC721";
+import ClaimConditionFormERC1155 from "../components/ClaimConditionFormERC1155";
 
 // Note: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0" contient {"name":"Public (With Allowlist) phase"} et peut être utilisé part tous les contrat.
 
@@ -299,7 +301,7 @@ const AdminPage: React.FC = () => {
               onSnapshotFetched={setSnapshotData}
               contract={selectedContract}
             />
-            <ClaimConditionForm
+            <ClaimConditionFormERC721
               initialOverrides={snapshotData}
               contract={selectedContract}
               contractType={selectedContractType}
@@ -364,10 +366,9 @@ const AdminPage: React.FC = () => {
             contract={selectedContract}
             tokenId={selectedERC1155Token}
           />
-          <ClaimConditionForm
+          <ClaimConditionFormERC1155
             initialOverrides={snapshotData}
             contract={selectedContract}
-            contractType={selectedContractType}
             tokenId={selectedERC1155Token}
           />
         </div>
