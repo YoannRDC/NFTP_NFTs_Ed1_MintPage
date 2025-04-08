@@ -66,7 +66,7 @@ export default function ClaimConditionFormERC1155({
         setMaxClaimableSupply(claimData.maxClaimableSupply.toString());
         setMaxClaimablePerWallet(claimData.quantityLimitPerWallet.toString());
         setCurrency(claimData.currency);
-        setPrice(claimData.pricePerToken.toString());
+        setPrice((parseFloat(claimData.pricePerToken.toString()) / 1e18).toString());
         if (claimData.startTimestamp) {
           const date = new Date(Number(claimData.startTimestamp) * 1000);
           setStartDate(date.toISOString().slice(0, 16));
