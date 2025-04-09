@@ -88,6 +88,9 @@ export function getNFTEuroPrice( projectName: string, tokenId: number): number {
   } else if (project === "NMMATHIEU") {
     // Tous les NFTs coutent 30e
     return 30;
+  } else if (project === "HAPPYBIRTHDAYCAKES") {
+    // Tous les NFTs coutent 10e
+    return 10;
   } else {
     throw new Error(`Aucune politique de prix définie pour le projet: ${projectName}`);
   }
