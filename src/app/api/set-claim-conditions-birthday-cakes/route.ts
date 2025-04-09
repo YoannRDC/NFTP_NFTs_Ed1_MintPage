@@ -1,11 +1,9 @@
-// src/app/api/set-claim-conditions-birthday-cakes/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import {
   createThirdwebClient,
   defineChain,
   getContract,
   sendTransaction,
-		
 } from "thirdweb";
 import { setClaimConditions } from "thirdweb/extensions/erc1155";
 import { privateKeyToAccount } from "thirdweb/wallets";
@@ -36,7 +34,7 @@ export async function POST(req: NextRequest) {
       chain,
       address: CONTRACT_ADDRESS,
     });
-		  
+    
     const account = privateKeyToAccount({ client, privateKey: PRIVATE_KEY });
     console.log("Compte temporaire utilisé:", account.address);
 
@@ -57,20 +55,20 @@ export async function POST(req: NextRequest) {
       },
     ];
 
-    // Exemple : envoi de la transaction pour tokenIds de 0 à 5 (adapter selon vos besoins)
-    const results: { tokenId: bigint; transactionHash: string }[] = [];
-																				  
-    for (let tokenIdNum = 3; tokenIdNum <= 70; tokenIdNum++) {
+    // Tableau pour accumuler les promesses des transactions
+    const transactionPromises: Promise<{ tokenId: bigint; transactionHash?: string; error?: string }>[] = [];
+
+    for (let tokenIdNum = 5; tokenIdNum <= 70; tokenIdNum++) {
       const tokenIdBig = BigInt(tokenIdNum);
       console.log(`Définition des conditions de claim pour tokenId: ${tokenIdNum}`);
       const transaction = setClaimConditions({
         contract: nftContract,
-        tokenId: BigInt(tokenIdNum),
+        tokenId: tokenIdBig,
         phases: [
           {
             maxClaimableSupply: BigInt(maxClaimableSupply),
             maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-            currencyAddress:currency,
+            currencyAddress: currency,
             price: parseFloat(price),
             startTime: new Date(startDate),
             overrideList,
@@ -80,19 +78,30 @@ export async function POST(req: NextRequest) {
       });
       console.log(`Transaction ready: ${tokenIdNum}`);
 
-      const { transactionHash } = await sendTransaction({
+      // Lancer la transaction sans attendre son retour dans la boucle
+      const txPromise = sendTransaction({
         transaction,
         account,
-      });
-      console.log(`Transaction sent !`);
+      })
+        .then(({ transactionHash }) => {
+          console.log(`Transaction envoyée pour tokenId ${tokenIdNum}: ${transactionHash}`);
+          return { tokenId: tokenIdBig, transactionHash };
+        })
+        .catch((error) => {
+          console.error(`Erreur pour tokenId ${tokenIdNum}: `, error);
+          return { tokenId: tokenIdBig, error: error.message || "Erreur inconnue" };
+        });
 
-      results.push({ tokenId: tokenIdBig, transactionHash });
-      console.log(`Transaction envoyée pour tokenId ${tokenIdNum}: ${transactionHash}`);
+      transactionPromises.push(txPromise);
     }
+
+    // Attendre que toutes les transactions soient résolues
+    const results = await Promise.all(transactionPromises);
 
     const serializedResults = results.map((item) => ({
       tokenId: item.tokenId.toString(),
       transactionHash: item.transactionHash,
+      ...(item.error && { error: item.error }),
     }));
 
     return NextResponse.json({
@@ -103,7 +112,6 @@ export async function POST(req: NextRequest) {
     console.error("Erreur lors de la définition des claim conditions :", error);
     const fullError = {
       message: error.message,
-      // Vous pouvez inclure d'autres propriétés utiles si nécessaire (par exemple error.stack)
       stack: error.stack,
     };
     return new NextResponse(
@@ -111,5 +119,4 @@ export async function POST(req: NextRequest) {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
-
 }
