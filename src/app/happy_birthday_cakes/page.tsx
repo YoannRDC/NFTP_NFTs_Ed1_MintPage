@@ -319,7 +319,7 @@ function NFTPed1Content() {
             onChange={(e) => setSelectedHundreds(e.target.value)}
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Tous Hundreds</option>
+            <option value="">Hundreds</option>
             {hundredsOptions.map((opt) => (
               <option key={opt} value={opt}>
                 {opt}
@@ -335,7 +335,7 @@ function NFTPed1Content() {
             onChange={(e) => setSelectedTens(e.target.value)}
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Tous Tens</option>
+            <option value="">Tens</option>
             {tensOptions.map((opt) => (
               <option key={opt} value={opt}>
                 {opt}
@@ -351,7 +351,7 @@ function NFTPed1Content() {
             onChange={(e) => setSelectedUnits(e.target.value)}
             className="px-3 py-2 border-2 border-blue-500 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Tous Units</option>
+            <option value="">Units</option>
             {unitsOptions.map((opt) => (
               <option key={opt} value={opt}>
                 {opt}
@@ -376,7 +376,7 @@ function NFTPed1Content() {
         ) : filteredNFTs.length > 0 ? (
           displayedNFTs.map((item) => {
             // On considère que l'édition dans metadata correspond à l'index (édition - 1)
-            const tokenIndex = item.edition - 1;
+            const tokenIndex = item.edition;
             return (
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
                 <ItemERC1155_HBC
