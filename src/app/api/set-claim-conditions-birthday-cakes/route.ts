@@ -8,6 +8,10 @@ import {
 import { setClaimConditions } from "thirdweb/extensions/erc1155";
 import { privateKeyToAccount } from "thirdweb/wallets";
 
+// ********************
+//  This route is called by pythontools/UpdateClaimConditionBirthdayCakes/callBackEndFunc.py
+// ********************
+
 export async function POST(req: NextRequest) {
   try {
     // Extraction des données du corps de la requête

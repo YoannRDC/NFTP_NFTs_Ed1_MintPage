@@ -6,7 +6,7 @@ import {
 } from "thirdweb";
 import { getOwnedTokenIds, isERC721 } from "thirdweb/extensions/erc721";
 
-export type GetERC721sParams = {
+export type GetOwnedERC721Params = {
 	owner: string;
 	// (optional) If pass `100` then the code will limit the RPC requests to 100 requests per second
 	requestPerSec?: number;
@@ -21,21 +21,21 @@ export type GetERC721sParams = {
  *
  * @example
  * // Usage with React
- * const { data, error } = useReadContract(getOwnedERC721s, {
+ * const { data, error } = useReadContract(getOwnedERC721, {
  *	 contract,
  *	 owner: "0x...",
  *	 requestPerSec: 99, // limit RPC reqs to 99 reqs per sec to avoid missing/corrupted data
  * });
  *
  * // Usage with TypeScript
- * const nfts = await getOwnedERC721s({
+ * const nfts = await getOwnedERC721({
  *   contract,
  *   owner: "0x...",
  *   requestPerSec: 99,
  * });
  */
-export async function getOwnedERC721s(
-	options: BaseTransactionOptions<GetERC721sParams>,
+export async function getOwnedERC721(
+	options: BaseTransactionOptions<GetOwnedERC721Params>,
 ): Promise<NFT[]> {
 	const { contract, owner, requestPerSec } = options;
 

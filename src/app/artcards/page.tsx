@@ -7,7 +7,7 @@ import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react
 import { client, getNFTEuroPrice } from "../constants";
 import Link from "next/link";
 
-import { getOwnedERC721s } from "../components/getOwnedERC721s";
+import { getOwnedERC721 } from "../components/getOwnedERC721";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
@@ -65,7 +65,7 @@ function NFTPed1Content() {
       if (!smartAccount?.address) return;
       setIsLoadingNfts(true);
       try {
-        const fetchedNfts = await getOwnedERC721s({
+        const fetchedNfts = await getOwnedERC721({
           contract: contract,
           owner: smartAccount.address,
           requestPerSec: 99,
