@@ -10,6 +10,18 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 
 export async function POST(req: NextRequest) {
   try {
+    // Extraction des données du corps de la requête
+    const body = await req.json();
+    const tokenIdFromRequest = body.tokenId;
+
+    // Vérifier que tokenId est bien présent et est un nombre
+    if (typeof tokenIdFromRequest !== "number") {
+      return NextResponse.json(
+        { error: "Le paramètre 'tokenId' doit être un nombre." },
+        { status: 400 }
+      );
+    }
+
     // Récupération des variables d'environnement
     const CONTRACT_ADDRESS = "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf";
     const THIRDWEB_API_SECRET_KEY = process.env.THIRDWEB_API_SECRET_KEY;
@@ -34,7 +46,7 @@ export async function POST(req: NextRequest) {
       chain,
       address: CONTRACT_ADDRESS,
     });
-    
+
     const account = privateKeyToAccount({ client, privateKey: PRIVATE_KEY });
     console.log("Compte temporaire utilisé:", account.address);
 
@@ -46,7 +58,7 @@ export async function POST(req: NextRequest) {
     const startDate = "2025-04-08T16:40:00"; // format ISO
     const metadata = "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0";
 
-    // AllowList avec un seul élément
+    // AllowList avec un seul élément (optionnel)
     const overrideList = [
       {
         address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
@@ -55,59 +67,38 @@ export async function POST(req: NextRequest) {
       },
     ];
 
-    // Tableau pour accumuler les promesses des transactions
-    const transactionPromises: Promise<{ tokenId: bigint; transactionHash?: string; error?: string }>[] = [];
+    // Traitement du tokenId spécifié dans la requête
+    const tokenIdBig = BigInt(tokenIdFromRequest);
+    console.log(`Définition des conditions de claim pour tokenId: ${tokenIdFromRequest}`);
 
-    for (let tokenIdNum = 5; tokenIdNum <= 70; tokenIdNum++) {
-      const tokenIdBig = BigInt(tokenIdNum);
-      console.log(`Définition des conditions de claim pour tokenId: ${tokenIdNum}`);
-      const transaction = setClaimConditions({
-        contract: nftContract,
-        tokenId: tokenIdBig,
-        phases: [
-          {
-            maxClaimableSupply: BigInt(maxClaimableSupply),
-            maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
-            currencyAddress: currency,
-            price: parseFloat(price),
-            startTime: new Date(startDate),
-            overrideList,
-            metadata,
-          },
-        ],
-      });
-      console.log(`Transaction ready: ${tokenIdNum}`);
+    const transaction = setClaimConditions({
+      contract: nftContract,
+      tokenId: tokenIdBig,
+      phases: [
+        {
+          maxClaimableSupply: BigInt(maxClaimableSupply),
+          maxClaimablePerWallet: BigInt(maxClaimablePerWallet),
+          currencyAddress: currency,
+          price: parseFloat(price),
+          startTime: new Date(startDate),
+          overrideList,
+          metadata,
+        },
+      ],
+    });
 
-      // Lancer la transaction sans attendre son retour dans la boucle
-      const txPromise = sendTransaction({
-        transaction,
-        account,
-      })
-        .then(({ transactionHash }) => {
-          console.log(`Transaction envoyée pour tokenId ${tokenIdNum}: ${transactionHash}`);
-          return { tokenId: tokenIdBig, transactionHash };
-        })
-        .catch((error) => {
-          console.error(`Erreur pour tokenId ${tokenIdNum}: `, error);
-          return { tokenId: tokenIdBig, error: error.message || "Erreur inconnue" };
-        });
+    const txResult = await sendTransaction({
+      transaction,
+      account,
+    });
 
-      transactionPromises.push(txPromise);
-    }
-
-    // Attendre que toutes les transactions soient résolues
-    const results = await Promise.all(transactionPromises);
-
-    const serializedResults = results.map((item) => ({
-      tokenId: item.tokenId.toString(),
-      transactionHash: item.transactionHash,
-      ...(item.error && { error: item.error }),
-    }));
+    console.log(`Transaction envoyée pour tokenId ${tokenIdFromRequest}: ${txResult.transactionHash}`);
 
     return NextResponse.json({
-      message: "Claim conditions définies pour tous les tokens",
-      results: serializedResults,
+      message: `Claim conditions définies pour tokenId ${tokenIdFromRequest}`,
+      transactionHash: txResult.transactionHash,
     });
+
   } catch (error: any) {
     console.error("Erreur lors de la définition des claim conditions :", error);
     const fullError = {
