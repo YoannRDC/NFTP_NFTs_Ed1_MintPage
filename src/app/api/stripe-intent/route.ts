@@ -4,6 +4,7 @@ import Stripe from "stripe";
 export async function POST(req: Request) {
   const {
     buyerWalletAddress,
+    recipientWalletAddress,
     nftContractAddress,
     blockchainId,
     requestedQuantity,
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
     payment_method_types: ["card"],
     metadata: {
       buyerWalletAddress,
+      recipientWalletAddress,
       nftContractAddress,
       blockchainId,
       requestedQuantity,

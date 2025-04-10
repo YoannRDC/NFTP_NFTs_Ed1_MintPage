@@ -5,7 +5,6 @@ import {
   getContract, 
   prepareContractCall, 
   sendTransaction, 
-  toWei
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { 
@@ -27,6 +26,7 @@ export async function POST(req: NextRequest) {
     const { 
       tokenId, 
       buyerWalletAddress, 
+      recipientWalletAddress, 
       nftContractAddress, 
       blockchainId, 
       contractType,
@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
     // Validation des paramètres de base
     if (!isValidEthereumAddress(buyerWalletAddress)) {
       return NextResponse.json({ error: "Adresse de l'acheteur invalide" }, { status: 400 });
+    }
+    // Validation des paramètres de base
+    if (!isValidEthereumAddress(recipientWalletAddress)) {
+      return NextResponse.json({ error: "Adresse de du receveur du NFT est invalide" }, { status: 400 });
     }
     if (!isValidEthereumAddress(nftContractAddress)) {
       return NextResponse.json({ error: "Adresse du contrat NFT invalide" }, { status: 400 });
@@ -96,6 +100,8 @@ export async function POST(req: NextRequest) {
   const artcardPolWeiPrice = await getNFTPolPriceInWei(projectName, tokenId);
 
     console.error("tokenId: ", tokenId);
+    console.error("buyerWalletAddress: ", buyerWalletAddress);
+    console.error("recipientWalletAddress: ", recipientWalletAddress);
     console.error("artcardEuroPrice: ", artcardEuroPrice);
     console.error("paymentTx.value: ", paymentTx.value);
     console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
@@ -126,7 +132,7 @@ export async function POST(req: NextRequest) {
     const transaction = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
-      params: [minterAddress, buyerWalletAddress, tokenId],
+      params: [minterAddress, recipientWalletAddress, tokenId],
     });
 
     // Création du compte minter à partir de la clé privée récupérée via le mapping

@@ -14,7 +14,7 @@ import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import PurchasePage from "./PurchasePage";
 
-interface ItemERC721Props {
+interface ItemERC1155_HBCProps {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
@@ -36,7 +36,7 @@ export default function ItemERC1155({
   contractType,
   tokenId,
   projectName,
-}: ItemERC721Props) {
+}: ItemERC1155_HBCProps) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
@@ -153,7 +153,7 @@ export default function ItemERC1155({
 
       {/* Affichage du nombre vendu / total supply */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {soldCount}/{totalSupply} NFT vendu
+        {soldCount}/{totalSupply} cakes offered
       </div>
 
       <div className="text-center mt-5">

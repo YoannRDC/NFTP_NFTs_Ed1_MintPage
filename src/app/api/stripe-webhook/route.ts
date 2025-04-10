@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
 
     // Extraction des données depuis les metadata Stripe
     const buyerWalletAddress = paymentIntent.metadata.buyerWalletAddress;
+    const recipientWalletAddress = paymentIntent.metadata.recipientWalletAddress;
     const nftContractAddress = paymentIntent.metadata.nftContractAddress;
     const blockchainId = paymentIntent.metadata.blockchainId;
     const requestedQuantity = paymentIntent.metadata.requestedQuantity; // en string
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
     const projectName = paymentIntent.metadata.projectName;
 
     console.log("buyerWalletAddress:", buyerWalletAddress);
+    console.log("recipientWalletAddress:", recipientWalletAddress);
     console.log("nftContractAddress:", nftContractAddress);
     console.log("blockchainId:", blockchainId);
     console.log("requestedQuantity:", requestedQuantity);
@@ -115,6 +117,10 @@ export async function POST(req: NextRequest) {
     if (!isValidEthereumAddress(buyerWalletAddress)) {
       console.error("Invalid buyer wallet address");
       return NextResponse.json({ error: "Invalid buyer wallet address" }, { status: 400 });
+    }
+    if (!isValidEthereumAddress(recipientWalletAddress)) {
+      console.error("Invalid recipient wallet address");
+      return NextResponse.json({ error: "Invalid recipient wallet address" }, { status: 400 });
     }
     if (!isValidEthereumAddress(nftContractAddress)) {
       console.error("Invalid NFT contract address");
@@ -159,28 +165,28 @@ export async function POST(req: NextRequest) {
 
     let transaction;
     if (contractType === "erc1155drop") {
-      console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity), ", tokenId:", tokenId);
+      console.log("contract:", contractType, ", to:", recipientWalletAddress, ", quantity:", BigInt(requestedQuantity), ", tokenId:", tokenId, ", buyer:", buyerWalletAddress);
       transaction = claimToERC1155({
         contract: nftContract,
-        to: buyerWalletAddress,
+        to: recipientWalletAddress,
         quantity: BigInt(requestedQuantity),
         from: minterAddress,
         tokenId: tokenId,
       });
     } else if (contractType === "erc721drop") {
-      console.log("contract:", contractType, ", to:", buyerWalletAddress, ", quantity:", BigInt(requestedQuantity));
+      console.log("contract:", contractType, ", to:", recipientWalletAddress, ", quantity:", BigInt(requestedQuantity), ", buyer:", buyerWalletAddress);
       transaction = claimToERC721({
         contract: nftContract,
-        to: buyerWalletAddress,
+        to: recipientWalletAddress,
         quantity: BigInt(requestedQuantity),
         from: minterAddress,
       });
     } else if (contractType === "erc721transfert") {
-      console.log("contract:", contractType, ", to:", buyerWalletAddress, ", tokenId:", tokenId);
+      console.log("contract:", contractType, ", to:", recipientWalletAddress, ", tokenId:", tokenId, ", buyer:", buyerWalletAddress);
       transaction = prepareContractCall({
         contract: nftContract,
         method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
-        params: [minterAddress, buyerWalletAddress, tokenId],
+        params: [minterAddress, recipientWalletAddress, tokenId],
       });
     } else {
       console.error("Unknown contract type");

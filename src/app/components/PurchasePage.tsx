@@ -62,6 +62,7 @@ export default function PurchasePage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           buyerWalletAddress: smartAccount?.address,
+          recipientWalletAddress: smartAccount?.address,
           nftContractAddress: contract?.address,
           blockchainId: contract.chain.id.toString(),
           requestedQuantity: requestedQuantity.toString(),

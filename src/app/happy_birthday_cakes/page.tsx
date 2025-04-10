@@ -300,10 +300,6 @@ function NFTPed1Content() {
         <MailchimpAccount />
       </div>
 
-      <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
-      </div>
-
       <div className="decorative-title mb-4">-- Cakes à offrir --</div>
 
       <div className="decorative-description text-gray-500 mt-2 mb-10 flex justify-center">
@@ -408,6 +404,10 @@ function NFTPed1Content() {
           onPageChange={setCurrentPage}
         />
       )}
+      
+      <div>
+        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
+      </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>
 

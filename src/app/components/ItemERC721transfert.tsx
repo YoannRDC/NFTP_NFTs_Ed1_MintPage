@@ -129,6 +129,7 @@ export default function ItemERC721transfert({
         body: JSON.stringify({
           tokenId: tokenId.toString(),
           buyerWalletAddress: smartAccount.address,
+          recipientWalletAddress: smartAccount.address,
           nftContractAddress: contract.address,
           blockchainId: 137,
           contractType: contractType,
