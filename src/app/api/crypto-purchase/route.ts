@@ -94,8 +94,8 @@ async function assertCryptoPaymentTransaction(
   const artcardEuroPrice = getNFTEuroPrice(paymentMetadata.projectName, paymentMetadata.tokenId);
   const artcardPolWeiPrice = await getNFTPolPriceInWei(paymentMetadata.projectName, paymentMetadata.tokenId);
 
-  console.error("artcardEuroPrice: ", artcardEuroPrice);
-  console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
+  console.log("artcardEuroPrice: ", artcardEuroPrice);
+  console.log("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
   // Calcul de la différence entre le montant payé et le montant attendu
   const diff = paymentTx.value >= artcardPolWeiPrice 
@@ -105,8 +105,8 @@ async function assertCryptoPaymentTransaction(
   // Tolérance fixée à 10 % du montant attendu (en wei)
   const toleranceWei = (artcardPolWeiPrice * 10n) / 100n;
 
-  console.error("diff: ", diff);
-  console.error("toleranceWei: ", toleranceWei);
+  console.log("diff: ", diff);
+  console.log("toleranceWei: ", toleranceWei);
 
   // Vérification que l'écart reste dans la tolérance autorisée
   if (diff > toleranceWei) {

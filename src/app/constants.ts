@@ -80,7 +80,7 @@ export function getNFTEuroPrice( projectName: string, tokenId: string): number {
   
   if (project === "ARTCARDS") {
     // Politique de prix pour Artcards
-	const artCardEuroPrices = [120, 130, 5, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
+	const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
     return artCardEuroPrices[Number(tokenId) % artCardEuroPrices.length];
   } else if (project === "NATETGITES") {
     // Les 500 premiers NFTs coûtent 50e, les 100 suivants coutent 30e.

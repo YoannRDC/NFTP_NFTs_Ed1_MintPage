@@ -24,7 +24,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   let tx;
 
   if (paymentMetadata.distributionType === DistributionType.ClaimToERC1155) {
-    tx = await claimToERC1155({
+    tx = claimToERC1155({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
       quantity: BigInt(paymentMetadata.requestedQuantity),
@@ -32,7 +32,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       tokenId: BigInt(paymentMetadata.tokenId),
     });
   } else if (paymentMetadata.distributionType === DistributionType.ClaimToERC721) {
-    tx = await claimToERC721({
+    tx = claimToERC721({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
       quantity: BigInt(paymentMetadata.requestedQuantity),
