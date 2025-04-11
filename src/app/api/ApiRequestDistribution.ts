@@ -5,6 +5,7 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiCommons";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName } from "../constants";
+import { NextResponse } from "next/server";
 
 export interface DistributionResult {
   transaction: any; 
@@ -70,11 +71,10 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   }
 
   // Récupérer la clé privée à partir des variables d'environnement.
-  const minterPrivateKey = getProjectMinterPrivateKeyEnvName(paymentMetadata.projectName);
+  const privateKeyEnvName = getProjectMinterPrivateKeyEnvName(paymentMetadata.projectName);
+  const minterPrivateKey = process.env[privateKeyEnvName];
   if (!minterPrivateKey) {
-    throw new Error(
-      "La clé privée n'est pas définie dans les variables d'environnement (process.env.PRIVATE_KEY)."
-    );
+    throw new Error("Missing minterPrivateKey, privateKeyEnvName: privateKeyEnvName: "+ privateKeyEnvName);
   }
 
   const account = privateKeyToAccount({
