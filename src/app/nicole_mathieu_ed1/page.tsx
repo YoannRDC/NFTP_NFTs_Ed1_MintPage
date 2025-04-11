@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client } from "../constants";
+import { client, DistributionType } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
@@ -33,7 +33,7 @@ const collectionImageSrc = "/nicole_mathieu_ed1/Nicole_Mathieu.png";
 const collectionShortDescription = "First NFT collection of Nicole Mathieu.";
 const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
-const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc1155drop";
+const contractType=DistributionType.ClaimToERC1155;
 const stripeMode: "test" | "live" = "test";
 const projectName = "NMMATHIEU";
 

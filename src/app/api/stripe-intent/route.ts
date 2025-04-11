@@ -3,16 +3,15 @@ import Stripe from "stripe";
 
 export async function POST(req: Request) {
   const {
+    projectName,
+    distributionType,
     buyerWalletAddress,
     recipientWalletAddress,
     nftContractAddress,
     blockchainId,
-    requestedQuantity,
-    amount,
-    stripeMode, // "test" ou "live"
-    contractType,
     tokenId,
-    projectName
+    requestedQuantity,
+    stripeMode, // "test" ou "live"
   } = await req.json();
 
   // Sélection de la clé Stripe en fonction du mode demandé
@@ -33,18 +32,18 @@ export async function POST(req: Request) {
   });
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount, // montant en centimes
+    amount: requestedQuantity, // montant en centimes
     currency: "eur",
     payment_method_types: ["card"],
     metadata: {
+      projectName,
+      distributionType, 
       buyerWalletAddress,
       recipientWalletAddress,
       nftContractAddress,
       blockchainId,
-      requestedQuantity,
-      contractType, 
       tokenId, 
-      projectName
+      requestedQuantity,
     },
   });
 

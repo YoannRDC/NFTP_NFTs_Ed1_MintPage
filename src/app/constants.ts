@@ -53,7 +53,7 @@ export const projectMappings: Record<string, { publicKey: string; privateKeyEnv:
  * @param projectName Nom du projet (ex: "ARTCARDS" ou "NATETGITES")
  * @returns La clé publique correspondant au projet.
  */
-export function getProjectPublicKey(projectName: string): string {
+export function getProjectMinterAddress(projectName: string): string {
 	const mapping = projectMappings[projectName.toUpperCase()];
 	if (!mapping) {
 		throw new Error(`Mapping non trouvé pour le projet: ${projectName}`);
@@ -66,7 +66,7 @@ export function getProjectPublicKey(projectName: string): string {
  * @param projectName Nom du projet (ex: "ARTCARDS" ou "NATETGITES")
  * @returns Le nom de la variable d'environnement pour la clé privée.
  */
-export function getProjectPrivateKeyEnvName(projectName: string): string {
+export function getProjectMinterPrivateKeyEnvName(projectName: string): string {
 	const mapping = projectMappings[projectName.toUpperCase()];
 	if (!mapping) {
 		throw new Error(`Mapping non trouvé pour le projet: ${projectName}`);
@@ -75,16 +75,16 @@ export function getProjectPrivateKeyEnvName(projectName: string): string {
 }
 
 // Fonction pour calculer le prix en euros en fonction du tokenId et du projet
-export function getNFTEuroPrice( projectName: string, tokenId: number): number {
+export function getNFTEuroPrice( projectName: string, tokenId: string): number {
   const project = projectName.toUpperCase();
   
   if (project === "ARTCARDS") {
     // Politique de prix pour Artcards
 	const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
-    return artCardEuroPrices[tokenId % artCardEuroPrices.length];
+    return artCardEuroPrices[Number(tokenId) % artCardEuroPrices.length];
   } else if (project === "NATETGITES") {
     // Les 500 premiers NFTs coûtent 50e, les 100 suivants coutent 30e.
-	return tokenId < 500 ? 50 : 30;
+	return Number(tokenId) < 500 ? 50 : 30;
   } else if (project === "NMMATHIEU") {
     // Tous les NFTs coutent 30e
     return 30;
@@ -96,10 +96,17 @@ export function getNFTEuroPrice( projectName: string, tokenId: number): number {
   }
 }
 
-export async function getNFTPolPriceInWei(projectName: string, tokenId: number): Promise<bigint> {
+export async function getNFTPolPriceInWei(projectName: string, tokenId: string): Promise<bigint> {
 	const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
 	const conversion = await convertEurToPOL(artcardEuroPrice);
 	// conversion.amount est un nombre décimal, on le convertit en wei (BigInt) en multipliant par 1e18
 	return BigInt(Math.floor(conversion.amount * 1e18));
   }
   
+  export enum DistributionType {
+	ClaimToERC721 = "claimToERC721",
+	ClaimToERC1155 = "claimToERC1155",
+	ERC1155Drop = "erc1155drop",
+	ERC721Transfert = "erc721transfert",
+  safeTransferFromERC721 = "safeTransferFromERC721",
+  }

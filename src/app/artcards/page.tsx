@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import { client, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
@@ -30,7 +30,7 @@ const collectionImageSrc = "/ArtCards.gif";
 const collectionShortDescription = "Art cards by YoArt.";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
-const contractType = "erc721transfert";
+const distributionType = DistributionType.safeTransferFromERC721;
 const projectName = "ARTCARDS" // define in .env and constant.tsx.
 const blockchain = "Polygon";
 
@@ -99,7 +99,7 @@ function NFTPed1Content() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName,i);
+          const euroPrice = getNFTEuroPrice(projectName,i.toString());
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
           // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
@@ -188,12 +188,12 @@ function NFTPed1Content() {
               <ItemERC721transfert 
                 tokenId={BigInt(index)}
                 priceInPol={pricesInPol[index] ?? null}
-                priceInEur={getNFTEuroPrice(projectName, index)}
+                priceInEur={getNFTEuroPrice(projectName, index.toString())}
                 contract={contract}
                 stripeMode={stripeMode}
                 previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
                 redirectPage={collectionPageRef}
-                contractType={contractType}
+                distributionType={distributionType}
                 projectName={projectName}
               />
             </div>

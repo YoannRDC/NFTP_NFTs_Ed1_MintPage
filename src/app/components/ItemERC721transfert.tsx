@@ -8,8 +8,8 @@ import {
   useActiveAccount,
   useReadContract,
 } from "thirdweb/react";
-import PurchasePage from "./PurchasePage";
-import { client, getProjectPublicKey } from "../constants";
+import StripePurchasePage from "./StripePurchasePage";
+import { client, DistributionType, getProjectMinterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { polygon } from "thirdweb/chains";
@@ -22,7 +22,7 @@ interface ItemERC721transfertProps {
   stripeMode: "test" | "live";
   previewImage: string;
   redirectPage: string;
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
+  distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
 }
@@ -34,7 +34,7 @@ export default function ItemERC721transfert({
   stripeMode,
   previewImage,
   redirectPage,
-  contractType,
+  distributionType,
   tokenId,
   projectName,
 }: ItemERC721transfertProps) {
@@ -50,7 +50,7 @@ export default function ItemERC721transfert({
   });
 
   // Récupération de l'adresse du minter via le mapping à partir du projectName
-  const minterAddress = getProjectPublicKey(projectName);
+  const minterAddress = getProjectMinterAddress(projectName);
 
   // Déterminer le statut du NFT : "Disponible" s'il appartient au minter, "Vendu" sinon
   let nftStatus = "Chargement...";
@@ -79,7 +79,7 @@ export default function ItemERC721transfert({
 
   // handlePurchase : effectue le paiement en crypto vers l'adresse du minter,
   // attend la confirmation et appelle l'API de transfert du NFT.
-  const handlePurchase = async () => {
+  const handleCryptoPurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
       return;
@@ -121,20 +121,20 @@ export default function ItemERC721transfert({
       console.log("Transaction de paiement confirmée :", paymentTxHash);
 
       // Appel de l'API pour transférer le NFT
-      const response = await fetch("/api/transfer-nft", {
+      const response = await fetch("/api/crypto-purchase", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tokenId: tokenId.toString(),
+          projectName,
           buyerWalletAddress: smartAccount.address,
           recipientWalletAddress: smartAccount.address,
           nftContractAddress: contract.address,
           blockchainId: 137,
-          contractType: contractType,
+          contractType: distributionType,
+          tokenId: tokenId.toString(),
           paymentTxHash,
-          projectName,
         }),
       });
       const data = await response.json();
@@ -211,19 +211,19 @@ export default function ItemERC721transfert({
             {smartAccount ? (
               <div className="text-center">
                 <button
-                  onClick={handlePurchase}
+                  onClick={handleCryptoPurchase}
                   className="px-4 py-2 bg-green-500 text-white rounded"
                 >
                   Acheter en Crypto
                 </button>
                 <p className="mb-2">{priceInPol} POL</p>
 
-                <PurchasePage
+                <StripePurchasePage
                   requestedQuantity={1n}
-                  amount={Number(priceInEur) * 100}
+                  paymentPriceFiat={Number(priceInEur) * 100}
                   stripeMode={stripeMode}
                   contract={contract}
-                  contractType={contractType}
+                  distributionType={distributionType}
                   redirectPage={redirectPage}
                   tokenId={tokenId}
                   projectName={projectName}

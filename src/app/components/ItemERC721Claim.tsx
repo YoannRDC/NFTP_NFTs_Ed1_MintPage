@@ -1,5 +1,9 @@
 "use client";
 
+/////////////////
+// Used by  NFT Propulsion Edition 1
+/////////////////
+
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
@@ -7,14 +11,14 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import PurchasePage from "./PurchasePage";
-import { client, projectMappings } from "../constants";
+import StripePurchasePage from "./StripePurchasePage";
+import { client, DistributionType } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
 
 // Définition de l'interface pour les props
-interface ItemERC721dropProps {
+interface ItemERC721ClaimProps {
   totalSupply: number;
   priceInPol: number | string | null;
   priceInEur: number | string | null;
@@ -22,12 +26,12 @@ interface ItemERC721dropProps {
   stripeMode: "test" | "live";
   previewImage: string; // Nouvelle prop pour l'image de preview
   redirectPage: string; // Nouvelle prop pour la page de redirection
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
+  distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
 }
 
-export default function ItemERC721drop({
+export default function ItemERC721Claim({
   totalSupply,
   priceInPol,
   priceInEur,
@@ -35,10 +39,10 @@ export default function ItemERC721drop({
   stripeMode,
   previewImage,
   redirectPage,
-  contractType,
+  distributionType: contractType,
   tokenId, 
   projectName
-}: ItemERC721dropProps) {
+}: ItemERC721ClaimProps) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
@@ -167,12 +171,12 @@ export default function ItemERC721drop({
             </TransactionButton>
 
             <p className="mb-2">{totalPricePol} POL</p>
-            <PurchasePage
+            <StripePurchasePage
               requestedQuantity={requestedQuantity}
-              amount={totalPriceEurCents}
+              paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               contract={contract}
-              contractType={contractType}
+              distributionType={contractType}
               redirectPage={redirectPage}
               tokenId={tokenId}
               projectName={projectName}

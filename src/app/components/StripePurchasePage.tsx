@@ -6,32 +6,32 @@ import { useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
-import { client, getProjectPublicKey } from "../constants";
+import { DistributionType } from "../constants";
 
-// Définition des props attendues par PurchasePage, incluant le contrat et la page de retour
-interface PurchasePageProps {
-  requestedQuantity: bigint;
-  amount: number; // montant en centimes
-  stripeMode: "test" | "live";
-  contract: any;
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
-  redirectPage: string;
-  tokenId: bigint;
+// Définition des props attendues par StripePurchasePage, incluant le contrat et la page de retour
+interface StripePurchasePageProps {
   projectName: string;
+  contract: any;
+  distributionType: DistributionType;
+  tokenId: bigint;
+  requestedQuantity: bigint;
+  paymentPriceFiat: number; // montant en centimes
+  stripeMode: "test" | "live";
+  redirectPage: string;
 }
 
-export default function PurchasePage({
-  requestedQuantity,
-  amount,
-  stripeMode,
+export default function StripePurchasePage({
+  projectName,
   contract,
-  contractType,
+  distributionType: distributionType,
   redirectPage,
   tokenId,
-  projectName,
-}: PurchasePageProps) {
+  requestedQuantity,
+  paymentPriceFiat: paymentPriceFiat,
+  stripeMode,
+}: StripePurchasePageProps) {
   
-  console.log("PurchasePage called");
+  console.log("StripePurchasePage called");
   const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
 
@@ -48,9 +48,9 @@ export default function PurchasePage({
   console.log("contract?.address: ", contract?.address);
   console.log("contract.chain.id.toString(): ", contract.chain.id.toString());
   console.log("requestedQuantity.toString(): ", requestedQuantity.toString());
-  console.log("amount.toString(): ", amount.toString());
+  console.log("amount.toString(): ", paymentPriceFiat.toString());
   console.log("stripeMode.toString(): ", stripeMode.toString());
-  console.log("contractType.toString(): ", contractType.toString());
+  console.log("contractType.toString(): ", distributionType.toString());
   console.log("tokenId.toString(): ", tokenId.toString());
   console.log("projectName: ", projectName);
 
@@ -66,9 +66,9 @@ export default function PurchasePage({
           nftContractAddress: contract?.address,
           blockchainId: contract.chain.id.toString(),
           requestedQuantity: requestedQuantity.toString(),
-          amount: amount.toString(),
+          paymentPriceFiat: paymentPriceFiat.toString(),
           stripeMode: stripeMode.toString(),
-          contractType: contractType.toString(),
+          contractType: distributionType.toString(),
           tokenId: tokenId.toString(), 
           projectName,
         }),

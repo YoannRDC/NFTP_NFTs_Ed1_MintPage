@@ -9,13 +9,13 @@ import { nftpPubKey } from "../constants";
 interface ClaimConditionFormERC721Props {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
-  contractType: "erc721drop" | "erc721transfert"; // On limite aux types ERC721
+  distributionType: "claimToERC721" | "safeTransferFromERC721"; // On limite aux types ERC721
 }
 
 export default function ClaimConditionFormERC721({
   contract,
   initialOverrides = [],
-  contractType,
+  distributionType: distributionType,
 }: ClaimConditionFormERC721Props) {
   const smartAccount = useActiveAccount();
 

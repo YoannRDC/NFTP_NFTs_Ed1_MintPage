@@ -8,11 +8,11 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, getProjectPublicKey } from "../constants";
+import { client, DistributionType, getProjectMinterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
-import PurchasePage from "./PurchasePage";
+import StripePurchasePage from "./StripePurchasePage";
 
 interface ItemERC1155_HBCProps {
   priceInPol: number | string | null;
@@ -21,7 +21,7 @@ interface ItemERC1155_HBCProps {
   stripeMode: "test" | "live";
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
+  distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
 }
@@ -33,7 +33,7 @@ export default function ItemERC1155({
   stripeMode,
   previewImage,
   redirectPage,
-  contractType,
+  distributionType: contractType,
   tokenId,
   projectName,
 }: ItemERC1155_HBCProps) {
@@ -46,7 +46,7 @@ export default function ItemERC1155({
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
   // Récupération de l'adresse du minter via le mapping à partir du projectName
-  const minterAddress = getProjectPublicKey(projectName);
+  const minterAddress = getProjectMinterAddress(projectName);
 
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
@@ -216,12 +216,12 @@ export default function ItemERC1155({
 
             <p className="mb-2">{totalPricePol} POL</p>
 
-            <PurchasePage
+            <StripePurchasePage
               requestedQuantity={requestedQuantity}
-              amount={totalPriceEurCents}
+              paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               contract={contract}
-              contractType={contractType}
+              distributionType={contractType}
               redirectPage={redirectPage}
               tokenId={tokenId}
               projectName={projectName}

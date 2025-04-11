@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import Link from "next/link";
 
-import { client, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice } from "../constants";
 import { getOwnedERC721 } from "../components/getOwnedERC721";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
@@ -17,7 +17,7 @@ import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
 import InfoBlockchain from "../components/InfoBlockchain";
 import { projectMappings } from "../constants";
-import { getNFTBalance } from "../utils/FetchBlockchainData";
+import { getNFTBalance } from "../utils/fetchBlockchainData";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -53,7 +53,7 @@ const collectionImageSrc = "/Nature_et_Gites.jpg";
 const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
-const contractType = "erc721transfert";
+const distributionType = DistributionType.safeTransferFromERC721;
 const projectName = "NATETGITES"; // défini dans .env et constants.tsx.
 const blockchain = "Polygon";
 
@@ -143,7 +143,7 @@ function NFTPed1Content() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName, i);
+          const euroPrice = getNFTEuroPrice(projectName, i.toString());
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
@@ -427,14 +427,14 @@ function NFTPed1Content() {
                 <ItemERC721transfert
                   tokenId={BigInt(tokenIndex)}
                   priceInPol={pricesInPol[tokenIndex] ?? null}
-                  priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
+                  priceInEur={getNFTEuroPrice(projectName, tokenIndex.toString())}
                   contract={contract}
                   stripeMode={stripeMode}
                   previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex
                     .toString()
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
-                  contractType={contractType}
+                  distributionType={distributionType}
                   projectName={projectName}
                 />
               </div>

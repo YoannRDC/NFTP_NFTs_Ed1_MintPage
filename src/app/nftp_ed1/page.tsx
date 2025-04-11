@@ -4,14 +4,14 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client } from "../constants";
+import { client, DistributionType } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
 import MenuItem from "../components/MenuItem";
 // Remplacez convertPolToEur par la fonction inverse qui convertit EUR en POL
 import VideoPresentation from "../components/NFTP_presentation";
-import ItemERC721drop from "../components/ItemERC721drop";
+import ItemERC721Claim from "../components/ItemERC721Claim";
 import { defineChain, getContract } from "thirdweb";
 import MailchimpAccount from "../components/MailchimpAccount";
 import InfoBlockchain from "../components/InfoBlockchain";
@@ -39,7 +39,7 @@ const collectionImageSrc="/logo_seul_11.png";
 const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
-const contractType: "erc721drop" | "erc1155drop" | "erc721transfert" = "erc721drop";
+const distributionType=DistributionType.ClaimToERC721;
 const projectName="NFTPED1";
 const blockchain = "Polygon";
 
@@ -145,7 +145,7 @@ function NFTPed1Content() {
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
-        <ItemERC721drop 
+        <ItemERC721Claim 
           totalSupply={TOTAL_SUPPLY} 
           priceInPol={DISPLAYED_NFT_PRICE_POL}
           priceInEur={NFT_PRICE_EUR} 
@@ -153,7 +153,7 @@ function NFTPed1Content() {
           stripeMode={stripeMode}
           previewImage={`${collectionPageRef}/preview.gif`}
           redirectPage={collectionPageRef}
-          contractType={contractType}
+          distributionType={distributionType}
           tokenId={tokenId}
           projectName={projectName}
         />

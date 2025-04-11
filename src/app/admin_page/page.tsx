@@ -8,7 +8,7 @@ import {
 } from "thirdweb/react";
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
-import { client, nftpPubKey, getProjectPublicKey, MAILCHIMP_LIST_ID } from "../constants";
+import { client, nftpPubKey, getProjectMinterAddress, MAILCHIMP_LIST_ID } from "../constants";
 import { inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
@@ -25,27 +25,27 @@ const contractsInfo = {
     metadataURI:
       "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
-    contractType: "erc721drop" as const,
+    distributionType: "claimToERC721" as const,
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 80002,
-    contractType: "erc1155drop" as const,
+    distributionType: "claimToERC1155" as const,
   },
   artcards: {
     address: "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47",
     metadataURI:
       "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0", // TBC
     chainId: 137,
-    contractType: "erc721transfert" as const,
+    distributionType: "safeTransferFromERC721" as const,
   },
   birthdayCakes: {
     address: "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf",
     metadataURI:
       "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
-    contractType: "erc1155drop" as const,
+    distributionType: "claimToERC1155" as const,
   }
 };
 
@@ -103,7 +103,7 @@ const AdminPage: React.FC = () => {
 
   // Récupération du contrat sélectionné
   const selectedContract = contractObjects[selectedContractKey];
-  const selectedContractType = contractsInfo[selectedContractKey].contractType;
+  const selectedDistributionType = contractsInfo[selectedContractKey].distributionType;
 
   // Récupération des merge fields via l'endpoint dédié
   useEffect(() => {
@@ -152,7 +152,7 @@ const AdminPage: React.FC = () => {
       return;
     }
     const claimNumber = BigInt(parseInt(numberToClaim));
-    const minterAddress = getProjectPublicKey("ARTCARDS");
+    const minterAddress = getProjectMinterAddress("ARTCARDS");
     const transaction = claimTo({
       contract: selectedContract,
       to: minterAddress,
@@ -183,12 +183,12 @@ const AdminPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (selectedContractType === "erc1155drop") {
+    if (selectedDistributionType === "claimToERC1155") {
       fetchNextTokenId();
     } else {
       setErc1155Tokens([]);
     }
-  }, [selectedContractType, selectedContract]);
+  }, [selectedDistributionType, selectedContract]);
 
   return (
     <div className="flex flex-col items-center">
@@ -232,8 +232,8 @@ const AdminPage: React.FC = () => {
       )}
 
       {isAdmin &&
-        (selectedContractType === "erc721drop" ||
-          selectedContractType === "erc721transfert") && (
+        (selectedDistributionType === "claimToERC721" ||
+          selectedDistributionType === "safeTransferFromERC721") && (
           <>
             <ClaimSnapshotERC721
               onSnapshotFetched={setSnapshotData}
@@ -242,9 +242,9 @@ const AdminPage: React.FC = () => {
             <ClaimConditionFormERC721
               initialOverrides={snapshotData}
               contract={selectedContract}
-              contractType={selectedContractType}
+              distributionType={selectedDistributionType}
             />
-            {selectedContractType === "erc721transfert" && (
+            {selectedDistributionType === "safeTransferFromERC721" && (
               <div className="mt-4">
                 <label htmlFor="numberToClaim" className="mr-2 font-bold">
                   Number of claim:
@@ -281,7 +281,7 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && selectedContractType === "erc1155drop" && (
+      {isAdmin && selectedDistributionType === "claimToERC1155" && (
         <div className="erc1155-section mt-10">
           {erc1155Tokens.length > 0 && (
             <div className="mt-4">

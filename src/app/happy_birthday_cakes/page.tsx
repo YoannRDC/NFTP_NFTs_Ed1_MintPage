@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import Link from "next/link";
 
-import { client, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice } from "../constants";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
@@ -16,7 +16,7 @@ import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
 import InfoBlockchain from "../components/InfoBlockchain";
 import { projectMappings } from "../constants";
-import { getNFTBalance } from "../utils/FetchBlockchainData";
+import { getNFTBalance } from "../utils/fetchBlockchainData";
 import { getOwnedERC1155 } from "../components/getOwnedERC1155";
 
 // Interface pour typer le contenu de metadata.json
@@ -55,7 +55,7 @@ const collectionShortDescription =
   "Because every birthday deserves a cake, even a digital one !";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoART.art";
-const contractType = "erc1155drop";
+const contractType = DistributionType.ClaimToERC1155;
 const projectName = "HAPPYBIRTHDAYCAKES"; // défini dans constants.tsx.
 const blockchain = "Polygon";
 
@@ -145,7 +145,7 @@ function NFTPed1Content() {
       if (totalNFTcount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < totalNFTcount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName, i);
+          const euroPrice = getNFTEuroPrice(projectName, i.toString());
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
@@ -378,14 +378,14 @@ function NFTPed1Content() {
                 <ItemERC1155_HBC
                   tokenId={BigInt(tokenIndex)}
                   priceInPol={pricesInPol[tokenIndex] ?? null}
-                  priceInEur={getNFTEuroPrice(projectName, tokenIndex)}
+                  priceInEur={getNFTEuroPrice(projectName, tokenIndex.toString())}
                   contract={contract}
                   stripeMode={stripeMode}
                   previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex
                     .toString()
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
-                  contractType={contractType}
+                  distributionType={contractType}
                   projectName={projectName}
                 />
               </div>

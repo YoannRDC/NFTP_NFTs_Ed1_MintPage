@@ -1,84 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { 
-  createThirdwebClient, 
-  defineChain, 
-  getContract, 
+import {  
+  createThirdwebClient,
   prepareContractCall, 
   sendTransaction, 
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { 
-  getProjectPublicKey,
-  getProjectPrivateKeyEnvName,
+  getProjectMinterAddress,
+  getProjectMinterPrivateKeyEnvName,
   getNFTEuroPrice,
   getNFTPolPriceInWei
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
-
-// Vérification simple d'une adresse Ethereum
-const isValidEthereumAddress = (address: string): boolean => {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-};
+import { distributeNFT } from "../ApiRequestDistribution";
+import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
+import { getNftContract, initializeThirdwebClient } from "../ApiCommons";
 
 export async function POST(req: NextRequest) {
   try {
-    const { 
-      tokenId, 
-      buyerWalletAddress, 
-      recipientWalletAddress, 
-      nftContractAddress, 
-      blockchainId, 
-      contractType,
-      paymentTxHash, 
-      projectName
-    } = await req.json();
 
-    // Validation des paramètres de base
-    if (!isValidEthereumAddress(buyerWalletAddress)) {
-      return NextResponse.json({ error: "Adresse de l'acheteur invalide" }, { status: 400 });
+    const metadataOrError = await extractPaymentMetadataCryptoTransfer(req);
+
+    if (metadataOrError instanceof NextResponse) {
+      return metadataOrError;
     }
-    // Validation des paramètres de base
-    if (!isValidEthereumAddress(recipientWalletAddress)) {
-      return NextResponse.json({ error: "Adresse de du receveur du NFT est invalide" }, { status: 400 });
-    }
-    if (!isValidEthereumAddress(nftContractAddress)) {
-      return NextResponse.json({ error: "Adresse du contrat NFT invalide" }, { status: 400 });
-    }
-    if (contractType !== "erc721transfert") {
-      return NextResponse.json({ error: "Type de contrat non supporté" }, { status: 400 });
-    }
-    if (!paymentTxHash) {
-      return NextResponse.json({ error: "Identifiant de transaction de paiement manquant" }, { status: 400 });
-    }
-    if (!process.env.THIRDWEB_API_SECRET_KEY) {
-      return NextResponse.json({ error: "THIRDWEB_API_SECRET_KEY manquant" }, { status: 500 });
-    }
-    
+    const paymentMetadata: PaymentMetadata = metadataOrError;
+
     // Récupérer le nom de la variable d'environnement pour la clé privée via la fonction getProjectPrivateKeyEnvName
-    const privateKeyEnvName = getProjectPrivateKeyEnvName(projectName);
+    const privateKeyEnvName = getProjectMinterPrivateKeyEnvName(paymentMetadata.projectName);
     const privateKey = process.env[privateKeyEnvName];
     if (!privateKey) {
-      return NextResponse.json({ error: `Clé privée pour le projet ${projectName} manquante` }, { status: 500 });
+      return NextResponse.json({ error: `Clé privée pour le projet ${paymentMetadata.projectName} manquante` }, { status: 500 });
     }
 
-    // Création du client Thirdweb
-    const client = createThirdwebClient({
-      secretKey: process.env.THIRDWEB_API_SECRET_KEY,
-    });
-    console.log("Client créé avec l'id :", client.clientId);
-
-    // Récupération du contrat NFT sur la chaîne spécifiée
-    const nftContract = getContract({
-      client,
-      chain: defineChain(Number(blockchainId)),
-      address: nftContractAddress,
-    });
+    const client = initializeThirdwebClient();
+    if (client instanceof NextResponse) {
+      return metadataOrError;
+    }
+    const nftContract = getNftContract(client, Number(paymentMetadata.blockchainId), paymentMetadata.nftContractAddress);
     
     // Récupération de la transaction de paiement via eth_getTransactionByHash
     const rpcRequest = getRpcClient({ client, chain: polygon });
     const paymentTx = await eth_getTransactionByHash(rpcRequest, {
-      hash: paymentTxHash,
+      hash: paymentMetadata.paymentTxHashCrypto as `0x${string}`,
     });
     console.log("paymentTx: ", paymentTx);
 
@@ -88,20 +53,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Récupération de l'adresse du minter via le mapping en fonction du projectName
-    const minterAddress = getProjectPublicKey(projectName);
+    const minterAddress = getProjectMinterAddress(paymentMetadata.projectName);
 
     // Vérifier que le destinataire de la transaction est bien le minter attendu
     if (!paymentTx.to || paymentTx.to.toLowerCase() !== minterAddress.toLowerCase()) {
       return NextResponse.json({ error: "Le destinataire de la transaction de paiement n'est pas le minter" }, { status: 400 });
     }
 
-  // Récupération du prix en euros et conversion en POL (en wei)
-  const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
-  const artcardPolWeiPrice = await getNFTPolPriceInWei(projectName, tokenId);
+    // Récupération du prix en euros et conversion en POL (en wei)
+    const artcardEuroPrice = getNFTEuroPrice(paymentMetadata.projectName, paymentMetadata.tokenId);
+    const artcardPolWeiPrice = await getNFTPolPriceInWei(paymentMetadata.projectName, paymentMetadata.tokenId);
 
-    console.error("tokenId: ", tokenId);
-    console.error("buyerWalletAddress: ", buyerWalletAddress);
-    console.error("recipientWalletAddress: ", recipientWalletAddress);
+    console.error("tokenId: ", paymentMetadata.tokenId);
+    console.error("buyerWalletAddress: ", paymentMetadata.buyerWalletAddress);
+    console.error("recipientWalletAddress: ", paymentMetadata.recipientWalletAddress);
     console.error("artcardEuroPrice: ", artcardEuroPrice);
     console.error("paymentTx.value: ", paymentTx.value);
     console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
@@ -128,11 +93,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(errorResponse, { status: 400 });
     }
 
+    distributeNFT(client, paymentMetadata);
+
     // Préparation de l'appel à safeTransferFrom pour transférer le NFT
     const transaction = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
-      params: [minterAddress, recipientWalletAddress, tokenId],
+      params: [minterAddress, paymentMetadata.recipientWalletAddress, BigInt(paymentMetadata.tokenId)],
     });
 
     // Création du compte minter à partir de la clé privée récupérée via le mapping
@@ -152,7 +119,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ transactionHash: result.transactionHash });
   } catch (error) {
-    console.error("Erreur dans la route transfer-nft :", error);
+    console.error("Erreur dans la route crypto-purchase :", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
 }
+

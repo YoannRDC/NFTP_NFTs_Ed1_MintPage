@@ -8,11 +8,11 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, getProjectPublicKey } from "../constants";
+import { client, DistributionType, getProjectMinterAddress } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
-import PurchasePage from "./PurchasePage";
+import StripePurchasePage from "./StripePurchasePage";
 
 interface ItemERC721Props {
   priceInPol: number | string | null;
@@ -21,7 +21,7 @@ interface ItemERC721Props {
   stripeMode: "test" | "live";
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
-  contractType: "erc721drop" | "erc1155drop" | "erc721transfert";
+  contractType: DistributionType;
   tokenId: bigint;
   projectName: string;
 }
@@ -33,7 +33,7 @@ export default function ItemERC1155({
   stripeMode,
   previewImage,
   redirectPage,
-  contractType,
+  contractType: distributionType,
   tokenId,
   projectName,
 }: ItemERC721Props) {
@@ -46,7 +46,7 @@ export default function ItemERC1155({
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
   // Récupération de l'adresse du minter via le mapping à partir du projectName
-  const minterAddress = getProjectPublicKey(projectName);
+  const minterAddress = getProjectMinterAddress(projectName);
 
   // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
   const totalPricePol =
@@ -216,15 +216,15 @@ export default function ItemERC1155({
 
             <p className="mb-2">{totalPricePol} POL</p>
 
-            <PurchasePage
-              requestedQuantity={requestedQuantity}
-              amount={totalPriceEurCents}
-              stripeMode={stripeMode}
-              contract={contract}
-              contractType={contractType}
-              redirectPage={redirectPage}
-              tokenId={tokenId}
+            <StripePurchasePage
               projectName={projectName}
+              contract={contract}
+              distributionType={distributionType}
+              tokenId={tokenId}
+              requestedQuantity={requestedQuantity}
+              paymentPriceFiat={totalPriceEurCents}
+              stripeMode={stripeMode}
+              redirectPage={redirectPage}
             />
             <p>{totalPriceEur} Euros</p>
           </div>
