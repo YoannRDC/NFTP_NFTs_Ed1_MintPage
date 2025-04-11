@@ -173,10 +173,6 @@ function NFTPed1Content() {
       <div className="decorative-title">
         -- NFTs à vendre --
       </div>
-
-      <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
-      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isMintedLoading ? (
@@ -201,6 +197,10 @@ function NFTPed1Content() {
         ) : (
           <p>Aucun NFT minté pour le moment.</p>
         )}
+      </div>
+
+      <div>
+        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
       </div>
 
       <div className="decorative-title">
