@@ -4,7 +4,7 @@ import { prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiCommons";
 import { PaymentMetadata } from "./PaymentMetadata";
-import { getProjectMinterAddress } from "../constants";
+import { DistributionType, getProjectMinterAddress } from "../constants";
 
 export interface DistributionResult {
   transaction: any; 
@@ -22,7 +22,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
 
   let tx;
 
-  if (paymentMetadata.distributionType === "claimToERC1155") {
+  if (paymentMetadata.distributionType === DistributionType.ClaimToERC1155) {
     tx = await claimToERC1155({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
@@ -30,14 +30,14 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       from: minterAddress,
       tokenId: BigInt(paymentMetadata.tokenId),
     });
-  } else if (paymentMetadata.distributionType === "claimToERC721") {
+  } else if (paymentMetadata.distributionType === DistributionType.ClaimToERC721) {
     tx = await claimToERC721({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
       quantity: BigInt(paymentMetadata.requestedQuantity),
       from: minterAddress,
     });
-  } else if (paymentMetadata.distributionType === "safeTransferFromERC721") {
+  } else if (paymentMetadata.distributionType === DistributionType.SafeTransferFromERC721) {
     tx = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
@@ -47,7 +47,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
         BigInt(paymentMetadata.tokenId)
       ],
     });
-  } else if (paymentMetadata.distributionType === "safeTransferFromERC1155") {
+  } else if (paymentMetadata.distributionType === DistributionType.SafeTransferFromERC1155) {
     const data = "0x"; // À compléter si nécessaire.
     tx = prepareContractCall({
       contract: nftContract,

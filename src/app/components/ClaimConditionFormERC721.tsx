@@ -4,18 +4,17 @@ import React, { useState, useEffect } from "react";
 import { setClaimConditions } from "thirdweb/extensions/erc721";
 import { ContractOptions, sendTransaction } from "thirdweb";
 import { useActiveAccount } from "thirdweb/react";
-import { nftpPubKey } from "../constants";
+import { DistributionType, nftpPubKey } from "../constants";
 
 interface ClaimConditionFormERC721Props {
   contract: ContractOptions<[], `0x${string}`>;
   initialOverrides?: any[];
-  distributionType: "claimToERC721" | "safeTransferFromERC721"; // On limite aux types ERC721
+  distributionType: DistributionType;
 }
 
 export default function ClaimConditionFormERC721({
   contract,
   initialOverrides = [],
-  distributionType: distributionType,
 }: ClaimConditionFormERC721Props) {
   const smartAccount = useActiveAccount();
 

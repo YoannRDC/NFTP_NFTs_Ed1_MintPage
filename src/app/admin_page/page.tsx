@@ -8,7 +8,7 @@ import {
 } from "thirdweb/react";
 import { claimTo } from "thirdweb/extensions/erc721";
 import ClaimSnapshotERC721 from "../components/ClaimSnapshotERC721";
-import { client, nftpPubKey, getProjectMinterAddress, MAILCHIMP_LIST_ID } from "../constants";
+import { client, nftpPubKey, getProjectMinterAddress, MAILCHIMP_LIST_ID, DistributionType } from "../constants";
 import { inAppWallet } from "thirdweb/wallets";
 import Link from "next/link";
 import { defineChain, getContract, readContract } from "thirdweb";
@@ -25,27 +25,27 @@ const contractsInfo = {
     metadataURI:
       "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
-    distributionType: "claimToERC721" as const,
+    distributionType: DistributionType.ClaimToERC721,
   },
   fragChroEd1: {
     address: "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e",
     metadataURI: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 80002,
-    distributionType: "claimToERC1155" as const,
+    distributionType: DistributionType.ClaimToERC1155,
   },
   artcards: {
     address: "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47",
     metadataURI:
       "ipfs://QmTj3G1KY9fZ91aExuSDGkhYMnBwbd3DWN9D5GVspRasQj/0", // TBC
     chainId: 137,
-    distributionType: "safeTransferFromERC721" as const,
+    distributionType: DistributionType.SafeTransferFromERC721,
   },
   birthdayCakes: {
     address: "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf",
     metadataURI:
       "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
     chainId: 137,
-    distributionType: "claimToERC1155" as const,
+    distributionType: DistributionType.ClaimToERC1155,
   }
 };
 
@@ -183,7 +183,7 @@ const AdminPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (selectedDistributionType === "claimToERC1155") {
+    if (selectedDistributionType === DistributionType.ClaimToERC1155) {
       fetchNextTokenId();
     } else {
       setErc1155Tokens([]);
@@ -232,8 +232,8 @@ const AdminPage: React.FC = () => {
       )}
 
       {isAdmin &&
-        (selectedDistributionType === "claimToERC721" ||
-          selectedDistributionType === "safeTransferFromERC721") && (
+        (selectedDistributionType === DistributionType.ClaimToERC721 ||
+          selectedDistributionType === DistributionType.SafeTransferFromERC721) && (
           <>
             <ClaimSnapshotERC721
               onSnapshotFetched={setSnapshotData}
@@ -244,7 +244,7 @@ const AdminPage: React.FC = () => {
               contract={selectedContract}
               distributionType={selectedDistributionType}
             />
-            {selectedDistributionType === "safeTransferFromERC721" && (
+            {selectedDistributionType === DistributionType.SafeTransferFromERC721 && (
               <div className="mt-4">
                 <label htmlFor="numberToClaim" className="mr-2 font-bold">
                   Number of claim:
@@ -281,7 +281,7 @@ const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {isAdmin && selectedDistributionType === "claimToERC1155" && (
+      {isAdmin && selectedDistributionType === DistributionType.ClaimToERC1155 && (
         <div className="erc1155-section mt-10">
           {erc1155Tokens.length > 0 && (
             <div className="mt-4">
