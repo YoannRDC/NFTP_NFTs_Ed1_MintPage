@@ -56,6 +56,7 @@ const artistProjectWebsitePrettyPrint = "Site en construction";
 const distributionType = DistributionType.SafeTransferFromERC721;
 const projectName = "NATETGITES"; // défini dans .env et constants.tsx.
 const blockchain = "Polygon";
+const requestedQuantity = "1";
 
 function NFTPed1Content() {
   const searchParams = useSearchParams();
@@ -436,6 +437,7 @@ function NFTPed1Content() {
                   redirectPage={collectionPageRef}
                   distributionType={distributionType}
                   projectName={projectName}
+                  requestedQuantity={requestedQuantity}
                 />
               </div>
             );

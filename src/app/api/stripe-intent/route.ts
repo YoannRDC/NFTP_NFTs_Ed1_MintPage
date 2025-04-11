@@ -12,8 +12,20 @@ export async function POST(req: Request) {
     blockchainId,
     tokenId,
     requestedQuantity,
+    paymentPriceFiat,
     stripeMode,
   } = await req.json();
+
+  console.log("projectName:", projectName);
+  console.log("distributionType:", distributionType);
+  console.log("buyerWalletAddress:", buyerWalletAddress);
+  console.log("recipientWalletAddress:", recipientWalletAddress);
+  console.log("nftContractAddress:", nftContractAddress);
+  console.log("blockchainId:", blockchainId);
+  console.log("tokenId:", tokenId);
+  console.log("requestedQuantity:", requestedQuantity);
+  console.log("paymentPriceFiat:", paymentPriceFiat);
+  console.log("stripeMode:", stripeMode);
 
   // Sélection de la clé Stripe en fonction du mode demandé
   const stripeSecretKey =
@@ -33,7 +45,7 @@ export async function POST(req: Request) {
   });
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: requestedQuantity, // montant en centimes
+    amount: paymentPriceFiat, // montant en centimes
     currency: "eur",
     payment_method_types: ["card"],
     metadata: {
@@ -45,6 +57,8 @@ export async function POST(req: Request) {
       blockchainId,
       tokenId, 
       requestedQuantity,
+      paymentPriceFiat,
+      stripeMode
     },
   });
 

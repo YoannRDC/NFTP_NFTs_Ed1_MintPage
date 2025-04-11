@@ -25,6 +25,7 @@ interface ItemERC721transfertProps {
   distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
+  requestedQuantity: string;
 }
 
 export default function ItemERC721transfert({
@@ -37,6 +38,7 @@ export default function ItemERC721transfert({
   distributionType,
   tokenId,
   projectName,
+  requestedQuantity,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -128,12 +130,13 @@ export default function ItemERC721transfert({
         },
         body: JSON.stringify({
           projectName,
+          distributionType: distributionType,
           buyerWalletAddress: smartAccount.address,
           recipientWalletAddress: smartAccount.address,
           nftContractAddress: contract.address,
           blockchainId: 137,
-          distributionType: distributionType,
           tokenId: tokenId.toString(),
+          requestedQuantity: requestedQuantity,
           paymentTxHash,
         }),
       });
@@ -219,14 +222,14 @@ export default function ItemERC721transfert({
                 <p className="mb-2">{priceInPol} POL</p>
 
                 <StripePurchasePage
+                  projectName={projectName}
+                  distributionType={distributionType}
+                  contract={contract}
+                  tokenId={tokenId}
                   requestedQuantity={1n}
                   paymentPriceFiat={Number(priceInEur) * 100}
                   stripeMode={stripeMode}
-                  contract={contract}
-                  distributionType={distributionType}
                   redirectPage={redirectPage}
-                  tokenId={tokenId}
-                  projectName={projectName}
                 />
                 <p>{priceInEur} Euros</p>
               </div>

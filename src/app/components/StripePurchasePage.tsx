@@ -11,24 +11,24 @@ import { DistributionType, StripeMode } from "../constants";
 // Définition des props attendues par StripePurchasePage, incluant le contrat et la page de retour
 interface StripePurchasePageProps {
   projectName: string;
-  contract: any;
   distributionType: DistributionType;
+  contract: any;
   tokenId: bigint;
   requestedQuantity: bigint;
   paymentPriceFiat: number; // montant en centimes
-  stripeMode: StripeMode;
   redirectPage: string;
+  stripeMode: StripeMode;
 }
 
 export default function StripePurchasePage({
   projectName,
-  contract,
   distributionType: distributionType,
-  redirectPage,
+  contract,
   tokenId,
   requestedQuantity,
   paymentPriceFiat: paymentPriceFiat,
   stripeMode,
+  redirectPage,
 }: StripePurchasePageProps) {
   
   console.log("StripePurchasePage called");
@@ -61,16 +61,16 @@ export default function StripePurchasePage({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          projectName,
+          distributionType: distributionType.toString(),
           buyerWalletAddress: smartAccount?.address,
           recipientWalletAddress: smartAccount?.address,
           nftContractAddress: contract?.address,
           blockchainId: contract.chain.id.toString(),
+          tokenId: tokenId.toString(), 
           requestedQuantity: requestedQuantity.toString(),
           paymentPriceFiat: paymentPriceFiat.toString(),
           stripeMode: stripeMode.toString(),
-          distributionType: distributionType.toString(),
-          tokenId: tokenId.toString(), 
-          projectName,
         }),
       });
       if (!response.ok) {

@@ -33,6 +33,7 @@ const artistProjectWebsitePrettyPrint = "YoArt.art";
 const distributionType = DistributionType.SafeTransferFromERC721;
 const projectName = "ARTCARDS" // define in .env and constant.tsx.
 const blockchain = "Polygon";
+const requestedQuantity = "1";
 
 // Composant principal
 function NFTPed1Content() {
@@ -193,6 +194,7 @@ function NFTPed1Content() {
                 redirectPage={collectionPageRef}
                 distributionType={distributionType}
                 projectName={projectName}
+                requestedQuantity={requestedQuantity}
               />
             </div>
           ))
