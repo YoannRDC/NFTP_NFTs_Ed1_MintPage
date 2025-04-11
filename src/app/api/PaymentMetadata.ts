@@ -76,18 +76,22 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
  */
   export async function extractPaymentMetadataCryptoTransfer(req: NextRequest): Promise<PaymentMetadata | NextResponse> {
 
-    const { 
-      projectName,
-      distributionType,
-      buyerWalletAddress, 
-      recipientWalletAddress, 
-      nftContractAddress, 
-      blockchainId, 
-      tokenId,
-      requestedQuantity,
-      paymentPriceFiat,
-      paymentTxHashCrypto 
-    } = await req.json();
+  // Récupération et log des données de la requête
+  const body = await req.json();
+  console.log("Données de req.json():", body);
+
+  const { 
+    projectName,
+    distributionType,
+    buyerWalletAddress, 
+    recipientWalletAddress, 
+    nftContractAddress, 
+    blockchainId, 
+    tokenId,
+    requestedQuantity,
+    paymentPriceFiat,
+    paymentTxHashCrypto 
+  } = body;
 
     const paymentMetadata: PaymentMetadata = {
       projectName: projectName,
@@ -99,7 +103,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
       tokenId: tokenId,
       requestedQuantity: requestedQuantity,
       paymentPriceFiat:paymentPriceFiat,
-      paymentTxHashCrypto: paymentTxHashCrypto, // propriété optionnelle
+      paymentTxHashCrypto: paymentTxHashCrypto,
     };
 
     // Validation des paramètres de base

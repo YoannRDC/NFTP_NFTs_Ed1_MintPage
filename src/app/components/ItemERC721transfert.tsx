@@ -104,7 +104,7 @@ export default function ItemERC721transfert({
       const receipt = await sendTransaction({ transaction, account: smartAccount });
       console.log("Transaction de paiement envoyée:", receipt.transactionHash);
 
-      const paymentTxHash = receipt.transactionHash;
+      const paymentTxHashCrypto = receipt.transactionHash;
 
       // Attente de 15 secondes avant d'appeler l'API de transfert
       await new Promise((resolve) => setTimeout(resolve, 15000));
@@ -113,14 +113,14 @@ export default function ItemERC721transfert({
       // Vérification de la transaction
       const rpcRequest = getRpcClient({ client, chain: polygon });
       const paymentTx = await eth_getTransactionByHash(rpcRequest, {
-        hash: paymentTxHash,
+        hash: paymentTxHashCrypto,
       });
       console.log("Détails de la transaction de paiement:", paymentTx);
 
       if (!paymentTx.blockNumber) {
         throw new Error("La transaction de paiement n'est pas confirmée");
       }
-      console.log("Transaction de paiement confirmée :", paymentTxHash);
+      console.log("Transaction de paiement confirmée :", paymentTxHashCrypto);
 
       // Appel de l'API pour transférer le NFT
       const response = await fetch("/api/crypto-purchase", {
@@ -137,7 +137,7 @@ export default function ItemERC721transfert({
           blockchainId: 137,
           tokenId: tokenId.toString(),
           requestedQuantity: requestedQuantity,
-          paymentTxHash,
+          paymentTxHashCrypto: paymentTxHashCrypto,
         }),
       });
       const data = await response.json();

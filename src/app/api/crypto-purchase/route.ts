@@ -94,11 +94,7 @@ async function assertCryptoPaymentTransaction(
   const artcardEuroPrice = getNFTEuroPrice(paymentMetadata.projectName, paymentMetadata.tokenId);
   const artcardPolWeiPrice = await getNFTPolPriceInWei(paymentMetadata.projectName, paymentMetadata.tokenId);
 
-  console.error("tokenId: ", paymentMetadata.tokenId);
-  console.error("buyerWalletAddress: ", paymentMetadata.buyerWalletAddress);
-  console.error("recipientWalletAddress: ", paymentMetadata.recipientWalletAddress);
   console.error("artcardEuroPrice: ", artcardEuroPrice);
-  console.error("paymentTx.value: ", paymentTx.value);
   console.error("artcardPolWeiPrice: ", artcardPolWeiPrice);
 
   // Calcul de la différence entre le montant payé et le montant attendu
