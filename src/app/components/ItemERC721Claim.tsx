@@ -43,6 +43,7 @@ export default function ItemERC721Claim({
   tokenId, 
   projectName
 }: ItemERC721ClaimProps) {
+  console.log("loading ItemERC721Claim  ...");
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
@@ -65,6 +66,8 @@ export default function ItemERC721Claim({
 
   // Conversion du prix total en Euros en centimes pour Stripe
   const totalPriceEurCents = Math.round(totalPriceEur * 100);
+  
+  console.log(" > totalPriceEurCents:", totalPriceEurCents);
 
   const wallets = [
     inAppWallet({
@@ -151,19 +154,33 @@ export default function ItemERC721Claim({
               </select>
             </div>
 
+            {/* Transaction on the front side.*/}
             <TransactionButton
-              transaction={() =>
-                claimTo({
+              transaction={async () => {
+                console.log("Début de la transaction claimTo avec les paramètres :", {
                   contract: contract,
                   to: smartAccount.address,
                   quantity: requestedQuantity,
-                })
-              }
+                });
+                try {
+                  const preparedTx = claimTo({
+                    contract: contract,
+                    to: smartAccount.address,
+                    quantity: requestedQuantity,
+                  });
+                  console.log("Transaction préparée :", preparedTx);
+                  return preparedTx;
+                } catch (error) {
+                  console.error("Erreur lors de la préparation de la transaction claimTo :", error);
+                  throw error;
+                }
+              }}
               onError={(error: Error) => {
-                console.error(error);
+                console.error("Erreur dans la transaction :", error);
                 window.location.href = `${redirectPage}?paymentResult=error`;
               }}
               onTransactionConfirmed={async () => {
+                console.log("Transaction confirmée. Redirection vers la page de succès.");
                 window.location.href = `${redirectPage}?paymentResult=success`;
               }}
             >
