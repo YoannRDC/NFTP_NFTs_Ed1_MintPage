@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType } from "../constants";
+import { client, DistributionType, StripeMode } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
@@ -33,8 +33,8 @@ const collectionImageSrc = "/nicole_mathieu_ed1/Nicole_Mathieu.png";
 const collectionShortDescription = "First NFT collection of Nicole Mathieu.";
 const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
-const contractType=DistributionType.ClaimToERC1155;
-const stripeMode: "test" | "live" = "test";
+const distributionType=DistributionType.ClaimToERC1155;
+const stripeMode=StripeMode.Test;
 const projectName = "NMMATHIEU";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
@@ -220,7 +220,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_49.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -233,7 +233,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_53.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -246,7 +246,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_76.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -259,7 +259,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_79.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -272,7 +272,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_83.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -285,7 +285,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_95.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -298,7 +298,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_96.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -311,7 +311,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_103.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -324,7 +324,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>
@@ -337,7 +337,7 @@ function NFTPed1Content() {
             stripeMode={stripeMode}
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_107.jpg`}
             redirectPage={collectionPageRef}
-            contractType={contractType}
+            distributionType={distributionType}
             projectName={projectName}
           />
         </div>

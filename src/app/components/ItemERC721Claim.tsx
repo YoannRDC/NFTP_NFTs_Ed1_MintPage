@@ -12,7 +12,7 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import StripePurchasePage from "./StripePurchasePage";
-import { client, DistributionType } from "../constants";
+import { client, DistributionType, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
@@ -23,7 +23,7 @@ interface ItemERC721ClaimProps {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
-  stripeMode: "test" | "live";
+  stripeMode: StripeMode;
   previewImage: string; // Nouvelle prop pour l'image de preview
   redirectPage: string; // Nouvelle prop pour la page de redirection
   distributionType: DistributionType;
@@ -39,7 +39,7 @@ export default function ItemERC721Claim({
   stripeMode,
   previewImage,
   redirectPage,
-  distributionType: contractType,
+  distributionType,
   tokenId, 
   projectName
 }: ItemERC721ClaimProps) {
@@ -189,14 +189,14 @@ export default function ItemERC721Claim({
 
             <p className="mb-2">{totalPricePol} POL</p>
             <StripePurchasePage
+              projectName={projectName}
+              contract={contract}
+              distributionType={distributionType}
+              tokenId={tokenId}
               requestedQuantity={requestedQuantity}
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
-              contract={contract}
-              distributionType={contractType}
               redirectPage={redirectPage}
-              tokenId={tokenId}
-              projectName={projectName}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

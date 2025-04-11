@@ -1,3 +1,4 @@
+import { StripeMode } from "@/app/constants";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -11,12 +12,12 @@ export async function POST(req: Request) {
     blockchainId,
     tokenId,
     requestedQuantity,
-    stripeMode, // "test" ou "live"
+    stripeMode,
   } = await req.json();
 
   // Sélection de la clé Stripe en fonction du mode demandé
   const stripeSecretKey =
-    stripeMode === "live"
+    stripeMode === StripeMode.Live
       ? process.env.STRIPE_SECRET_KEY_LIVE
       : process.env.STRIPE_SECRET_KEY_TEST;
 

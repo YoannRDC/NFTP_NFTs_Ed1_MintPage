@@ -9,7 +9,7 @@ import {
   useReadContract,
 } from "thirdweb/react";
 import StripePurchasePage from "./StripePurchasePage";
-import { client, DistributionType, getProjectMinterAddress } from "../constants";
+import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { polygon } from "thirdweb/chains";
@@ -19,7 +19,7 @@ interface ItemERC721transfertProps {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
-  stripeMode: "test" | "live";
+  stripeMode: StripeMode;
   previewImage: string;
   redirectPage: string;
   distributionType: DistributionType;
@@ -132,7 +132,7 @@ export default function ItemERC721transfert({
           recipientWalletAddress: smartAccount.address,
           nftContractAddress: contract.address,
           blockchainId: 137,
-          contractType: distributionType,
+          distributionType: distributionType,
           tokenId: tokenId.toString(),
           paymentTxHash,
         }),

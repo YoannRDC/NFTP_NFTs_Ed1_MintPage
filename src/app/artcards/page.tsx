@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import { client, DistributionType, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice, StripeMode } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
@@ -47,9 +47,7 @@ function NFTPed1Content() {
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
-
-  // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live";
+  const stripeMode=StripeMode.Live;
 
   // Récupérer le nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({

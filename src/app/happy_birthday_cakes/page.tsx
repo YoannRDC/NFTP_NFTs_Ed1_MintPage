@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import Link from "next/link";
 
-import { client, DistributionType, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice, StripeMode } from "../constants";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
@@ -55,7 +55,7 @@ const collectionShortDescription =
   "Because every birthday deserves a cake, even a digital one !";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoART.art";
-const contractType = DistributionType.ClaimToERC1155;
+const distributionType = DistributionType.ClaimToERC1155;
 const projectName = "HAPPYBIRTHDAYCAKES"; // défini dans constants.tsx.
 const blockchain = "Polygon";
 
@@ -76,7 +76,7 @@ function NFTPed1Content() {
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
 
-  const stripeMode: "test" | "live" = "test";
+  const stripeMode=StripeMode.Test;
 
   // Chargement des metadata depuis public/happy_birthday_cakes/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);
@@ -385,7 +385,7 @@ function NFTPed1Content() {
                     .toString()
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
-                  distributionType={contractType}
+                  distributionType={distributionType}
                   projectName={projectName}
                 />
               </div>

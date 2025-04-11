@@ -8,7 +8,7 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, DistributionType, getProjectMinterAddress } from "../constants";
+import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
@@ -18,7 +18,7 @@ interface ItemERC1155_HBCProps {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
-  stripeMode: "test" | "live";
+  stripeMode: StripeMode;
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
   distributionType: DistributionType;
@@ -33,7 +33,7 @@ export default function ItemERC1155({
   stripeMode,
   previewImage,
   redirectPage,
-  distributionType: contractType,
+  distributionType,
   tokenId,
   projectName,
 }: ItemERC1155_HBCProps) {
@@ -221,7 +221,7 @@ export default function ItemERC1155({
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               contract={contract}
-              distributionType={contractType}
+              distributionType={distributionType}
               redirectPage={redirectPage}
               tokenId={tokenId}
               projectName={projectName}

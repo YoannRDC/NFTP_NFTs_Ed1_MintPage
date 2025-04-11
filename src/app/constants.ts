@@ -108,3 +108,8 @@ export async function getNFTPolPriceInWei(projectName: string, tokenId: string):
 	ClaimToERC1155 = "claimToERC1155",
 	SafeTransferFromERC721 = "SafeTransferFromERC721"
   }
+
+  export enum StripeMode {
+	Live = "live",
+	Test = "test",
+  }

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
-import { DistributionType } from "../constants";
+import { DistributionType, StripeMode } from "../constants";
 
 // Définition des props attendues par StripePurchasePage, incluant le contrat et la page de retour
 interface StripePurchasePageProps {
@@ -16,7 +16,7 @@ interface StripePurchasePageProps {
   tokenId: bigint;
   requestedQuantity: bigint;
   paymentPriceFiat: number; // montant en centimes
-  stripeMode: "test" | "live";
+  stripeMode: StripeMode;
   redirectPage: string;
 }
 
@@ -37,7 +37,7 @@ export default function StripePurchasePage({
 
   // Choix de la clé publishable en fonction du mode
   const stripePublishableKey =
-    stripeMode === "live"
+    stripeMode === StripeMode.Live
       ? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE!
       : process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!;
 
@@ -50,7 +50,7 @@ export default function StripePurchasePage({
   console.log("requestedQuantity.toString(): ", requestedQuantity.toString());
   console.log("amount.toString(): ", paymentPriceFiat.toString());
   console.log("stripeMode.toString(): ", stripeMode.toString());
-  console.log("contractType.toString(): ", distributionType.toString());
+  console.log("distributionType.toString(): ", distributionType.toString());
   console.log("tokenId.toString(): ", tokenId.toString());
   console.log("projectName: ", projectName);
 
@@ -68,7 +68,7 @@ export default function StripePurchasePage({
           requestedQuantity: requestedQuantity.toString(),
           paymentPriceFiat: paymentPriceFiat.toString(),
           stripeMode: stripeMode.toString(),
-          contractType: distributionType.toString(),
+          distributionType: distributionType.toString(),
           tokenId: tokenId.toString(), 
           projectName,
         }),

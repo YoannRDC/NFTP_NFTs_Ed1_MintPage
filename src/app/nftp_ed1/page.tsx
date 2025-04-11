@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType } from "../constants";
+import { client, DistributionType, StripeMode } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
@@ -53,8 +53,7 @@ function NFTPed1Content() {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  // Définir le mode Stripe ici : "test" ou "live"
-  const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
+  const stripeMode=StripeMode.Live;
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {

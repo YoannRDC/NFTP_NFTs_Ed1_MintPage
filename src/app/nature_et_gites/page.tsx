@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import Link from "next/link";
 
-import { client, DistributionType, getNFTEuroPrice } from "../constants";
+import { client, DistributionType, getNFTEuroPrice, StripeMode } from "../constants";
 import { getOwnedERC721 } from "../components/getOwnedERC721";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
@@ -74,7 +74,7 @@ function NFTPed1Content() {
   const itemsPerPage = 21;
   const [hasRandomized, setHasRandomized] = useState<boolean>(false);
 
-  const stripeMode: "test" | "live" = "live";
+  const stripeMode=StripeMode.Live;
 
   // Charger metadata depuis public/nature_et_gites/metadata.json
   const [metadataData, setMetadataData] = useState<NFTMetadata[]>([]);

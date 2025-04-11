@@ -8,7 +8,7 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, DistributionType, getProjectMinterAddress } from "../constants";
+import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
@@ -18,10 +18,10 @@ interface ItemERC721Props {
   priceInPol: number | string | null;
   priceInEur: number | string | null;
   contract: any;
-  stripeMode: "test" | "live";
+  stripeMode: StripeMode;
   previewImage: string; // Image de preview
   redirectPage: string; // Page de redirection après transaction
-  contractType: DistributionType;
+  distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
 }
@@ -33,7 +33,7 @@ export default function ItemERC1155({
   stripeMode,
   previewImage,
   redirectPage,
-  contractType: distributionType,
+  distributionType,
   tokenId,
   projectName,
 }: ItemERC721Props) {
