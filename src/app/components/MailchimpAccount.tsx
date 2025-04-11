@@ -32,7 +32,7 @@ const MailchimpAccount: React.FC = () => {
               m.merge_fields.WALLET &&
               m.merge_fields.WALLET.toLowerCase() === account.address.toLowerCase()
           );
-          console.log("member: ", member)
+          console.log("mailchimp member: ", member)
           setIsSubscribed(!!member);
         }
       })

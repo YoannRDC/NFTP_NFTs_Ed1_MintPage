@@ -47,7 +47,7 @@ function NFTPed1Content() {
   const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
   // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
   const [polEurRate, setPolEurRate] = useState<number | null>(null);
-  const stripeMode=StripeMode.Live;
+  const stripeMode=StripeMode.Test;
 
   // Récupérer le nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
