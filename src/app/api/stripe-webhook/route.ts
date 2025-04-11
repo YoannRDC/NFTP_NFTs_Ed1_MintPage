@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     const client = initializeThirdwebClient();
     if (client instanceof NextResponse) {
-      return metadataOrError;
+      return client;
     }
 
     // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)

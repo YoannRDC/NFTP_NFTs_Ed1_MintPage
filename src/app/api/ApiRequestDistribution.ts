@@ -2,16 +2,12 @@ import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
 import { claimTo as claimToERC1155 } from "thirdweb/extensions/erc1155";
 import { prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { getNftContract, initializeThirdwebClient, maskSecretKey } from "./ApiCommons";
+import { getNftContract, maskSecretKey } from "./ApiCommons";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { getProjectMinterAddress } from "../constants";
-// import { projectMappings } from "../constants"; // à utiliser si nécessaire
 
-// Définir un type pour le résultat de distribution,
-// combinant les métadonnées initiales et les données de transaction.
 export interface DistributionResult {
-  metadata: PaymentMetadata;
-  transaction: any; // Remplacez par le type exact retourné par sendTransaction si disponible.
+  transaction: any; 
 }
 
 /**
@@ -21,14 +17,13 @@ export interface DistributionResult {
  * @returns Un objet DistributionResult contenant les métadonnées d'origine et le résultat de la transaction.
  */
 export async function distributeNFT(client: any, paymentMetadata: PaymentMetadata): Promise<DistributionResult> {
-
   const nftContract = getNftContract(client, Number(paymentMetadata.blockchainId), paymentMetadata.nftContractAddress);
   const minterAddress = getProjectMinterAddress(paymentMetadata.projectName);
 
-  let transaction;
+  let tx;
 
   if (paymentMetadata.distributionType === "claimToERC1155") {
-    transaction = claimToERC1155({
+    tx = await claimToERC1155({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
       quantity: BigInt(paymentMetadata.requestedQuantity),
@@ -36,21 +31,25 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       tokenId: BigInt(paymentMetadata.tokenId),
     });
   } else if (paymentMetadata.distributionType === "claimToERC721") {
-    transaction = claimToERC721({
+    tx = await claimToERC721({
       contract: nftContract,
       to: paymentMetadata.recipientWalletAddress,
       quantity: BigInt(paymentMetadata.requestedQuantity),
       from: minterAddress,
     });
   } else if (paymentMetadata.distributionType === "safeTransferFromERC721") {
-    transaction = prepareContractCall({
+    tx = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
-      params: [minterAddress, paymentMetadata.recipientWalletAddress, BigInt(paymentMetadata.tokenId)],
+      params: [
+        minterAddress,
+        paymentMetadata.recipientWalletAddress,
+        BigInt(paymentMetadata.tokenId)
+      ],
     });
   } else if (paymentMetadata.distributionType === "safeTransferFromERC1155") {
     const data = "0x"; // À compléter si nécessaire.
-    transaction = prepareContractCall({
+    tx = prepareContractCall({
       contract: nftContract,
       method: "function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes data)",
       params: [
@@ -66,7 +65,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   }
 
   // Vérifier que la transaction a bien été préparée.
-  if (!transaction) {
+  if (!tx) {
     throw new Error("La transaction n'a pas pu être préparée.");
   }
 
@@ -84,7 +83,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   });
 
   const result = await sendTransaction({
-    transaction,
+    transaction: tx,
     account,
   });
 
@@ -99,7 +98,6 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   console.log("Transaction result:", safeResult);
 
   return {
-    metadata: paymentMetadata,
     transaction: safeResult,
   };
 }
