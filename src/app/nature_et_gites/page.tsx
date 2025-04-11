@@ -53,7 +53,7 @@ const collectionImageSrc = "/Nature_et_Gites.jpg";
 const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
-const distributionType = DistributionType.safeTransferFromERC721;
+const distributionType = DistributionType.SafeTransferFromERC721;
 const projectName = "NATETGITES"; // défini dans .env et constants.tsx.
 const blockchain = "Polygon";
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createThirdwebClient, prepareContractCall, sendTransaction, ThirdwebClient } from "thirdweb";
-import { privateKeyToAccount } from "thirdweb/wallets";
+import {  ThirdwebClient } from "thirdweb";
 import { 
   getProjectMinterAddress,
   getProjectMinterPrivateKeyEnvName,

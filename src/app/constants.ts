@@ -106,7 +106,5 @@ export async function getNFTPolPriceInWei(projectName: string, tokenId: string):
   export enum DistributionType {
 	ClaimToERC721 = "claimToERC721",
 	ClaimToERC1155 = "claimToERC1155",
-	ERC1155Drop = "erc1155drop",
-	ERC721Transfert = "erc721transfert",
-  safeTransferFromERC721 = "safeTransferFromERC721",
+	SafeTransferFromERC721 = "SafeTransferFromERC721"
   }

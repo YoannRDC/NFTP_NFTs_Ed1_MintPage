@@ -30,7 +30,7 @@ const collectionImageSrc = "/ArtCards.gif";
 const collectionShortDescription = "Art cards by YoArt.";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
-const distributionType = DistributionType.safeTransferFromERC721;
+const distributionType = DistributionType.SafeTransferFromERC721;
 const projectName = "ARTCARDS" // define in .env and constant.tsx.
 const blockchain = "Polygon";
 

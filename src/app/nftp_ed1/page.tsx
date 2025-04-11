@@ -53,9 +53,6 @@ function NFTPed1Content() {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  // Price is set in Claim conditions. Cannot define another price during when user claims. 
-  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
-
   // Définir le mode Stripe ici : "test" ou "live"
   const stripeMode: "test" | "live" = "live"; // Changez ici selon votre besoin
 
