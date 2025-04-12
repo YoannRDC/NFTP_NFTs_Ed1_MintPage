@@ -8,7 +8,12 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
+import {
+  client,
+  DistributionType,
+  getProjectMinterAddress,
+  StripeMode,
+} from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
@@ -42,6 +47,11 @@ export default function ItemERC1155({
   const [soldCount, setSoldCount] = useState<number>(0);
   // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
+
+  // États pour la méthode d'envoi du NFT
+  const [selectedOption, setSelectedOption] = useState<"myWallet" | "walletAddress" | "email">("myWallet");
+  const [customWalletAddress, setCustomWalletAddress] = useState<string>("");
+  const [recipientEmail, setRecipientEmail] = useState<string>("");
 
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
@@ -121,6 +131,17 @@ export default function ItemERC1155({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
+  // Fonction pour gérer la logique d'envoi par email
+  const handleEmailClaim = async () => {
+    if (!recipientEmail) {
+      throw new Error("Veuillez saisir un email valide.");
+    }
+    // Ici, ajoutez la logique pour générer et envoyer un code unique à l'email saisi.
+    console.log("Envoi d'un code unique à :", recipientEmail);
+    // Simuler la réussite de l'envoi et rediriger :
+    window.location.href = `${redirectPage}?paymentResult=success`;
+  };
+
   return (
     <div className="">
       {/* Aperçu du NFT */}
@@ -193,26 +214,120 @@ export default function ItemERC1155({
               </select>
             </div>
 
-            <TransactionButton
-              transaction={() =>
-                claimTo({
-                  contract: contract,
-                  to: smartAccount.address,
-                  tokenId: tokenId,
-                  quantity: BigInt(requestedQuantity),
-                })
-              }
-              onError={(error: Error) => {
-                console.error(error);
-                const errorMessage = encodeURIComponent(error.message);
-                window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
-              }}
-              onTransactionConfirmed={async () => {
-                window.location.href = `${redirectPage}?paymentResult=success`;
-              }}
-            >
-              Acheter en Crypto
-            </TransactionButton>
+            {/* Boutons radio pour sélectionner le destinataire */}
+            <div className="my-4 text-left">
+              <div className="mb-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    className="mr-2"
+                    checked={selectedOption === "myWallet"}
+                    onChange={() => setSelectedOption("myWallet")}
+                  />
+                  Send to my wallet
+                </label>
+              </div>
+              <div className="mb-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    className="mr-2"
+                    checked={selectedOption === "walletAddress"}
+                    onChange={() => setSelectedOption("walletAddress")}
+                  />
+                  Send to this wallet address
+                </label>
+                {selectedOption === "walletAddress" && (
+                  <input
+                    type="text"
+                    placeholder="0x..."
+                    value={customWalletAddress}
+                    onChange={(e) => setCustomWalletAddress(e.target.value)}
+                    pattern="^0x[a-fA-F0-9]{40}$"
+                    className="border rounded px-2 py-1 text-black mt-2 w-full"
+                  />
+                )}
+              </div>
+              <div className="mb-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    className="mr-2"
+                    checked={selectedOption === "email"}
+                    onChange={() => setSelectedOption("email")}
+                  />
+                  Send to an email
+                </label>
+                {selectedOption === "email" && (
+                  <input
+                    type="email"
+                    placeholder="example@mail.com"
+                    value={recipientEmail}
+                    onChange={(e) => setRecipientEmail(e.target.value)}
+                    className="border rounded px-2 py-1 text-black mt-2 w-full"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Utilisation conditionnelle du bouton suivant la méthode choisie */}
+            {selectedOption === "email" ? (
+              <button
+                onClick={async () => {
+                  try {
+                    await handleEmailClaim();
+                  } catch (error) {
+                    console.error(error);
+                    const errorMessage = encodeURIComponent(
+                      (error as Error).message
+                    );
+                    window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
+                  }
+                }}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Acheter par Email
+              </button>
+            ) : (
+              <TransactionButton
+                transaction={async () => {
+                  if (selectedOption === "walletAddress") {
+                    // Validation simple de l'adresse au format Ethereum
+                    const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+                    if (!walletRegex.test(customWalletAddress)) {
+                      throw new Error("Adresse de wallet non valide.");
+                    }
+                    return claimTo({
+                      contract: contract,
+                      to: customWalletAddress,
+                      tokenId: tokenId,
+                      quantity: BigInt(requestedQuantity),
+                    });
+                  } else {
+                    // Option par défaut : envoi à smartAccount.address
+                    return claimTo({
+                      contract: contract,
+                      to: smartAccount.address,
+                      tokenId: tokenId,
+                      quantity: BigInt(requestedQuantity),
+                    });
+                  }
+                }}
+                onError={(error: Error) => {
+                  console.error(error);
+                  const errorMessage = encodeURIComponent(error.message);
+                  window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
+                }}
+                onTransactionConfirmed={async () => {
+                  window.location.href = `${redirectPage}?paymentResult=success`;
+                }}
+              >
+                Acheter en Crypto
+              </TransactionButton>
+            )}
 
             <p className="mb-2">{totalPricePol} POL</p>
 
