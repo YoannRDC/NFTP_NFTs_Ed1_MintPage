@@ -122,7 +122,7 @@ export default function ItemERC1155({
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   return (
-    <div className="border p-4 rounded-lg shadow-lg text-center">
+    <div className="">
       {/* Aperçu du NFT */}
       <div className="mt-10 flex justify-center">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
@@ -217,14 +217,14 @@ export default function ItemERC1155({
             <p className="mb-2">{totalPricePol} POL</p>
 
             <StripePurchasePage
+              projectName={projectName}
+              distributionType={distributionType}
+              contract={contract}
+              tokenId={tokenId}
               requestedQuantity={requestedQuantity}
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
-              contract={contract}
-              distributionType={distributionType}
               redirectPage={redirectPage}
-              tokenId={tokenId}
-              projectName={projectName}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

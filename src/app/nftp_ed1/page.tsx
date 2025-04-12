@@ -53,7 +53,7 @@ function NFTPed1Content() {
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  const stripeMode=StripeMode.Test;
+  const stripeMode=StripeMode.Live;
 
   // Récupérer les NFTs de l'utilisateur
   useEffect(() => {
