@@ -53,6 +53,9 @@ export default function ItemERC1155({
   const [customWalletAddress, setCustomWalletAddress] = useState<string>("");
   const [recipientEmail, setRecipientEmail] = useState<string>("");
 
+  // Ici nous générons un nom de groupe unique grâce au tokenId pour que chaque composant ait ses propres radio boutons
+  const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
+
   const NextImage = dynamic(() => import("next/image"), { ssr: false });
 
   // Récupération de l'adresse du minter via le mapping à partir du projectName
@@ -100,15 +103,13 @@ export default function ItemERC1155({
         const total = Number(totalMinted);
         setTotalSupply(total);
 
-        // Récupère le solde de l'adresse pré-mint pour le token donné en utilisant l'adresse du minter issue du mapping
+        // Récupère le solde de l'adresse pré-mint pour le token donné
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
           params: [minterAddress, tokenId],
         });
         const sellerBal = Number(sellerBalance);
-
-        // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
         const sold = total - sellerBal;
         setSoldCount(sold);
       } catch (error) {
@@ -136,9 +137,7 @@ export default function ItemERC1155({
     if (!recipientEmail) {
       throw new Error("Veuillez saisir un email valide.");
     }
-    // Ici, ajoutez la logique pour générer et envoyer un code unique à l'email saisi.
     console.log("Envoi d'un code unique à :", recipientEmail);
-    // Simuler la réussite de l'envoi et rediriger :
     window.location.href = `${redirectPage}?paymentResult=success`;
   };
 
@@ -149,7 +148,7 @@ export default function ItemERC1155({
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
           <MediaRenderer
             client={client}
-            src={previewImage} // Image de preview passée en prop
+            src={previewImage}
             style={{ height: "auto", borderRadius: "10px" }}
           />
         </div>
@@ -214,34 +213,31 @@ export default function ItemERC1155({
               </select>
             </div>
 
+            {/* Boutons radio pour sélectionner le destinataire */}
             <div className="my-4 text-left">
-              <div className="mb-2 flex items-center">
-                <input
-                  id="delivery-myWallet"
-                  type="radio"
-                  name="deliveryMethod"
-                  className="mr-2 accent-blue-500"
-                  checked={selectedOption === "myWallet"}
-                  onChange={() => setSelectedOption("myWallet")}
-                />
-                <label htmlFor="delivery-myWallet" className="cursor-pointer">
+              <div className="mb-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name={radioGroupName}
+                    className="mr-2"
+                    checked={selectedOption === "myWallet"}
+                    onChange={() => setSelectedOption("myWallet")}
+                  />
                   Send to my wallet
                 </label>
               </div>
               <div className="mb-2">
-                <div className="flex items-center">
+                <label className="inline-flex items-center">
                   <input
-                    id="delivery-walletAddress"
                     type="radio"
-                    name="deliveryMethod"
-                    className="mr-2 accent-blue-500"
+                    name={radioGroupName}
+                    className="mr-2"
                     checked={selectedOption === "walletAddress"}
                     onChange={() => setSelectedOption("walletAddress")}
                   />
-                  <label htmlFor="delivery-walletAddress" className="cursor-pointer">
-                    Send to this wallet address
-                  </label>
-                </div>
+                  Send to this wallet address
+                </label>
                 {selectedOption === "walletAddress" && (
                   <input
                     type="text"
@@ -254,19 +250,16 @@ export default function ItemERC1155({
                 )}
               </div>
               <div className="mb-2">
-                <div className="flex items-center">
+                <label className="inline-flex items-center">
                   <input
-                    id="delivery-email"
                     type="radio"
-                    name="deliveryMethod"
-                    className="mr-2 accent-blue-500"
+                    name={radioGroupName}
+                    className="mr-2"
                     checked={selectedOption === "email"}
                     onChange={() => setSelectedOption("email")}
                   />
-                  <label htmlFor="delivery-email" className="cursor-pointer">
-                    Send to an email
-                  </label>
-                </div>
+                  Send to an email
+                </label>
                 {selectedOption === "email" && (
                   <input
                     type="email"
@@ -287,9 +280,7 @@ export default function ItemERC1155({
                     await handleEmailClaim();
                   } catch (error) {
                     console.error(error);
-                    const errorMessage = encodeURIComponent(
-                      (error as Error).message
-                    );
+                    const errorMessage = encodeURIComponent((error as Error).message);
                     window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
                   }
                 }}
@@ -301,7 +292,6 @@ export default function ItemERC1155({
               <TransactionButton
                 transaction={async () => {
                   if (selectedOption === "walletAddress") {
-                    // Validation simple de l'adresse au format Ethereum
                     const walletRegex = /^0x[a-fA-F0-9]{40}$/;
                     if (!walletRegex.test(customWalletAddress)) {
                       throw new Error("Adresse de wallet non valide.");
@@ -313,7 +303,6 @@ export default function ItemERC1155({
                       quantity: BigInt(requestedQuantity),
                     });
                   } else {
-                    // Option par défaut : envoi à smartAccount.address
                     return claimTo({
                       contract: contract,
                       to: smartAccount.address,
