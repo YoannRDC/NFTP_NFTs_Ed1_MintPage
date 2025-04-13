@@ -221,7 +221,7 @@ export default function ItemERC1155({
                   <input
                     type="radio"
                     name="deliveryMethod"
-                    className="mr-2"
+                    className="mr-2 accent-blue-500"
                     checked={selectedOption === "myWallet"}
                     onChange={() => setSelectedOption("myWallet")}
                   />
@@ -233,7 +233,7 @@ export default function ItemERC1155({
                   <input
                     type="radio"
                     name="deliveryMethod"
-                    className="mr-2"
+                    className="mr-2 accent-blue-500"
                     checked={selectedOption === "walletAddress"}
                     onChange={() => setSelectedOption("walletAddress")}
                   />
@@ -250,7 +250,7 @@ export default function ItemERC1155({
                   />
                 )}
               </div>
-              <div className="mb-2">
+              <div className="mb-2 accent-blue-500">
                 <label className="inline-flex items-center">
                   <input
                     type="radio"
