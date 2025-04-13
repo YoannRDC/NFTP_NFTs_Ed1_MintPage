@@ -214,36 +214,36 @@ export default function ItemERC1155({
               </select>
             </div>
 
-            {/* Boutons radio pour sélectionner le destinataire */}
             <div className="my-4 text-left">
-              <div className="mb-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    id="deliveryMethod"
-                    name="deliveryMethod"
-                    className="mr-2 accent-blue-500"
-                    checked={selectedOption === "myWallet"}
-                    onChange={() => setSelectedOption("myWallet")}
-                  />
+              <div className="mb-2 flex items-center">
+                <input
+                  id="delivery-myWallet"
+                  type="radio"
+                  name="deliveryMethod"
+                  className="mr-2 accent-blue-500"
+                  checked={selectedOption === "myWallet"}
+                  onChange={() => setSelectedOption("myWallet")}
+                />
+                <label htmlFor="delivery-myWallet" className="cursor-pointer">
                   Send to my wallet
                 </label>
               </div>
               <div className="mb-2">
-                <label className="inline-flex items-center">
+                <div className="flex items-center">
                   <input
-                    id="delivery-myWallet"
+                    id="delivery-walletAddress"
                     type="radio"
                     name="deliveryMethod"
                     className="mr-2 accent-blue-500"
                     checked={selectedOption === "walletAddress"}
                     onChange={() => setSelectedOption("walletAddress")}
                   />
-                  Send to this wallet address
-                </label>
+                  <label htmlFor="delivery-walletAddress" className="cursor-pointer">
+                    Send to this wallet address
+                  </label>
+                </div>
                 {selectedOption === "walletAddress" && (
                   <input
-                    id="delivery-myWallet"
                     type="text"
                     placeholder="0x..."
                     value={customWalletAddress}
@@ -253,18 +253,20 @@ export default function ItemERC1155({
                   />
                 )}
               </div>
-              <div className="mb-2 accent-blue-500">
-                <label className="inline-flex items-center">
+              <div className="mb-2">
+                <div className="flex items-center">
                   <input
-                    id="delivery-myWallet"
+                    id="delivery-email"
                     type="radio"
                     name="deliveryMethod"
-                    className="mr-2"
+                    className="mr-2 accent-blue-500"
                     checked={selectedOption === "email"}
                     onChange={() => setSelectedOption("email")}
                   />
-                  Send to an email
-                </label>
+                  <label htmlFor="delivery-email" className="cursor-pointer">
+                    Send to an email
+                  </label>
+                </div>
                 {selectedOption === "email" && (
                   <input
                     type="email"
