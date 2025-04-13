@@ -220,6 +220,7 @@ export default function ItemERC1155({
                 <label className="inline-flex items-center">
                   <input
                     type="radio"
+                    id="deliveryMethod"
                     name="deliveryMethod"
                     className="mr-2 accent-blue-500"
                     checked={selectedOption === "myWallet"}
@@ -231,6 +232,7 @@ export default function ItemERC1155({
               <div className="mb-2">
                 <label className="inline-flex items-center">
                   <input
+                    id="delivery-myWallet"
                     type="radio"
                     name="deliveryMethod"
                     className="mr-2 accent-blue-500"
@@ -241,6 +243,7 @@ export default function ItemERC1155({
                 </label>
                 {selectedOption === "walletAddress" && (
                   <input
+                    id="delivery-myWallet"
                     type="text"
                     placeholder="0x..."
                     value={customWalletAddress}
@@ -253,6 +256,7 @@ export default function ItemERC1155({
               <div className="mb-2 accent-blue-500">
                 <label className="inline-flex items-center">
                   <input
+                    id="delivery-myWallet"
                     type="radio"
                     name="deliveryMethod"
                     className="mr-2"
