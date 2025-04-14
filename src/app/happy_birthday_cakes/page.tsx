@@ -380,6 +380,7 @@ function NFTPed1Content() {
                   priceInPol={pricesInPol[tokenIndex] ?? null}
                   priceInEur={getNFTEuroPrice(projectName, tokenIndex.toString())}
                   contract={contract}
+                  blockchainId={contract.chain.id}
                   stripeMode={stripeMode}
                   previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex
                     .toString()

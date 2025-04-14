@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     projectName,
     distributionType,
     buyerWalletAddress,
-    recipientWalletAddress,
+    recipientWalletAddressOrEmail,
     nftContractAddress,
     blockchainId,
     tokenId,
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   console.log("projectName:", projectName);
   console.log("distributionType:", distributionType);
   console.log("buyerWalletAddress:", buyerWalletAddress);
-  console.log("recipientWalletAddress:", recipientWalletAddress);
+  console.log("recipientWalletAddressOrEmail:", recipientWalletAddressOrEmail);
   console.log("nftContractAddress:", nftContractAddress);
   console.log("blockchainId:", blockchainId);
   console.log("tokenId:", tokenId);
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       projectName,
       distributionType, 
       buyerWalletAddress,
-      recipientWalletAddress,
+      recipientWalletAddressOrEmail,
       nftContractAddress,
       blockchainId,
       tokenId, 

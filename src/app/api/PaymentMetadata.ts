@@ -5,7 +5,7 @@ export interface PaymentMetadata {
   projectName: string;
   distributionType: string;
   buyerWalletAddress: string;
-  recipientWalletAddress: string;
+  recipientWalletAddressOrEmail: string;
   nftContractAddress: string;
   blockchainId: string;
   tokenId: string;
@@ -30,7 +30,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     projectName: paymentIntent.metadata.projectName,
     distributionType: paymentIntent.metadata.distributionType,
     buyerWalletAddress: paymentIntent.metadata.buyerWalletAddress,
-    recipientWalletAddress: paymentIntent.metadata.recipientWalletAddress,
+    recipientWalletAddressOrEmail: paymentIntent.metadata.recipientWalletAddressOrEmail,
     nftContractAddress: paymentIntent.metadata.nftContractAddress,
     blockchainId: paymentIntent.metadata.blockchainId,
     tokenId: paymentIntent.metadata.tokenId,
@@ -43,7 +43,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     console.error("Invalid buyer wallet address");
     return NextResponse.json({ error: "Invalid buyer wallet address" }, { status: 400 });
   }
-  if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddress)) {
+  if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddressOrEmail)) {
     console.error("Invalid recipient wallet address");
     return NextResponse.json({ error: "Invalid recipient wallet address" }, { status: 400 });
   }
@@ -84,7 +84,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     projectName,
     distributionType,
     buyerWalletAddress, 
-    recipientWalletAddress, 
+    recipientWalletAddressOrEmail, 
     nftContractAddress, 
     blockchainId, 
     tokenId,
@@ -97,7 +97,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
       projectName: projectName,
       distributionType: distributionType,
       buyerWalletAddress: buyerWalletAddress,
-      recipientWalletAddress: recipientWalletAddress,
+      recipientWalletAddressOrEmail: recipientWalletAddressOrEmail,
       nftContractAddress: nftContractAddress,
       blockchainId: blockchainId,
       tokenId: tokenId,
@@ -111,7 +111,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
       return NextResponse.json({ error: "Adresse de l'acheteur invalide" }, { status: 400 });
     }
     // Validation des paramètres de base
-    if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddress)) {
+    if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddressOrEmail)) {
       return NextResponse.json({ error: "Adresse de du receveur du NFT est invalide" }, { status: 400 });
     }
     if (!isValidEthereumAddress(paymentMetadata.nftContractAddress)) {

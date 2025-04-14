@@ -189,6 +189,8 @@ function NFTPed1Content() {
                 previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
                 redirectPage={collectionPageRef}
                 distributionType={distributionType}
+                buyerWalletAddress={smartAccount?.address || ""}
+                recipientWalletAddressOrEmail={smartAccount?.address || ""}
                 projectName={projectName}
                 requestedQuantity={requestedQuantity}
               />

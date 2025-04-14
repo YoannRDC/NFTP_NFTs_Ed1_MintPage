@@ -192,6 +192,8 @@ export default function ItemERC721Claim({
               projectName={projectName}
               contract={contract}
               distributionType={distributionType}
+              buyerWalletAddress={smartAccount?.address || ""}
+              recipientWalletAddressOrEmail={smartAccount?.address || ""}
               tokenId={tokenId}
               requestedQuantity={requestedQuantity}
               paymentPriceFiat={totalPriceEurCents}

@@ -437,7 +437,9 @@ function NFTPed1Content() {
                   redirectPage={collectionPageRef}
                   distributionType={distributionType}
                   projectName={projectName}
-                  requestedQuantity={requestedQuantity}
+                  requestedQuantity={requestedQuantity} 
+                  buyerWalletAddress={smartAccount?.address ?? ""} 
+                  recipientWalletAddressOrEmail={smartAccount?.address ?? ""}                
                 />
               </div>
             );

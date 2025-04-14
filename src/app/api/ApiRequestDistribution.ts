@@ -26,7 +26,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   if (paymentMetadata.distributionType === DistributionType.ClaimToERC1155) {
     tx = claimToERC1155({
       contract: nftContract,
-      to: paymentMetadata.recipientWalletAddress,
+      to: paymentMetadata.recipientWalletAddressOrEmail,
       quantity: BigInt(paymentMetadata.requestedQuantity),
       from: minterAddress,
       tokenId: BigInt(paymentMetadata.tokenId),
@@ -34,7 +34,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
   } else if (paymentMetadata.distributionType === DistributionType.ClaimToERC721) {
     tx = claimToERC721({
       contract: nftContract,
-      to: paymentMetadata.recipientWalletAddress,
+      to: paymentMetadata.recipientWalletAddressOrEmail,
       quantity: BigInt(paymentMetadata.requestedQuantity),
       from: minterAddress,
     });
@@ -44,7 +44,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       method: "function safeTransferFrom(address from, address to, uint256 tokenId)",
       params: [
         minterAddress,
-        paymentMetadata.recipientWalletAddress,
+        paymentMetadata.recipientWalletAddressOrEmail,
         BigInt(paymentMetadata.tokenId)
       ],
     });
@@ -55,12 +55,14 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       method: "function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes data)",
       params: [
         minterAddress,
-        paymentMetadata.recipientWalletAddress,
+        paymentMetadata.recipientWalletAddressOrEmail,
         BigInt(paymentMetadata.tokenId),
         BigInt(paymentMetadata.requestedQuantity),
         data,
       ],
     });
+  } else if (paymentMetadata.distributionType === DistributionType.EmailCode) {
+    // TODO send email code.
   } else {
     throw new Error(`Unknown distributionType: ${paymentMetadata.distributionType}`);
   }

@@ -34,9 +34,8 @@ export async function POST(req: NextRequest) {
     // Initialisation du client Thirdweb
     const client = initializeThirdwebClient();
     if (client instanceof NextResponse) {
-      return client;
+      return client; 
     }
-    const nftContract = getNftContract(client, Number(paymentMetadata.blockchainId), paymentMetadata.nftContractAddress);
 
     // Récupération de l'adresse du minter
     const minterAddress = getProjectMinterAddress(paymentMetadata.projectName);

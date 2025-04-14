@@ -8,10 +8,13 @@ import { Elements } from "@stripe/react-stripe-js";
 import CreditCardForm from "./CreditCardForm";
 import { DistributionType, StripeMode } from "../constants";
 
-// Définition des props attendues par StripePurchasePage, incluant le contrat et la page de retour
+// Définition des props attendues par StripePurchasePage, incluant le contrat, la page de retour
+// et les nouveaux paramètres buyerWalletAddress et recipientWalletAddress
 interface StripePurchasePageProps {
   projectName: string;
   distributionType: DistributionType;
+  buyerWalletAddress: string;      // adresse du wallet acheteur
+  recipientWalletAddressOrEmail: string;  // adresse du wallet destinataire
   contract: any;
   tokenId: bigint;
   requestedQuantity: bigint;
@@ -22,11 +25,13 @@ interface StripePurchasePageProps {
 
 export default function StripePurchasePage({
   projectName,
-  distributionType: distributionType,
+  distributionType,
+  buyerWalletAddress,
+  recipientWalletAddressOrEmail,
   contract,
   tokenId,
   requestedQuantity,
-  paymentPriceFiat: paymentPriceFiat,
+  paymentPriceFiat,
   stripeMode,
   redirectPage,
 }: StripePurchasePageProps) {
@@ -44,15 +49,17 @@ export default function StripePurchasePage({
   // Chargement de Stripe avec la clé correspondante
   const stripePromise = loadStripe(stripePublishableKey);
 
-  console.log("smartAccount?.address: ", smartAccount?.address);
-  console.log("contract?.address: ", contract?.address);
-  console.log("contract.chain.id.toString(): ", contract.chain.id.toString());
-  console.log("requestedQuantity.toString(): ", requestedQuantity.toString());
-  console.log("amount.toString(): ", paymentPriceFiat.toString());
-  console.log("stripeMode.toString(): ", stripeMode.toString());
-  console.log("distributionType.toString(): ", distributionType.toString());
-  console.log("tokenId.toString(): ", tokenId.toString());
-  console.log("projectName: ", projectName);
+  console.log("smartAccount?.address:", smartAccount?.address);
+  console.log("buyerWalletAddress:", buyerWalletAddress);
+  console.log("recipientWalletAddressOrEmail:", recipientWalletAddressOrEmail);
+  console.log("contract?.address:", contract?.address);
+  console.log("contract.chain.id.toString():", contract.chain.id.toString());
+  console.log("requestedQuantity.toString():", requestedQuantity.toString());
+  console.log("paymentPriceFiat.toString():", paymentPriceFiat.toString());
+  console.log("stripeMode.toString():", stripeMode.toString());
+  console.log("distributionType.toString():", distributionType.toString());
+  console.log("tokenId.toString():", tokenId.toString());
+  console.log("projectName:", projectName);
 
   // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {
@@ -63,8 +70,8 @@ export default function StripePurchasePage({
         body: JSON.stringify({
           projectName,
           distributionType: distributionType.toString(),
-          buyerWalletAddress: smartAccount?.address,
-          recipientWalletAddress: smartAccount?.address,
+          buyerWalletAddress: buyerWalletAddress,
+          recipientWalletAddressOrEmail: recipientWalletAddressOrEmail,
           nftContractAddress: contract?.address,
           blockchainId: contract.chain.id.toString(),
           tokenId: tokenId.toString(), 

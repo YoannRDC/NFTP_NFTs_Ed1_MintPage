@@ -220,6 +220,8 @@ export default function ItemERC1155({
               projectName={projectName}
               contract={contract}
               distributionType={distributionType}
+              buyerWalletAddress={smartAccount?.address || ""}
+              recipientWalletAddressOrEmail={smartAccount?.address || ""}
               tokenId={tokenId}
               requestedQuantity={requestedQuantity}
               paymentPriceFiat={totalPriceEurCents}
