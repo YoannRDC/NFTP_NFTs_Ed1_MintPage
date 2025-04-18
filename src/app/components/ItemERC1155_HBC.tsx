@@ -397,7 +397,9 @@ export default function ItemERC1155_HBC({
             />
             <p>{totalPriceEur} Euros</p>
             <br></br>
-            <TestEmailButton>
+            <div>
+              <TestEmailButton/>
+            </div>
           </div>
         ) : (
           <div className="text-center">
