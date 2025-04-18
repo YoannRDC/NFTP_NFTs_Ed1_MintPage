@@ -5,7 +5,6 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiCommons";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName } from "../constants";
-import { NextResponse } from "next/server";
 import { generateDownloadCode } from "./ApiEmailCodes";
 
 export interface DistributionResult {
