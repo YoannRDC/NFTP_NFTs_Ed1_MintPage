@@ -8,7 +8,7 @@ export default function TestEmailButton() {
   const handleTestEmail = async () => {
     setStatus('Envoi en cours…')
     try {
-      const res = await fetch('/api/ApiEmailCodes', {
+      const res = await fetch('/api/test-email-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
