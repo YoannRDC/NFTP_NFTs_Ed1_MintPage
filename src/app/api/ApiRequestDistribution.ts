@@ -6,6 +6,7 @@ import { getNftContract, maskSecretKey } from "./ApiCommons";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName } from "../constants";
 import { NextResponse } from "next/server";
+import { generateDownloadCode } from "./ApiEmailCodes";
 
 export interface DistributionResult {
   transaction: any; 
@@ -62,7 +63,7 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       ],
     });
   } else if (paymentMetadata.distributionType === DistributionType.EmailCode) {
-    // TODO send email code.
+    generateDownloadCode(paymentMetadata.recipientWalletAddressOrEmail);
   } else {
     throw new Error(`Unknown distributionType: ${paymentMetadata.distributionType}`);
   }

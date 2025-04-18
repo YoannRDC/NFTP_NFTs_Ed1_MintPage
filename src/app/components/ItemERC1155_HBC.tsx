@@ -22,6 +22,7 @@ import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPayment } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
 import { callBackEndTransferNFT } from "../utils/backendCalls";
+import TestEmailButton from "./Test_callSendEmail";
 
 interface ItemERC1155_HBCProps {
   priceInPol: number;
@@ -395,6 +396,8 @@ export default function ItemERC1155_HBC({
               redirectPage={redirectPage}
             />
             <p>{totalPriceEur} Euros</p>
+            <br></br>
+            <TestEmailButton>
           </div>
         ) : (
           <div className="text-center">
