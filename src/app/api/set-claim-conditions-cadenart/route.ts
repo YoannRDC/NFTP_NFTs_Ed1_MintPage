@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { setClaimConditionERC1155 } from "../ApiSetClaimConditionsERC1155";
 
 export async function POST(req: NextRequest) {
+
+  // SECURITY DEACTIVATE ONCE DONE !!
+  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  console.log("Not allowed to call this function ! error code: NotAllowedInCode");
+  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  return false;
+
   try {
     const body = await req.json();
     const tokenId = body.tokenId;

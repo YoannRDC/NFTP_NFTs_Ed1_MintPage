@@ -33,6 +33,7 @@ export async function setClaimConditionERC1155({
       price: string;
     }>;
   }) {
+
     const client = createThirdwebClient({ secretKey: thirdwebSecretKey });
     const chain = defineChain(Number(chainId));
     const nftContract = getContract({ client, chain, address: contractAddress });
