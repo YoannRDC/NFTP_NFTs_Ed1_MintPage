@@ -10,7 +10,7 @@ import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
 import { distributeNFT } from "../ApiRequestDistribution";
 import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
-import { getNftContract, initializeThirdwebClient } from "../ApiCommons";
+import { getNftContract, initializeThirdwebClient } from "../ApiPaymentReception";
 
 export async function POST(req: NextRequest) {
   try {

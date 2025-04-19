@@ -2,7 +2,7 @@ import { claimTo as claimToERC721 } from "thirdweb/extensions/erc721";
 import { claimTo as claimToERC1155 } from "thirdweb/extensions/erc1155";
 import { prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { getNftContract, maskSecretKey } from "./ApiCommons";
+import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName } from "../constants";
 import { generateDownloadCode } from "./ApiEmailCodes";

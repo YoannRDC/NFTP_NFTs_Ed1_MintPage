@@ -5,7 +5,7 @@ import {
   PaymentMetadata,
 } from "../PaymentMetadata";
 import { distributeNFT } from "../ApiRequestDistribution";
-import { assertValidityStripe, initializeThirdwebClient } from "../ApiCommons";
+import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentReception";
 
 export async function POST(req: NextRequest) {
   // Vérification et extraction de l'événement Stripe
