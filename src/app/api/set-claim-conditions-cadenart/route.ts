@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
       privateKey: process.env.PRIVATE_KEY_CADENART!,
       thirdwebSecretKey: process.env.THIRDWEB_API_SECRET_KEY!,
       chainId:"137",
-      maxClaimableSupply: "1000000",
-      maxClaimablePerWallet: "1000000",
+      maxClaimableSupply: "100",
+      maxClaimablePerWallet: "10",
       currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       price: "30",
       startDate: "2025-04-19T19:00:00",
@@ -28,12 +28,12 @@ export async function POST(req: NextRequest) {
       overrideList: [
         {
           address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
-          maxClaimable: "1000000",
+          maxClaimable: "10",
           price: "0",
         },
         {
           address: "0x70fB670E902904f7BE7A7fd455c792f0B0C5Bccb",
-          maxClaimable: "1000000",
+          maxClaimable: "10",
           price: "0",
         },
       ],
