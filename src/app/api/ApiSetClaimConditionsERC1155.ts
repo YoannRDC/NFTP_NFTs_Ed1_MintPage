@@ -38,6 +38,7 @@ export async function setClaimConditionERC1155({
     const nftContract = getContract({ client, chain, address: contractAddress });
   
     const account = privateKeyToAccount({ client, privateKey });
+    console.log("Adresse dérivée de la clé privée :", account.address);
   
     const tokenIdBig = BigInt(tokenId);
     const transaction = setClaimConditions({
