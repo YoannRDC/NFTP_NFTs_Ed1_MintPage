@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       contractAddress: "0x2d4108d38b19B8acC72B83B7Facb46dB0ECCe237",
       privateKey: process.env.PRIVATE_KEY_CADENART!,
       thirdwebSecretKey: process.env.THIRDWEB_API_SECRET_KEY!,
+      chainId:"137",
       maxClaimableSupply: "1000000",
       maxClaimablePerWallet: "1000000",
       currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",

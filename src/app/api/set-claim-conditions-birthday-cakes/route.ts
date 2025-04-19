@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       contractAddress: "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf",
       privateKey: process.env.PRIVATE_KEY_BIRTHDAY_CAKES!,
       thirdwebSecretKey: process.env.THIRDWEB_API_SECRET_KEY!,
+      chainId:"137",
       maxClaimableSupply: "1000000",
       maxClaimablePerWallet: "1000000",
       currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
