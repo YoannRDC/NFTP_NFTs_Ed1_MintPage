@@ -9,15 +9,19 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { createListing } from "thirdweb/extensions/marketplace";
 
 export async function POST(req: NextRequest) {
-  // 🔐 Sécurité
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader !== `Bearer ${process.env.BACKEND_SECRET_KEY}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
 
   try {
     const body = await req.json();
-    const { tokenId, quantity, price } = body;
+    const { tokenId, quantity, price, adminCode } = body;
+
+    // 🔐 Vérification du code secret
+    const expectedCode = process.env.ADMIN_CODE;
+    if (adminCode !== expectedCode) {
+      return NextResponse.json(
+        { error: "Code d'autorisation invalide." },
+        { status: 403 }
+      );
+    }
 
     if (
       typeof tokenId !== "number" ||
@@ -51,6 +55,14 @@ export async function POST(req: NextRequest) {
 
     const txResult = await sendTransaction({ transaction, account });
 
+    if (!txResult || !txResult.transactionHash) {
+      return NextResponse.json(
+        { error: "Transaction échouée ou hash manquant." },
+        { status: 500 }
+      );
+    }
+
+    // ✅ Ici on retourne bien un NextResponse en cas de succès
     return NextResponse.json({
       message: `NFT listé en vente avec succès pour tokenId ${tokenId}`,
       transactionHash: txResult.transactionHash,

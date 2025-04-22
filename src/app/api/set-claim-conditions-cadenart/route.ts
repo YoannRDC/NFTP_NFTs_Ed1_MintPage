@@ -3,15 +3,19 @@ import { setClaimConditionERC1155 } from "../ApiSetClaimConditionsERC1155";
 
 export async function POST(req: NextRequest) {
 
-  // SECURITY DEACTIVATE ONCE DONE !!
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  console.log("Not allowed to call this function ! error code: NotAllowedInCode");
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  return false;
-
   try {
     const body = await req.json();
-    const tokenId = body.tokenId;
+
+    const { tokenId, adminCode } = body;
+
+    // 🔐 Vérification du code secret
+    const expectedCode = process.env.ADMIN_CODE;
+    if (adminCode !== expectedCode) {
+      return NextResponse.json(
+        { error: "Code d'autorisation invalide." },
+        { status: 403 }
+      );
+    }
 
     if (typeof tokenId !== "number") {
       return NextResponse.json(
