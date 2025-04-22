@@ -13,6 +13,8 @@ export async function POST(req: NextRequest) {
     // 🔐 Vérification du code secret
     const expectedCode = process.env.ADMIN_CODE;
     if (adminCode !== expectedCode) {
+      console.log("expectedCode:", expectedCode)
+      console.log("process.env.ADMIN_CODE:", process.env.ADMIN_CODE)
       return NextResponse.json(
         { error: "Code d'autorisation invalide." },
         { status: 403 }
