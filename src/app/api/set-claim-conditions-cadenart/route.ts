@@ -3,6 +3,8 @@ import { setClaimConditionERC1155 } from "../ApiSetClaimConditionsERC1155";
 
 export async function POST(req: NextRequest) {
 
+  console.log("set-claim-conditions-cadenart called.")
+
   try {
     const body = await req.json();
 
