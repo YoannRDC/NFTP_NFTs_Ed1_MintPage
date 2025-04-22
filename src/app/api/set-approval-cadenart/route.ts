@@ -3,16 +3,17 @@ import {
   createThirdwebClient,
   defineChain,
   getContract,
+  prepareContractCall,
   sendTransaction,
 } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { createListing } from "thirdweb/extensions/marketplace";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { tokenId, quantity, price, adminCode } = body;
+    const { operator, approved, adminCode } = body;
 
+    // 🔐 Sécurité : vérifie le code admin
     const expectedCode = process.env.ADMIN_CODE;
     if (adminCode !== expectedCode) {
       return NextResponse.json(
@@ -21,44 +22,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (
-      typeof tokenId !== "number" ||
-      typeof quantity !== "number" ||
-      typeof price !== "number"
-    ) {
+    if (typeof operator !== "string" || typeof approved !== "boolean") {
       return NextResponse.json(
-        {
-          error:
-            "Les champs 'tokenId', 'quantity' et 'price' doivent être des nombres.",
-        },
+        { error: "Champs invalides : 'operator' doit être une adresse et 'approved' un booléen." },
         { status: 400 }
       );
     }
 
+    // 🔗 Variables de config
     const NFT_CONTRACT_ADDRESS = "0x2d4108d38b19B8acC72B83B7Facb46dB0ECCe237";
-    const MARKETPLACE_ADDRESS = "0x0EfFa5135C304AAdcE31ae30CE0913D55234BF8B";
     const PRIVATE_KEY = process.env.PRIVATE_KEY_CADENART!;
     const THIRDWEB_SECRET_KEY = process.env.THIRDWEB_API_SECRET_KEY!;
     const CHAIN_ID = process.env.CHAIN_ID || "137";
 
     const client = createThirdwebClient({ secretKey: THIRDWEB_SECRET_KEY });
     const chain = defineChain(Number(CHAIN_ID));
-    const marketplace = getContract({
-      client,
-      chain,
-      address: MARKETPLACE_ADDRESS,
-    });
-    const account = privateKeyToAccount({
-      client,
-      privateKey: PRIVATE_KEY,
-    });
+    const contract = getContract({ client, chain, address: NFT_CONTRACT_ADDRESS });
+    const account = privateKeyToAccount({ client, privateKey: PRIVATE_KEY });
 
-    const transaction = createListing({
-      contract: marketplace,
-      assetContractAddress: NFT_CONTRACT_ADDRESS,
-      tokenId: BigInt(tokenId),
-      quantity: BigInt(quantity),
-      pricePerToken: price.toString(),
+    // ⚙️ Prépare et envoie la transaction
+    const transaction = prepareContractCall({
+      contract,
+      method: "function setApprovalForAll(address operator, bool approved)",
+      params: [operator, approved],
     });
 
     const txResult = await sendTransaction({ transaction, account });
@@ -71,11 +57,11 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      message: `NFT listé en vente avec succès pour tokenId ${tokenId}`,
+      message: `Autorisation ${approved ? "activée" : "révoquée"} pour l’opérateur ${operator}`,
       transactionHash: txResult.transactionHash,
     });
   } catch (error: any) {
-    console.error("Erreur lors de la mise en vente :", error);
+    console.error("Erreur lors de l'approbation :", error);
     return new NextResponse(
       JSON.stringify({
         error: { message: error.message, stack: error.stack },
