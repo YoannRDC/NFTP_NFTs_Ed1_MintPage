@@ -1,86 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  createThirdwebClient,
-  defineChain,
-  getContract,
-  sendTransaction,
-} from "thirdweb";
-import { privateKeyToAccount } from "thirdweb/wallets";
-import { createListing } from "thirdweb/extensions/marketplace";
+import { Seaport } from "@opensea/seaport-js";
+import { ethers } from "ethers";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { tokenId, quantity, price, adminCode } = body;
+    const { tokenAddress, tokenId, priceInEth, adminCode } = body;
 
-    const expectedCode = process.env.ADMIN_CODE;
-    if (adminCode !== expectedCode) {
-      return NextResponse.json(
-        { error: "Code d'autorisation invalide." },
-        { status: 403 }
-      );
+    if (adminCode !== process.env.ADMIN_CODE) {
+      return NextResponse.json({ error: "Code d'autorisation invalide" }, { status: 403 });
     }
 
-    if (
-      typeof tokenId !== "number" ||
-      typeof quantity !== "number" ||
-      typeof price !== "number"
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Les champs 'tokenId', 'quantity' et 'price' doivent être des nombres.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const NFT_CONTRACT_ADDRESS = "0x2d4108d38b19B8acC72B83B7Facb46dB0ECCe237";
-    const MARKETPLACE_ADDRESS = "0x0EfFa5135C304AAdcE31ae30CE0913D55234BF8B";
     const PRIVATE_KEY = process.env.PRIVATE_KEY_CADENART!;
-    const THIRDWEB_SECRET_KEY = process.env.THIRDWEB_API_SECRET_KEY!;
-    const CHAIN_ID = process.env.CHAIN_ID || "137";
+    const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY_CADENART!;
+    const RPC_URL = process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL!;
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+    const seaport = new Seaport(wallet);
 
-    const client = createThirdwebClient({ secretKey: THIRDWEB_SECRET_KEY });
-    const chain = defineChain(Number(CHAIN_ID));
-    const marketplace = getContract({
-      client,
-      chain,
-      address: MARKETPLACE_ADDRESS,
+    const offerer = await wallet.getAddress();
+    const price = ethers.parseEther(priceInEth.toString()); // bigint
+
+    const now = Math.floor(Date.now() / 1000);
+    const end = now + 90 * 24 * 60 * 60; // 90 jours
+
+    const { executeAllActions } = await seaport.createOrder({
+      offer: [
+        {
+          itemType: 2, // 2 = ERC1155
+          token: tokenAddress,
+          identifier: tokenId.toString(),
+          amount: "1",
+        },
+      ],
+      consideration: [
+        {
+          amount: price.toString(),
+          recipient: offerer,
+        },
+        {
+          amount: ((price * 25n) / 1000n).toString(), // 2.5% OpenSea fee
+          recipient: "0x0000a26b00c1F0DF003000390027140000fAa719",
+        },
+      ],
+      endTime: end,
+      startTime: now,
+      zone: "0x0000000000000000000000000000000000000000",
+      conduitKey: "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000",
     });
-    const account = privateKeyToAccount({
-      client,
-      privateKey: PRIVATE_KEY,
-    });
 
-    const transaction = createListing({
-      contract: marketplace,
-      assetContractAddress: NFT_CONTRACT_ADDRESS,
-      tokenId: BigInt(tokenId),
-      quantity: BigInt(quantity),
-      pricePerToken: price.toString(),
-    });
+    const order = await executeAllActions(); // signature, parameters
 
-    const txResult = await sendTransaction({ transaction, account });
-
-    if (!txResult || !txResult.transactionHash) {
-      return NextResponse.json(
-        { error: "Transaction échouée ou hash manquant." },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      message: `NFT listé en vente avec succès pour tokenId ${tokenId}`,
-      transactionHash: txResult.transactionHash,
-    });
-  } catch (error: any) {
-    console.error("Erreur lors de la mise en vente :", error);
-    return new NextResponse(
-      JSON.stringify({
-        error: { message: error.message, stack: error.stack },
+    const openseaResponse = await fetch("https://api.opensea.io/api/v2/orders/matic/seaport/listings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": OPENSEA_API_KEY,
+      },
+      body: JSON.stringify({
+        parameters: order.parameters,
+        signature: order.signature,
+        protocol_address: "0x0000000000000068f116a894984e2db1123eb395",
       }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    });
+
+    const result = await openseaResponse.json();
+    return NextResponse.json({ success: true, result });
+  } catch (error: any) {
+    console.error("Erreur :", error);
+    return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 }
