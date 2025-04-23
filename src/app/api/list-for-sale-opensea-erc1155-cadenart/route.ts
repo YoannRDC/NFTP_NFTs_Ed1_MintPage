@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       ],
       startTime: now.toString(),
       endTime: end.toString(),
-      orderType: 0,
+      orderType: 1,
       zone: "0x0000000000000000000000000000000000000000",
       zoneHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
       salt: Date.now().toString(),
