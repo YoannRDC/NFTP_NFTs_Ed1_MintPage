@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
     const now = Math.floor(Date.now() / 1000);
     const end = now + 90 * 24 * 60 * 60; // 90 jours
 
+    const contract = new ethers.Contract(tokenAddress, [
+      "function balanceOf(address, uint256) view returns (uint256)"
+    ], provider);
+    
+    const balance = await contract.balanceOf(offerer, tokenId);
+    console.log("🧪 Balance test:", balance.toString());
+    
+
     const { executeAllActions } = await seaport.createOrder({
       offer: [
         {
