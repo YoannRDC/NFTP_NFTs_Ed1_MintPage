@@ -64,7 +64,8 @@ export async function POST(req: NextRequest) {
       salt: Date.now().toString(),
       conduitKey,
       totalOriginalConsiderationItems: 2,
-      counter: counter.toString()
+      counter: counter.toString(),
+      allowPartialFills: true
     };
     
 
