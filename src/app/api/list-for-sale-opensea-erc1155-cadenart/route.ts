@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
     const seaport = new Seaport(wallet);
 
     const offerer = await wallet.getAddress();
+    console.log("👛 Wallet backend utilisé :", offerer);
+
     const price = ethers.parseEther(priceInEth.toString()); // bigint
 
     const now = Math.floor(Date.now() / 1000);
