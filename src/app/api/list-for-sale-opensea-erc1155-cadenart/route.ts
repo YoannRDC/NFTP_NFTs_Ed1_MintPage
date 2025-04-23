@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { tokenAddress, tokenId, priceInMatic, adminCode } = body;
+    const { tokenAddress, tokenId, priceInMatic, quantity, adminCode } = body;
 
     if (adminCode !== process.env.ADMIN_CODE) {
       return NextResponse.json({ error: "Code d'autorisation invalide" }, { status: 403 });
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           itemType: 3,
           token: tokenAddress,
           identifier: tokenId.toString(),
-          amount: "1"
+          amount: quantity
         }
       ],
       consideration: [
