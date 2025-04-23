@@ -48,11 +48,11 @@ export async function POST(req: NextRequest) {
       ],
       consideration: [
         {
-          amount: ((price * 975n) / 1000n).toString(),
+          amount: ((price * 995n) / 1000n).toString(),
           recipient: address
         },
         {
-          amount: ((price * 25n) / 1000n).toString(),
+          amount: ((price * 5n) / 1000n).toString(),
           recipient: openseaFeeRecipient
         }
       ],
