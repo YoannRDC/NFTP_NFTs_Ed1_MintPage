@@ -24,8 +24,8 @@ const theContract = getContract({
   address: contractAddress,
 });
 
-const videoPresentationLink =
-  "https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
+// const videoPresentationLink =
+//   "https://www.youtube.com/embed/Xu1ybZk8Pqw?rel=0&modestbranding=1&autoplay=0";
 const videoPresentationTitle = "Présentation CadenART";
 const collectionName = "Photos de CadenART";
 const collectionPageRef = "/cadenart";
@@ -190,18 +190,15 @@ function NFTPed1Content() {
         Plus qu’un simple loisir, la photographie est pour lui un moyen de ralentir le rythme, 
         de se connecter à l’essentiel et de garder une trace sensible de ces moments suspendus.
         </div>
-        <div className="decorative-description">Loïc Radenac</div>
+        {/* <div className="decorative-description">Loïc Radenac</div> */}
       </div>
-      <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
+      {/* <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
         <VideoPresentation src={videoPresentationLink} title={videoPresentationTitle} />
-      </div>
+      </div> */}
 {/*       <Link className="text-sm text-gray-400" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
       </Link> */}
       <div className="decorative-title mb-5">-- NFTs à vendre --</div>
-      <h1 style={{ fontSize: "4em", color: "red" }}>
-        !! Page en construction, merci de ne pas intéragir !!
-      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {tokenIds.slice(0, 20).map((tokenId) => (
           <div key={tokenId.toString()}>
@@ -215,6 +212,7 @@ function NFTPed1Content() {
               redirectPage={collectionPageRef}
               distributionType={distributionType}
               projectName={projectName}
+              showSupply={false}
             />
           </div>
         ))}

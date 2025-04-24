@@ -19,11 +19,12 @@ interface ItemERC721Props {
   priceInEur: number | string | null;
   contract: any;
   stripeMode: StripeMode;
-  previewImage: string; // Image de preview
-  redirectPage: string; // Page de redirection après transaction
+  previewImage: string;
+  redirectPage: string;
   distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
+  showSupply: boolean;
 }
 
 export default function ItemERC1155({
@@ -36,6 +37,7 @@ export default function ItemERC1155({
   distributionType,
   tokenId,
   projectName,
+  showSupply
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
@@ -153,7 +155,11 @@ export default function ItemERC1155({
 
       {/* Affichage du nombre vendu / total supply */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {soldCount}/{totalSupply} NFT vendu
+        {showSupply !== false && (
+          <div className="text-gray-500 mt-2 flex justify-center">
+            {soldCount}/{totalSupply} NFT vendu
+          </div>
+        )}
       </div>
 
       <div className="text-center mt-5">

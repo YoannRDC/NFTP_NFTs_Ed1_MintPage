@@ -222,6 +222,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -235,6 +236,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -248,6 +250,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -261,6 +264,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -274,6 +278,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -287,6 +292,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -300,6 +306,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -313,6 +320,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -326,6 +334,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
         <div>
@@ -339,6 +348,7 @@ function NFTPed1Content() {
             redirectPage={collectionPageRef}
             distributionType={distributionType}
             projectName={projectName}
+            showSupply={false}
           />
         </div>
       </div>
