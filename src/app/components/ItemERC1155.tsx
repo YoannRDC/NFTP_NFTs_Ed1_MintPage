@@ -155,10 +155,10 @@ export default function ItemERC1155({
 
       {/* Affichage du nombre vendu / total supply */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {showSupply !== false && (
-          <div className="text-gray-500 mt-2 flex justify-center">
-            {soldCount}/{totalSupply} NFT vendu
-          </div>
+        {showSupply === false ? (
+          <>{soldCount} NFT vendu</>
+        ) : (
+          <>{soldCount}/{totalSupply} NFT vendu</>
         )}
       </div>
 
