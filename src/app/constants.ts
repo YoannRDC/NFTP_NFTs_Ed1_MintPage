@@ -46,6 +46,10 @@ export const projectMappings: Record<string, { publicKey: string; privateKeyEnv:
 		publicKey: "0x87e366F9F644c2dB43d9f24346C530F2915Be0d7", 
 		privateKeyEnv: "PRIVATE_KEY_BIRTHDAY_CAKES",
 	},
+	"CADENART": {
+		publicKey: "0x70fB670E902904f7BE7A7fd455c792f0B0C5Bccb", 
+		privateKeyEnv: "PRIVATE_KEY_CADENART",
+	},
 };
 
 /**
