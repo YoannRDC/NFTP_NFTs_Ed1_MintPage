@@ -119,6 +119,12 @@ function Menu({ isAdmin }: MenuProps) {
           description="52 œuvres uniques qui entrelacent les quatre symboles d'un jeu de 52 cartes."
           imageSrc="/artcards/ArtCards.gif"
         />
+        <MenuItem
+          title="CadenART"
+          href="/cadenart"
+          description="Passionné de nature, Loïc Radenac saisis des instants simples lors de ses randonnées."
+          imageSrc="/artcards/ArtCards.gif"
+        />
         {isAdmin && (
           <MenuItem
             title="Nicole Mathieu"

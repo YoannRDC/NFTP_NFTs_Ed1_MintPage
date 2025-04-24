@@ -210,7 +210,24 @@ function NFTPed1Content() {
           Opensea
         </a>.
       </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {tokenIds.slice(0, 20).map((tokenId) => (
+          <div key={tokenId.toString()}>
+            <ItemERC1155
+              tokenId={tokenId}
+              priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+              priceInEur={NFT_PRICE_EUR}
+              contract={theContract}
+              stripeMode={stripeMode}
+              previewImage={`/cadenart/oeuvres/${tokenId.toString()}.jpg`}
+              redirectPage={collectionPageRef}
+              distributionType={distributionType}
+              projectName={projectName}
+              showSupply={false}
+            />
+          </div>
+        ))}
+      </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>
       {isLoadingNfts ? (
