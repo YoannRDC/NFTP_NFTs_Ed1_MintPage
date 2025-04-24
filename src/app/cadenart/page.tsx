@@ -199,24 +199,18 @@ function NFTPed1Content() {
         Visit {artistProjectWebsitePrettyPrint}
       </Link> */}
       <div className="decorative-title mb-5">-- NFTs à vendre --</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tokenIds.slice(0, 20).map((tokenId) => (
-          <div key={tokenId.toString()}>
-            <ItemERC1155
-              tokenId={tokenId}
-              priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
-              priceInEur={NFT_PRICE_EUR}
-              contract={theContract}
-              stripeMode={stripeMode}
-              previewImage={`/cadenart/Oeuvres_reduced3/${tokenId.toString()}.jpg`}
-              redirectPage={collectionPageRef}
-              distributionType={distributionType}
-              projectName={projectName}
-              showSupply={false}
-            />
-          </div>
-        ))}
+      <div className="mb-10">
+        Retrouvez toutes les œuvres à vendre sur{" "}
+        <a
+          href="https://opensea.io/fr/collection/photos-de-cadenart"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          Opensea
+        </a>.
       </div>
+
 
       <div className="decorative-title">-- Mes NFTs --</div>
       {isLoadingNfts ? (
