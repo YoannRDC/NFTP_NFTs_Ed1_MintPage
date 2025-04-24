@@ -92,7 +92,7 @@ export function getNFTEuroPrice( projectName: string, tokenId: string): number {
     // Tous les NFTs coutent 10e
     return 10;
   } else if (project === "CADENART") {
-    // Tous les NFTs coutent 10e
+    // Tous les NFTs coutent 5e
     return 30;
   } else {
     throw new Error(`Aucune politique de prix définie pour le projet: ${projectName}`);
