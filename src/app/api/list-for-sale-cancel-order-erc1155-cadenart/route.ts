@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Seaport } from "@opensea/seaport-js";
 import { ethers } from "ethers";
 
 export async function POST(req: NextRequest) {
@@ -17,9 +16,8 @@ export async function POST(req: NextRequest) {
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
     const address = await wallet.getAddress();
-    const seaport = new Seaport(wallet);
 
-    // Étape 1 : Récupérer les orderHashes
+    // Étape 1 : Récupérer les ordres COMPLETS depuis OpenSea
     const ordersResponse = await fetch(
       `https://api.opensea.io/api/v2/orders/matic/seaport/listings?asset_contract_address=${tokenAddress}&token_ids=${tokenId}&maker=${address}`,
       {
@@ -37,21 +35,44 @@ export async function POST(req: NextRequest) {
     }
 
     const ordersData = await ordersResponse.json();
-    const orderHashes = ordersData.orders.map((order: any) => order.order_hash);
 
-    if (orderHashes.length === 0) {
+    if (ordersData.orders.length === 0) {
       return NextResponse.json({ error: "Aucun ordre trouvé à annuler." }, { status: 404 });
     }
 
-    // Étape 2 : Annuler les ordres via Seaport (envoi direct sur Polygon)
-    const transaction = await seaport.cancelOrders(orderHashes).transact();
-    const receipt = await transaction.wait();
+    const protocolAddress = "0x0000000000000068f116a894984e2db1123eb395";
 
-    if (!receipt) {
-    throw new Error("La transaction n'a pas retourné de reçu valide.");
-    }
+    // Étape 2 : Générer les signatures EIP712 d'annulation puis envoyer explicitement à OpenSea
+    const cancelResponses = await Promise.all(ordersData.orders.map(async (order: any) => {
+      const domain = order.protocol_data.domain;
+      const types = { OrderComponents: order.protocol_data.types.OrderComponents };
+      const value = order.protocol_data.parameters;
 
-    return NextResponse.json({ success: true, transactionHash: receipt.hash });
+      // Signature EIP712 d'annulation
+      const signature = await wallet.signTypedData(domain, types, value);
+
+      // Appel API REST OpenSea pour annuler explicitement l'ordre
+      const cancelResponse = await fetch(
+        `https://api.opensea.io/api/v2/orders/matic/seaport/${protocolAddress}/${order.order_hash}/cancel`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": OPENSEA_API_KEY,
+          },
+          body: JSON.stringify({ signature }),
+        }
+      );
+
+      if (!cancelResponse.ok) {
+        const errorResult = await cancelResponse.json();
+        throw new Error(`Erreur OpenSea : ${cancelResponse.status} - ${JSON.stringify(errorResult)}`);
+      }
+
+      return cancelResponse.json();
+    }));
+
+    return NextResponse.json({ success: true, cancelResponses });
   } catch (error: any) {
     return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
