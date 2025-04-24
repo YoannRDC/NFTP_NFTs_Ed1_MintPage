@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const address = await wallet.getAddress();
     const seaport = new Seaport(wallet);
 
-    // Étape 1 : Récupérer les orderHashes à partir de tokenAddress et tokenId
+    // Étape 1 : Récupérer les orderHashes
     const ordersResponse = await fetch(
       `https://api.opensea.io/api/v2/orders/matic/seaport/listings?asset_contract_address=${tokenAddress}&token_ids=${tokenId}&maker=${address}`,
       {
@@ -43,10 +43,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Aucun ordre trouvé à annuler." }, { status: 404 });
     }
 
-    // Étape 2 : Annuler les ordres via Seaport
-    const cancelResult = seaport.cancelOrders(orderHashes);
+    // Étape 2 : Annuler les ordres via Seaport (envoi direct sur Polygon)
+    const transaction = await seaport.cancelOrders(orderHashes).transact();
+    const receipt = await transaction.wait();
 
-    return NextResponse.json({ success: true, cancelResult });
+    if (!receipt) {
+    throw new Error("La transaction n'a pas retourné de reçu valide.");
+    }
+
+    return NextResponse.json({ success: true, transactionHash: receipt.hash });
   } catch (error: any) {
     return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
