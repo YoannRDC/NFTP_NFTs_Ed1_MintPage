@@ -123,7 +123,7 @@ function Menu({ isAdmin }: MenuProps) {
           title="CadenART"
           href="/cadenart"
           description="Passionné de nature, Loïc Radenac saisis des instants simples lors de ses randonnées."
-          imageSrc="/artcards/ArtCards.gif"
+          imageSrc="/cadenart/cadenart.jpg"
         />
         {isAdmin && (
           <MenuItem
