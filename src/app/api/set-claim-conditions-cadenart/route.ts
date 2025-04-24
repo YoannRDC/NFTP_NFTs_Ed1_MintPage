@@ -42,13 +42,8 @@ export async function POST(req: NextRequest) {
       metadata: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0",
       overrideList: [
         {
-          address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
-          maxClaimable: "10",
-          price: "0",
-        },
-        {
           address: "0x70fB670E902904f7BE7A7fd455c792f0B0C5Bccb",
-          maxClaimable: "10",
+          maxClaimable: "100",
           price: "0",
         },
       ],
