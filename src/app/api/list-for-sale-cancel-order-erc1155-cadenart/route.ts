@@ -1,6 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 
+// Type standard OpenSea Seaport OrderComponents pour EIP712
+const orderComponentsType = {
+  OrderComponents: [
+    { name: "offerer", type: "address" },
+    { name: "zone", type: "address" },
+    { name: "offer", type: "OfferItem[]" },
+    { name: "consideration", type: "ConsiderationItem[]" },
+    { name: "orderType", type: "uint8" },
+    { name: "startTime", type: "uint256" },
+    { name: "endTime", type: "uint256" },
+    { name: "zoneHash", type: "bytes32" },
+    { name: "salt", type: "uint256" },
+    { name: "conduitKey", type: "bytes32" },
+    { name: "counter", type: "uint256" }
+  ],
+  OfferItem: [
+    { name: "itemType", type: "uint8" },
+    { name: "token", type: "address" },
+    { name: "identifierOrCriteria", type: "uint256" },
+    { name: "startAmount", type: "uint256" },
+    { name: "endAmount", type: "uint256" }
+  ],
+  ConsiderationItem: [
+    { name: "itemType", type: "uint8" },
+    { name: "token", type: "address" },
+    { name: "identifierOrCriteria", type: "uint256" },
+    { name: "startAmount", type: "uint256" },
+    { name: "endAmount", type: "uint256" },
+    { name: "recipient", type: "address" }
+  ]
+};
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -17,7 +49,7 @@ export async function POST(req: NextRequest) {
     const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
     const address = await wallet.getAddress();
 
-    // Étape 1 : Récupérer les ordres COMPLETS depuis OpenSea
+    // Récupérer les ordres depuis OpenSea
     const ordersResponse = await fetch(
       `https://api.opensea.io/api/v2/orders/matic/seaport/listings?asset_contract_address=${tokenAddress}&token_ids=${tokenId}&maker=${address}`,
       {
@@ -42,16 +74,13 @@ export async function POST(req: NextRequest) {
 
     const protocolAddress = "0x0000000000000068f116a894984e2db1123eb395";
 
-    // Étape 2 : Générer les signatures EIP712 d'annulation puis envoyer explicitement à OpenSea
+    // Générer la signature d'annulation (EIP712)
     const cancelResponses = await Promise.all(ordersData.orders.map(async (order: any) => {
       const domain = order.protocol_data.domain;
-      const types = { OrderComponents: order.protocol_data.types.OrderComponents };
       const value = order.protocol_data.parameters;
 
-      // Signature EIP712 d'annulation
-      const signature = await wallet.signTypedData(domain, types, value);
+      const signature = await wallet.signTypedData(domain, orderComponentsType, value);
 
-      // Appel API REST OpenSea pour annuler explicitement l'ordre
       const cancelResponse = await fetch(
         `https://api.opensea.io/api/v2/orders/matic/seaport/${protocolAddress}/${order.order_hash}/cancel`,
         {
