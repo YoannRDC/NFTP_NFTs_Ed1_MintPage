@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useSearchParams } from "next/navigation";
 import React, { useState } from "react";
@@ -40,7 +41,7 @@ export default function HappyBirthdayCakeDownload() {
     <div className="flex flex-col items-center justify-center p-6">
       <h1 className="text-2xl font-bold mb-4">🎂 Joyeux anniversaire !</h1>
       <p className="text-center max-w-xl mb-4">
-        Merci pour votre achat d'un NFT Happy Birthday Cake !
+        Merci pour votre achat d’un NFT Happy Birthday Cake !
         <br />
         Pour le récupérer :
       </p>
