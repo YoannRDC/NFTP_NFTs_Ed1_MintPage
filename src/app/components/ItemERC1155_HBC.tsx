@@ -198,7 +198,7 @@ export default function ItemERC1155_HBC({
 
       {/* Nombre de NFTs vendus */}
       <div className="text-gray-500 mt-2 flex justify-center">
-        {soldCount}/{totalSupply} cakes offered
+        {soldCount} cakes offered
       </div>
 
       {/* Connexion */}

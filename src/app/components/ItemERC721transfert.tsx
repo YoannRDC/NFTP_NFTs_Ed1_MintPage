@@ -7,7 +7,12 @@ import {
   useActiveAccount,
   useReadContract,
 } from "thirdweb/react";
-import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
+import {
+  client,
+  DistributionType,
+  getProjectMinterAddress,
+  StripeMode,
+} from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { polygon } from "thirdweb/chains";
 import StripePurchasePage from "./StripePurchasePage";
@@ -40,13 +45,11 @@ export default function ItemERC721transfert({
   recipientWalletAddressOrEmail,
   tokenId,
   projectName,
-  requestedQuantity,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Lecture du propriétaire via ownerOf
   const { data: owner, isPending: ownerLoading } = useReadContract({
     contract,
     method: "function ownerOf(uint256 tokenId) view returns (address)",
@@ -55,13 +58,12 @@ export default function ItemERC721transfert({
 
   const minterAddress = getProjectMinterAddress(projectName);
 
-  let nftStatus = "Chargement...";
-  if (!ownerLoading && owner) {
-    nftStatus =
-      owner.toLowerCase() === minterAddress.toLowerCase()
+  const nftStatus =
+    !ownerLoading && owner
+      ? owner.toLowerCase() === minterAddress.toLowerCase()
         ? "Disponible"
-        : "Vendu";
-  }
+        : "Vendu"
+      : "Chargement...";
 
   const wallets = [
     inAppWallet({ auth: { options: ["google", "email", "passkey", "phone"] } }),
@@ -72,38 +74,31 @@ export default function ItemERC721transfert({
     createWallet("io.zerion.wallet"),
   ];
 
-  if (priceInEur === null) {
-    throw new Error("Le prix en Euros (priceInEur) doit être défini.");
-  }
+  const parsedPricePol = priceInPol !== null ? Number(priceInPol) : 0;
+  const parsedPriceEur = priceInEur !== null ? Number(priceInEur) : 0;
+  const totalPriceEurCents = Math.round(parsedPriceEur * 100);
 
   const handleCryptoPurchase = async () => {
     if (!smartAccount?.address) {
       console.error("Aucun wallet connecté");
       return;
     }
-    if (!priceInPol) {
+    if (!parsedPricePol) {
       console.error("Le montant à payer n'est pas défini");
       return;
     }
     try {
       setIsProcessing(true);
 
-      // Utilisation de la fonction performCryptoPayment depuis utils/cryptoOperations
       const paymentTxHashCrypto = await performCryptoPayment({
         client,
         chain: polygon,
-        priceInPol: priceInPol,
-        minterAddress: minterAddress,
+        priceInPol: parsedPricePol,
+        minterAddress,
         account: smartAccount,
       });
 
-      // Vous pouvez ici appeler la fonction d'API de transfert (callBackEndTransferNFT par exemple)
-      // ou toute autre action post-transaction.
-      console.log("Transaction de paiement confirmée, hash:", paymentTxHashCrypto);
-
-      // Par exemple, appel à l'API pour transférer le NFT...
-      // await callBackEndTransferNFT({ ... });
-
+      console.log("Transaction de paiement confirmée :", paymentTxHashCrypto);
       window.location.href = `${redirectPage}?paymentResult=success`;
     } catch (error: any) {
       console.error(error);
@@ -125,10 +120,8 @@ export default function ItemERC721transfert({
         </div>
       )}
 
-      <div
-        className="mt-10 flex justify-center cursor-pointer"
-        onClick={() => setIsFullscreen(true)}
-      >
+      {/* Aperçu de l’image cliquable */}
+      <div className="mt-10 flex justify-center cursor-pointer" onClick={() => setIsFullscreen(true)}>
         <Image
           src={previewImage}
           alt="NFT Preview"
@@ -140,24 +133,40 @@ export default function ItemERC721transfert({
         />
       </div>
 
+      {/* Modal plein écran avec bouton de téléchargement */}
       {isFullscreen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
           onClick={() => setIsFullscreen(false)}
         >
-          <Image
-            src={previewImage}
-            alt="NFT Fullscreen"
-            width={800}
-            height={800}
-            className="max-w-full max-h-full"
-          />
+          <div className="relative w-screen h-screen">
+            <a
+              href={previewImage}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Télécharger l’image en haute définition
+            </a>
+
+            <Image
+              src={previewImage}
+              alt="NFT Fullscreen"
+              fill
+              sizes="100vw"
+              className="rounded-none"
+              style={{ objectFit: "contain", cursor: "pointer" }}
+              onClick={() => setIsFullscreen(false)}
+            />
+          </div>
         </div>
       )}
 
       <div className="text-gray-500 mt-2 flex justify-center">{nftStatus}</div>
 
-      {nftStatus === "Disponible" ? (
+      {nftStatus === "Disponible" && (
         <>
           <div className="text-center mt-10">
             <ConnectButton
@@ -177,7 +186,7 @@ export default function ItemERC721transfert({
                 >
                   Acheter en Crypto
                 </button>
-                <p className="mb-2">{priceInPol} POL</p>
+                <p className="mb-2">{parsedPricePol} POL</p>
 
                 <StripePurchasePage
                   projectName={projectName}
@@ -187,11 +196,11 @@ export default function ItemERC721transfert({
                   contract={contract}
                   tokenId={tokenId}
                   requestedQuantity={1n}
-                  paymentPriceFiat={Number(priceInEur) * 100}
+                  paymentPriceFiat={totalPriceEurCents}
                   stripeMode={stripeMode}
                   redirectPage={redirectPage}
                 />
-                <p>{priceInEur} Euros</p>
+                <p>{parsedPriceEur} Euros</p>
               </div>
             ) : (
               <div className="text-center">
@@ -202,7 +211,7 @@ export default function ItemERC721transfert({
             )}
           </div>
         </>
-      ) : null}
+      )}
     </div>
   );
 }
