@@ -160,7 +160,7 @@ export default function ItemERC1155({
               className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
               onClick={(e) => e.stopPropagation()} // empêcher fermeture juste si on clique sur le bouton
             >
-              Télécharger l'image en haute définition
+              Télécharger l’image en haute définition
             </a>
 
             {/* Image */}
