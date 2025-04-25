@@ -34,7 +34,7 @@ const collectionShortDescription = "Passionné de nature et de randonnée, je ca
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "TBD";
 const distributionType=DistributionType.ClaimToERC1155;
-const stripeMode=StripeMode.Test;
+const stripeMode=StripeMode.Live;
 const projectName = "CADENART";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
