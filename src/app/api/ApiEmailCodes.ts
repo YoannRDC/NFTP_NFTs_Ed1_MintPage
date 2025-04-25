@@ -96,7 +96,7 @@ export async function sendDownloadEmail(
       <p>Merci pour votre achat ! Voici votre code unique pour télécharger votre NFT :</p>
       <p style="text-align:center;">
         <a 
-          href="https://www.authentart.com/download_happy_birthday_cake?code=${downloadCode}" 
+          href="https://www.authentart.com/happy_birthday_cake_download?code=${downloadCode}" 
           style="
             display:inline-block;
             background-color:#0050ef;
