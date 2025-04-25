@@ -145,25 +145,40 @@ export default function ItemERC1155({
         </div>
       </div>
 
-	{isModalOpen && (
-	  <div
-		className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
-		onClick={toggleModal}
-	  >
-		<div className="relative w-screen h-screen">
-		  <Image
-			src={previewImage}
-			alt="NFT agrandi"
-			fill
-			sizes="100vw"
-			className="rounded-none"
-			style={{ objectFit: "contain" }}
-		  />
-		</div>
-	  </div>
-	)}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+          onClick={toggleModal}
+        >
+          <div
+            className="relative w-screen h-screen"
+            onClick={(e) => e.stopPropagation()} // empêcher fermeture sur clic dans l'image
+          >
+            {/* Bouton Télécharger */}
+            <a
+              href={previewImage}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
+              onClick={(e) => e.stopPropagation()} // pour ne pas fermer la modal
+            >
+              Télécharger l'image en haute définition
+            </a>
 
-													  
+            {/* Image */}
+            <Image
+              src={previewImage}
+              alt="NFT agrandi"
+              fill
+              sizes="100vw"
+              style={{ objectFit: "contain" }}
+              className="rounded-none"
+            />
+          </div>
+        </div>
+      )}
+      
       <div className="text-gray-500 mt-2 flex justify-center">
         {showSupply === false ? (
           <>{soldCount} NFT vendu</>
@@ -201,12 +216,6 @@ export default function ItemERC1155({
                     {i + 1}
                   </option>
                 ))}
-											
-											
-											
-											
-											
-											  
               </select>
             </div>
 
