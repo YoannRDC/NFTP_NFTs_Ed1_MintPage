@@ -148,12 +148,9 @@ export default function ItemERC1155({
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
-          onClick={toggleModal}
+          onClick={toggleModal} // Cliquer n'importe où dehors ferme
         >
-          <div
-            className="relative w-screen h-screen"
-            onClick={(e) => e.stopPropagation()} // empêcher fermeture sur clic dans l'image
-          >
+          <div className="relative w-screen h-screen">
             {/* Bouton Télécharger */}
             <a
               href={previewImage}
@@ -161,9 +158,9 @@ export default function ItemERC1155({
               target="_blank"
               rel="noopener noreferrer"
               className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
-              onClick={(e) => e.stopPropagation()} // pour ne pas fermer la modal
+              onClick={(e) => e.stopPropagation()} // empêcher fermeture juste si on clique sur le bouton
             >
-              Télécharger l’image en haute définition
+              Télécharger l'image en haute définition
             </a>
 
             {/* Image */}
@@ -172,12 +169,14 @@ export default function ItemERC1155({
               alt="NFT agrandi"
               fill
               sizes="100vw"
-              style={{ objectFit: "contain" }}
+              style={{ objectFit: "contain", cursor: "pointer" }}
               className="rounded-none"
+              onClick={toggleModal} // Clic sur l'image ferme la modal
             />
           </div>
         </div>
       )}
+
       
       <div className="text-gray-500 mt-2 flex justify-center">
         {showSupply === false ? (
