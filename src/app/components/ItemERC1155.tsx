@@ -1,6 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
@@ -8,7 +8,12 @@ import {
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
-import { client, DistributionType, getProjectMinterAddress, StripeMode } from "../constants";
+import {
+  client,
+  DistributionType,
+  getProjectMinterAddress,
+  StripeMode,
+} from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
@@ -37,20 +42,20 @@ export default function ItemERC1155({
   distributionType,
   tokenId,
   projectName,
-  showSupply
+  showSupply,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
-  // Quantité sélectionnée, initialisée à 1
+												
   const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
 
-  const NextImage = dynamic(() => import("next/image"), { ssr: false });
+																		
 
-  // Récupération de l'adresse du minter via le mapping à partir du projectName
+																				  
   const minterAddress = getProjectMinterAddress(projectName);
 
-  // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
+																				   
   const totalPricePol =
     (priceInPol !== null && priceInPol !== undefined
       ? typeof priceInPol === "number"
@@ -65,7 +70,7 @@ export default function ItemERC1155({
         : parseFloat(priceInEur)
       : 0) * Number(requestedQuantity);
 
-  // Conversion du prix total en Euros en centimes pour Stripe
+															  
   const totalPriceEurCents = Math.round(totalPriceEur * 100);
 
   const wallets = [
@@ -79,11 +84,11 @@ export default function ItemERC1155({
     createWallet("io.zerion.wallet"),
   ];
 
-  // Récupérer le total supply et la balance de l'adresse pré-mint pour calculer le nombre vendu
+																								   
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
       try {
-        // Récupère le total supply pour le token donné
+														  
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
@@ -92,7 +97,7 @@ export default function ItemERC1155({
         const total = Number(totalMinted);
         setTotalSupply(total);
 
-        // Récupère le solde de l'adresse pré-mint pour le token donné en utilisant l'adresse du minter issue du mapping
+																															
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
@@ -100,60 +105,65 @@ export default function ItemERC1155({
         });
         const sellerBal = Number(sellerBalance);
 
-        // Le nombre vendu correspond au total pré-minté moins les tokens encore détenus par le vendeur
+																										  
         const sold = total - sellerBal;
         setSoldCount(sold);
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des informations sur la supply et le nombre vendu :",
-          error
-        );
+					  
+        console.error("Erreur lors de la récupération des infos de supply :", error);
+			   
+		  
       }
     };
 
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
-  // Mise à jour de la quantité sélectionnée
+												
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setrequestedQuantity(BigInt(e.target.value));
   };
 
-  // État pour contrôler l'affichage de l'image en grand (modal)
+																  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   return (
     <div className="border p-4 rounded-lg shadow-lg text-center">
-      {/* Aperçu du NFT */}
+      {/* Aperçu optimisé du NFT */}
       <div className="mt-10 flex justify-center">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
-          <MediaRenderer
-            client={client}
-            src={previewImage} // Image de preview passée en prop
-            style={{ height: "auto", borderRadius: "10px" }}
+          <Image
+						   
+            src={previewImage}
+            alt="NFT preview"
+            width={400}
+            height={400}
+            className="rounded-lg"
+            style={{ height: "auto" }}
           />
         </div>
       </div>
-      {/* Modal pour l'affichage en grand de l'image */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
-          onClick={toggleModal}
-        >
-          <div className="relative w-full h-full max-w-3xl max-h-full">
-            <NextImage
-              src={previewImage}
-              alt="NFT agrandi"
-              fill
-              style={{ objectFit: "contain" }}
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-      )}
 
-      {/* Affichage du nombre vendu / total supply */}
+	{isModalOpen && (
+	  <div
+		className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+		onClick={toggleModal}
+	  >
+		<div className="relative w-screen h-screen">
+		  <Image
+			src={previewImage}
+			alt="NFT agrandi"
+			fill
+			sizes="100vw"
+			className="rounded-none"
+			style={{ objectFit: "contain" }}
+		  />
+		</div>
+	  </div>
+	)}
+
+													  
       <div className="text-gray-500 mt-2 flex justify-center">
         {showSupply === false ? (
           <>{soldCount} NFT vendu</>
@@ -171,11 +181,11 @@ export default function ItemERC1155({
         />
       </div>
 
-      {/* Section Mint / Vente */}
+								  
       <div className="flex flex-col m-2">
         {smartAccount ? (
           <div className="text-center">
-            {/* Sélecteur de quantité (actuellement masqué) */}
+																  
             <div className="mb-4 hidden">
               <label htmlFor="quantity" className="mr-2">
                 Quantity:
@@ -186,16 +196,17 @@ export default function ItemERC1155({
                 onChange={handleQuantityChange}
                 className="border rounded px-2 py-1 text-black"
               >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
+                {[...Array(10)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+											
+											
+											
+											
+											
+											  
               </select>
             </div>
 
@@ -213,7 +224,7 @@ export default function ItemERC1155({
                 const errorMessage = encodeURIComponent(error.message);
                 window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
               }}
-              onTransactionConfirmed={async () => {
+              onTransactionConfirmed={() => {
                 window.location.href = `${redirectPage}?paymentResult=success`;
               }}
             >
