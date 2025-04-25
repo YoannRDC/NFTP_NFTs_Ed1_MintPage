@@ -2,12 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import { inAppWallet } from "thirdweb/wallets";
 import { client } from "../constants";
 
-export default function HappyBirthdayCakeDownload() {
+function HappyBirthdayCakeDownload() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const account = useActiveAccount();
@@ -105,5 +105,13 @@ export default function HappyBirthdayCakeDownload() {
         </a>
       )}
     </div>
+  );
+}
+
+export default function HBCD() {
+  return (
+    <Suspense fallback={<div>Chargement de la page...</div>}>
+      <HappyBirthdayCakeDownload />
+    </Suspense>
   );
 }
