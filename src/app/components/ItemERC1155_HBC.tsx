@@ -1,10 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
-  MediaRenderer,
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
@@ -29,12 +28,12 @@ interface ItemERC1155_HBCProps {
   priceInEur: number;
   contract: any;
   stripeMode: StripeMode;
-  previewImage: string; // Image de preview
-  redirectPage: string; // Page de redirection après transaction
+  previewImage: string;
+  redirectPage: string;
   distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
-  blockchainId: number; 
+  blockchainId: number;
 }
 
 export default function ItemERC1155_HBC({
@@ -52,44 +51,20 @@ export default function ItemERC1155_HBC({
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
-  // Quantité sélectionnée, initialisée à 1
   const [requestedQuantity, setRequestedQuantity] = useState<bigint>(1n);
-
-  // États pour la méthode d'envoi du NFT
   const [selectedOption, setSelectedOption] = useState<NFTrecipient>(NFTrecipient.BuyerAddress);
   const [specificWalletAddress, setSpecificWalletAddress] = useState<string>("");
   const [recipientEmail, setRecipientEmail] = useState<string>("");
 
-  // Un nom de groupe unique pour les boutons radio (basé sur le tokenId)
   const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
-
-  const NextImage = dynamic(() => import("next/image"), { ssr: false });
-
-  // Récupération de l'adresse du minter via le mapping selon projectName
   const minterAddress = getProjectMinterAddress(projectName);
 
-  // Calcul du prix total en POL et en EUR (par unité multiplié par la quantité)
-  const totalPricePol =
-    (priceInPol !== null && priceInPol !== undefined
-      ? typeof priceInPol === "number"
-        ? priceInPol
-        : parseFloat(priceInPol)
-      : 0) * Number(requestedQuantity);
-
-  const totalPriceEur =
-    (priceInEur !== null && priceInEur !== undefined
-      ? typeof priceInEur === "number"
-        ? priceInEur
-        : parseFloat(priceInEur)
-      : 0) * Number(requestedQuantity);
-
-  // Conversion du prix total en Euros en centimes pour Stripe
+  const totalPricePol = (priceInPol ?? 0) * Number(requestedQuantity);
+  const totalPriceEur = (priceInEur ?? 0) * Number(requestedQuantity);
   const totalPriceEurCents = Math.round(totalPriceEur * 100);
 
   const wallets = [
-    inAppWallet({
-      auth: { options: ["google", "email", "passkey", "phone"] },
-    }),
+    inAppWallet({ auth: { options: ["google", "email", "passkey", "phone"] } }),
     createWallet("io.metamask"),
     createWallet("com.coinbase.wallet"),
     createWallet("me.rainbow"),
@@ -97,69 +72,44 @@ export default function ItemERC1155_HBC({
     createWallet("io.zerion.wallet"),
   ];
 
-  // Récupération des informations de supply et du nombre de NFT vendus
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
       try {
-        // Récupère le total supply pour ce token
         const totalMinted = await readContract({
           contract: contract,
           method: "function totalSupply(uint256 tokenId) view returns (uint256)",
           params: [tokenId],
         });
-        const total = Number(totalMinted);
-        setTotalSupply(total);
+        setTotalSupply(Number(totalMinted));
 
-        // Récupère la balance de l'adresse pré-mint et calcule le nombre vendu
         const sellerBalance = await readContract({
           contract: contract,
           method: "function balanceOf(address account, uint256 id) view returns (uint256)",
           params: [minterAddress, tokenId],
         });
-        const sellerBal = Number(sellerBalance);
-        const sold = total - sellerBal;
-        setSoldCount(sold);
+        setSoldCount(Number(totalMinted) - Number(sellerBalance));
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des informations sur la supply et le nombre vendu :",
-          error
-        );
+        console.error("Erreur lors de la récupération du supply :", error);
       }
     };
 
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
-  // Mise à jour de la quantité sélectionnée
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRequestedQuantity(BigInt(e.target.value));
   };
 
-  // État pour contrôler l'affichage de l'image en mode modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const recipientWalletAddressOrEmail = selectedOption === NFTrecipient.BuyerAddress
+    ? smartAccount?.address
+    : selectedOption === NFTrecipient.SpecificWallet
+      ? specificWalletAddress
+      : recipientEmail;
 
-  // Calcul de l'adresse (ou de l'email) destinataire à utiliser dans la transaction
-  const recipientWalletAddressOrEmail = (() => {
-    if (selectedOption === NFTrecipient.BuyerAddress) {
-      return smartAccount?.address;
-    } else if (selectedOption === NFTrecipient.SpecificWallet) {
-      return specificWalletAddress;
-    } else if (selectedOption === NFTrecipient.Email) {
-      return recipientEmail;
-    }
-    return smartAccount?.address || "";
-  })();
-
-  // Handler pour le paiement crypto lorsque l'option "Email" est sélectionnée
   const handleEmailCryptoPayment = async () => {
-    if (!smartAccount) {
-      console.error("Aucun smartAccount actif");
-      return; // Ou déclencher une alerte, rediriger, etc.
-    }
     if (!smartAccount || !recipientWalletAddressOrEmail) {
-      console.error("Recipient email is not defined");
-      return; // Ou déclencher une alerte, rediriger, etc.
+      console.error("Informations incomplètes pour envoyer le NFT.");
+      return;
     }
 
     try {
@@ -171,13 +121,12 @@ export default function ItemERC1155_HBC({
         account: smartAccount,
       });
 
-      if (paymentTxHash !== "") {
-        // Paiement confirmé : on appelle le callback côté backend pour transférer le NFT
+      if (paymentTxHash) {
         await callBackEndTransferNFT({
           projectName,
           distributionType,
           buyerWalletAddress: smartAccount.address,
-          recipientWalletAddressOrEmail: recipientWalletAddressOrEmail,
+          recipientWalletAddressOrEmail,
           nftContractAddress: contract.address,
           blockchainId,
           tokenId: tokenId.toString(),
@@ -195,41 +144,64 @@ export default function ItemERC1155_HBC({
     }
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
   return (
-    <div className="">
-      {/* Aperçu du NFT */}
+    <div>
+      {/* Aperçu de l'image */}
       <div className="mt-10 flex justify-center">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
-          <MediaRenderer
-            client={client}
+          <Image
             src={previewImage}
-            style={{ height: "auto", borderRadius: "10px" }}
+            alt="NFT preview"
+            width={400}
+            height={400}
+            className="rounded-lg"
+            style={{ height: "auto" }}
           />
         </div>
       </div>
-      {/* Modal pour affichage agrandi */}
+
+      {/* Modal plein écran avec bouton de téléchargement */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
           onClick={toggleModal}
         >
-          <div className="relative w-full h-full max-w-3xl max-h-full">
-            <NextImage
+          <div className="relative w-screen h-screen">
+            {/* Bouton télécharger */}
+            <a
+              href={previewImage}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Télécharger l’image en haute définition
+            </a>
+
+            {/* Image plein écran */}
+            <Image
               src={previewImage}
               alt="NFT agrandi"
               fill
-              style={{ objectFit: "contain" }}
-              className="rounded-lg"
+              sizes="100vw"
+              style={{ objectFit: "contain", cursor: "pointer" }}
+              className="rounded-none"
+              onClick={toggleModal}
             />
           </div>
         </div>
       )}
 
-      {/* Affichage du nombre vendu / total supply */}
+      {/* Nombre de NFTs vendus */}
       <div className="text-gray-500 mt-2 flex justify-center">
         {soldCount}/{totalSupply} cakes offered
       </div>
 
+      {/* Connexion */}
       <div className="text-center mt-5">
         <ConnectButton
           client={client}
@@ -239,7 +211,7 @@ export default function ItemERC1155_HBC({
         />
       </div>
 
-      {/* Section Mint / Vente */}
+      {/* Achat */}
       <div className="flex flex-col m-2">
         {smartAccount ? (
           <div className="text-center">
@@ -412,3 +384,4 @@ export default function ItemERC1155_HBC({
     </div>
   );
 }
+
