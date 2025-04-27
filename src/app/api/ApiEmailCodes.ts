@@ -45,7 +45,11 @@ export async function storeCode(email: string, nftId: string, code:string, offer
   all.push(record)
   await fs.writeFile(FILE_PATH, JSON.stringify(all, null, 2), 'utf-8')
 
-  console.log("storeCode. Email:",email,", nftId:", nftId, ", code:", code, ", offererName:", offererName);
+  console.log("storeCode: Email:",email,", nftId:", nftId, ", code:", code, ", offererName:", offererName);
+
+  //log display file content
+  const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
+  console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
 
   return code
 }
@@ -76,6 +80,10 @@ export async function markNFTAsDownloaded(code: string): Promise<boolean> {
     // (optionnel) ajouter une date de téléchargement : all[idx].downloadedAt = new Date().toISOString()
     await fs.writeFile(FILE_PATH, JSON.stringify(all, null, 2), 'utf-8')
   }
+
+  //log display file content
+  const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
+  console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
 
   return true
 }
@@ -137,8 +145,7 @@ export async function sendDownloadEmail(
 
     Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes facile !
 
-    Tout le monde se souvient de son premier NFT !
-    Vous aurez désormais le votre :)
+    Tout le monde se souvient de son premier NFT 😉 !
 
     Bonne journée,
     L’équipe AuthentArt.com

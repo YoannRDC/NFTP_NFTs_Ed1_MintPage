@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code ou adresse manquant." }, { status: 400 });
     }
 
+    //log display file content
+    const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
+    console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
+
     // Vérification du code
     let allCodes: any[] = [];
     try {
