@@ -18,7 +18,6 @@ import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPayment } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
-import { callBackEndTransferNFT } from "../utils/backendCalls";
 import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
 interface ItemERC1155_HBCProps {
@@ -47,6 +46,7 @@ export default function ItemERC1155_HBC({
   blockchainId,
 }: ItemERC1155_HBCProps) {
   const smartAccount = useActiveAccount();
+
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [soldCount, setSoldCount] = useState<number>(0);
   const [requestedQuantity, setRequestedQuantity] = useState<bigint>(1n);
@@ -54,6 +54,8 @@ export default function ItemERC1155_HBC({
   const [specificWalletAddress, setSpecificWalletAddress] = useState<string>("");
   const [recipientEmail, setRecipientEmail] = useState<string>("");
   const [offererName, setOffererName] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>("");
 
   const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
   const minterAddress = getProjectMinterAddress(projectName);
@@ -96,6 +98,30 @@ export default function ItemERC1155_HBC({
     setRequestedQuantity(BigInt(e.target.value));
   };
 
+  const sendEmailGift = async () => {
+    setStatus('⏳ Envoi de l’email en cours...');
+    try {
+      const res = await fetch('/api/test-email-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: recipientEmail,
+          downloadCode: 'TEST_CODE_123', // ⚡ À remplacer par un vrai code plus tard
+          offererName: offererName || "Quelqu'un",
+        })
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setStatus('✅ Email envoyé avec succès !');
+      } else {
+        setStatus(`❌ Erreur serveur : ${json.error || JSON.stringify(json)}`);
+      }
+    } catch (err: any) {
+      setStatus(`❌ Erreur réseau : ${err.message}`);
+    }
+  };
+
   const handleEmailCryptoPayment = async () => {
     if (!smartAccount || !recipientWalletAddressOrEmail) {
       console.error("Informations incomplètes pour envoyer le NFT.");
@@ -112,21 +138,10 @@ export default function ItemERC1155_HBC({
       });
 
       if (paymentTxHash) {
-        await callBackEndTransferNFT({
-          projectName,
-          distributionType,
-          buyerWalletAddress: smartAccount.address,
-          recipientWalletAddressOrEmail,
-          nftContractAddress: contract.address,
-          blockchainId,
-          tokenId: tokenId.toString(),
-          requestedQuantity: requestedQuantity.toString(),
-          paymentTxHashCrypto: paymentTxHash,
-          offererName,
-        });
+        await sendEmailGift();
         window.location.href = `${redirectPage}?paymentResult=success`;
       } else {
-        throw new Error("La transaction de paiement n'a pas été confirmée");
+        throw new Error("La transaction crypto n'a pas été confirmée.");
       }
     } catch (error: any) {
       console.error(error);
@@ -135,13 +150,12 @@ export default function ItemERC1155_HBC({
     }
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   return (
-    <div>
-      {/* Aperçu image */}
-      <div className="mt-10 flex justify-center">
+    <div className="p-4">
+      {/* Image Preview */}
+      <div className="flex justify-center mt-10">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
           <Image
             src={previewImage}
@@ -154,7 +168,7 @@ export default function ItemERC1155_HBC({
         </div>
       </div>
 
-      {/* Modal plein écran */}
+      {/* Fullscreen Image Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50" onClick={toggleModal}>
           <div className="relative w-screen h-screen">
@@ -166,7 +180,7 @@ export default function ItemERC1155_HBC({
               className="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-200 z-50"
               onClick={(e) => e.stopPropagation()}
             >
-              Télécharger l’image en haute définition
+              Télécharger l’image HD
             </a>
             <Image
               src={previewImage}
@@ -175,7 +189,6 @@ export default function ItemERC1155_HBC({
               sizes="100vw"
               style={{ objectFit: "contain", cursor: "pointer" }}
               className="rounded-none"
-              onClick={toggleModal}
             />
           </div>
         </div>
@@ -186,142 +199,95 @@ export default function ItemERC1155_HBC({
         Offered {soldCount} times
       </div>
 
-      {/* Connexion */}
+      {/* Connect Button */}
       <div className="text-center mt-5">
         <ConnectButtonSimple />
       </div>
 
-      {/* Achat */}
-      <div className="flex flex-col m-2">
+      {/* Purchase section */}
+      <div className="flex flex-col mt-4">
         {smartAccount ? (
           <div className="text-center">
-
-            {/* Sélecteur quantité */}
-            <div className="mb-4 hidden">
-              <label htmlFor="quantity" className="mr-2">
-                Quantity:
-              </label>
-              <select
-                id="quantity"
-                value={requestedQuantity.toString()}
-                onChange={handleQuantityChange}
-                className="border rounded px-2 py-1 text-black"
-              >
-                {[...Array(10)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>{i + 1}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Choix destinataire */}
+            {/* Delivery method */}
             <div className="my-4 text-left">
-              <div className="mb-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name={radioGroupName}
-                    className="mr-2"
-                    checked={selectedOption === NFTrecipient.BuyerAddress}
-                    onChange={() => setSelectedOption(NFTrecipient.BuyerAddress)}
-                  />
-                  Send to my wallet
-                </label>
-              </div>
-              <div className="mb-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name={radioGroupName}
-                    className="mr-2"
-                    checked={selectedOption === NFTrecipient.SpecificWallet}
-                    onChange={() => setSelectedOption(NFTrecipient.SpecificWallet)}
-                  />
-                  Send to a specific wallet address
-                </label>
-                {selectedOption === NFTrecipient.SpecificWallet && (
-                  <input
-                    type="text"
-                    placeholder="0x..."
-                    value={specificWalletAddress}
-                    onChange={(e) => setSpecificWalletAddress(e.target.value)}
-                    className="border rounded px-2 py-1 text-black mt-2 w-full"
-                  />
-                )}
-              </div>
-              <div className="mb-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name={radioGroupName}
-                    className="mr-2"
-                    checked={selectedOption === NFTrecipient.Email}
-                    onChange={() => setSelectedOption(NFTrecipient.Email)}
-                  />
-                  Send to an email
-                </label>
-                {selectedOption === NFTrecipient.Email && (
-                  <input
-                    type="email"
-                    placeholder="example@mail.com"
-                    value={recipientEmail}
-                    onChange={(e) => setRecipientEmail(e.target.value)}
-                    className="border rounded px-2 py-1 text-black mt-2 w-full"
-                  />
-                )}
-              </div>
-
-              {/* Champ "De la part de" */}
-              <div className="mb-2">
-                <label className="inline-flex items-center">
-                  De la part de :
-                </label>
-                <input
-                  type="text"
-                  placeholder="Votre prénom"
-                  value={offererName}
-                  onChange={(e) => setOffererName(e.target.value)}
-                  className="border rounded px-2 py-1 text-black mt-2 w-full"
-                />
-              </div>
+              {[
+                { label: "Send to my wallet", value: NFTrecipient.BuyerAddress },
+                { label: "Send to a specific wallet address", value: NFTrecipient.SpecificWallet },
+                { label: "Send to an email", value: NFTrecipient.Email },
+              ].map(({ label, value }) => (
+                <div className="mb-2" key={value}>
+                  <label className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name={radioGroupName}
+                      className="mr-2"
+                      checked={selectedOption === value}
+                      onChange={() => setSelectedOption(value)}
+                    />
+                    {label}
+                  </label>
+                  {selectedOption === value && value === NFTrecipient.SpecificWallet && (
+                    <input
+                      type="text"
+                      placeholder="0x..."
+                      value={specificWalletAddress}
+                      onChange={(e) => setSpecificWalletAddress(e.target.value)}
+                      className="border rounded px-2 py-1 text-black mt-2 w-full"
+                    />
+                  )}
+                  {selectedOption === value && value === NFTrecipient.Email && (
+                    <input
+                      type="email"
+                      placeholder="example@mail.com"
+                      value={recipientEmail}
+                      onChange={(e) => setRecipientEmail(e.target.value)}
+                      className="border rounded px-2 py-1 text-black mt-2 w-full"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
 
-            {/* Boutons d'achat */}
+            {/* Offerer's name */}
+            <div className="mb-4">
+              <label>De la part de :</label>
+              <input
+                type="text"
+                placeholder="Votre prénom"
+                value={offererName}
+                onChange={(e) => setOffererName(e.target.value)}
+                className="border rounded px-2 py-1 text-black mt-2 w-full"
+              />
+            </div>
+
+            {/* Crypto purchase button */}
             <div className="mb-4">
               {selectedOption === NFTrecipient.Email ? (
-                <button
-                  onClick={handleEmailCryptoPayment}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Acheter en Crypto
-                </button>
+                <>
+                  <button
+                    onClick={handleEmailCryptoPayment}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Acheter en Crypto & Envoyer par Email
+                  </button>
+                  {status && <p className="text-sm mt-2">{status}</p>}
+                </>
               ) : (
                 <TransactionButton
                   transaction={async () => {
-                    if (selectedOption === NFTrecipient.SpecificWallet) {
-                      const walletRegex = /^0x[a-fA-F0-9]{40}$/;
-                      if (!walletRegex.test(specificWalletAddress)) {
-                        throw new Error("Adresse de wallet non valide.");
-                      }
-                      return claimTo({
-                        contract,
-                        to: specificWalletAddress,
-                        tokenId,
-                        quantity: requestedQuantity,
-                      });
-                    } else {
-                      return claimTo({
-                        contract,
-                        to: smartAccount.address!,
-                        tokenId,
-                        quantity: requestedQuantity,
-                      });
-                    }
+                    const toAddress = selectedOption === NFTrecipient.SpecificWallet
+                      ? specificWalletAddress
+                      : smartAccount.address!;
+                    return claimTo({
+                      contract,
+                      to: toAddress,
+                      tokenId,
+                      quantity: requestedQuantity,
+                    });
                   }}
-                
                   onError={(error: Error) => {
                     console.error(error);
-                    const errorMessage = encodeURIComponent(error.message);
-                    window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
+                    window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${encodeURIComponent(error.message)}`;
                   }}
                   onTransactionConfirmed={() => {
                     window.location.href = `${redirectPage}?paymentResult=success`;
@@ -332,10 +298,10 @@ export default function ItemERC1155_HBC({
               )}
             </div>
 
-            {/* Prix */}
+            {/* Prices */}
             <p className="mb-2">{totalPricePol} POL</p>
 
-            {/* Paiement par Stripe */}
+            {/* Stripe */}
             <StripePurchasePage
               projectName={projectName}
               distributionType={distributionType}
