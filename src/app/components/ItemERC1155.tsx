@@ -30,6 +30,7 @@ interface ItemERC721Props {
   tokenId: bigint;
   projectName: string;
   showSupply: boolean;
+  offererName: string;
 }
 
 export default function ItemERC1155({
@@ -43,19 +44,14 @@ export default function ItemERC1155({
   tokenId,
   projectName,
   showSupply,
+  offererName,
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
-  const [soldCount, setSoldCount] = useState<number>(0);
-												
-  const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);
-
-																		
-
-																				  
+  const [soldCount, setSoldCount] = useState<number>(0);										
+  const [requestedQuantity, setrequestedQuantity] = useState<bigint>(1n);																	  
   const minterAddress = getProjectMinterAddress(projectName);
-
-																				   
+													   
   const totalPricePol =
     (priceInPol !== null && priceInPol !== undefined
       ? typeof priceInPol === "number"
@@ -252,6 +248,7 @@ export default function ItemERC1155({
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               redirectPage={redirectPage}
+              offererName={offererName}
             />
             <p>{totalPriceEur} Euros</p>
           </div>

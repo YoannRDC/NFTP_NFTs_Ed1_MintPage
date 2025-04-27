@@ -190,6 +190,7 @@ function ArtcardsContent() {
                 recipientWalletAddressOrEmail={smartAccount?.address || ""}
                 projectName={projectMappings.ARTCARDS.projectName}
                 requestedQuantity={requestedQuantity}
+                offererName=""
               />
             </div>
           ))

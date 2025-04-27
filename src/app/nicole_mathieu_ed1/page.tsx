@@ -222,6 +222,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -236,6 +237,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -250,6 +252,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -264,6 +267,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -278,6 +282,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -292,6 +297,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -306,6 +312,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -320,6 +327,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -334,6 +342,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
         <div>
@@ -348,6 +357,7 @@ function PageContent() {
             distributionType={distributionType}
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
+            offererName=""
           />
         </div>
       </div>

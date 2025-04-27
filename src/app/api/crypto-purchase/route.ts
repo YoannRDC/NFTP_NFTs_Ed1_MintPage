@@ -4,7 +4,8 @@ import {
   getProjectMinterAddress,
   getProjectMinterPrivateKeyEnvName,
   getNFTEuroPrice,
-  getNFTPolPriceInWei
+  getNFTPolPriceInWei,
+  parseProjectName
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
@@ -90,8 +91,8 @@ async function assertCryptoPaymentTransaction(
   }
 
   // Récupération du prix en euros et conversion en POL (en wei)
-  const artcardEuroPrice = getNFTEuroPrice(paymentMetadata.projectName, paymentMetadata.tokenId);
-  const artcardPolWeiPrice = await getNFTPolPriceInWei(paymentMetadata.projectName, paymentMetadata.tokenId);
+  const artcardEuroPrice = getNFTEuroPrice(parseProjectName(paymentMetadata.projectName), paymentMetadata.tokenId);
+  const artcardPolWeiPrice = await getNFTPolPriceInWei(parseProjectName(paymentMetadata.projectName), paymentMetadata.tokenId);
 
   console.log("artcardEuroPrice: ", artcardEuroPrice);
   console.log("artcardPolWeiPrice: ", artcardPolWeiPrice);

@@ -78,7 +78,7 @@ function HappyBirthdayCakeDownload() {
           download
           className="mt-8 bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700"
         >
-          📥 Télécharger l'image du NFT
+          📥 Télécharger l’image du NFT
         </a>
       )}
     </div>

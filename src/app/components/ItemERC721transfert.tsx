@@ -31,6 +31,7 @@ interface ItemERC721transfertProps {
   tokenId: bigint;
   projectName: string;
   requestedQuantity: string;
+  offererName: string;
 }
 
 export default function ItemERC721transfert({
@@ -45,6 +46,7 @@ export default function ItemERC721transfert({
   recipientWalletAddressOrEmail,
   tokenId,
   projectName,
+  offererName
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -199,6 +201,7 @@ export default function ItemERC721transfert({
                   paymentPriceFiat={totalPriceEurCents}
                   stripeMode={stripeMode}
                   redirectPage={redirectPage}
+                  offererName={offererName}
                 />
                 <p>{parsedPriceEur} Euros</p>
               </div>

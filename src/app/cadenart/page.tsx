@@ -222,6 +222,7 @@ function PageContent() {
               distributionType={distributionType}
               projectName={projectMappings.CADENART.projectName}
               showSupply={false}
+              offererName=""
             />
           </div>
         ))}

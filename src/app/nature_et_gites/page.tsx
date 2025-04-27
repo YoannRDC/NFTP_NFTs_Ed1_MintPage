@@ -436,7 +436,8 @@ function PageContent() {
                   projectName={projectMappings.NATETGITES.projectName}
                   requestedQuantity={requestedQuantity} 
                   buyerWalletAddress={smartAccount?.address ?? ""} 
-                  recipientWalletAddressOrEmail={smartAccount?.address ?? ""}                
+                  recipientWalletAddressOrEmail={smartAccount?.address ?? ""}  
+                  offererName=""              
                 />
               </div>
             );
