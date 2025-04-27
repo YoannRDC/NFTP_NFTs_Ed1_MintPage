@@ -20,6 +20,17 @@ function isValidEthereumAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
+// Vérifie si c'est une adresse email basique
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Vérifie si c'est une adresse Ethereum OU une adresse email
+function isValidEthereumAddressOrEmail(input: string): boolean {
+  return isValidEthereumAddress(input) || isValidEmail(input);
+}
+
 /**
  * Extrait les métadonnées d’un objet paymentIntent provenant de Stripe.
  * Retourne soit l'objet PaymentMetadata en cas de succès, soit une réponse d'erreur (NextResponse)
@@ -115,7 +126,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
       return NextResponse.json({ error: "Adresse de l'acheteur invalide" }, { status: 400 });
     }
     // Validation des paramètres de base
-    if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddressOrEmail)) {
+    if (!isValidEthereumAddressOrEmail(paymentMetadata.recipientWalletAddressOrEmail)) {
       return NextResponse.json({ error: "Adresse de du receveur du NFT est invalide" }, { status: 400 });
     }
     if (!isValidEthereumAddress(paymentMetadata.nftContractAddress)) {
