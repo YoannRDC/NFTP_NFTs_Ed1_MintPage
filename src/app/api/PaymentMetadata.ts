@@ -12,7 +12,8 @@ export interface PaymentMetadata {
   requestedQuantity: string;
   paymentPriceFiat?: string;
   paymentTxHashCrypto?: string;
-}					 
+  offererName?: string;
+}
   
 // Fonction de validation d'une adresse Ethereum
 function isValidEthereumAddress(address: string): boolean {																				  
@@ -36,6 +37,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     tokenId: paymentIntent.metadata.tokenId,
     requestedQuantity: paymentIntent.metadata.requestedQuantity,
     paymentPriceFiat: paymentIntent.metadata.paymentPriceFiat,
+    offererName: paymentIntent.metadata.offererName
   };
 
   // Validation des adresses Ethereum
@@ -90,7 +92,8 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     tokenId,
     requestedQuantity,
     paymentPriceFiat,
-    paymentTxHashCrypto 
+    paymentTxHashCrypto,
+    offererName, 
   } = body;
 
     const paymentMetadata: PaymentMetadata = {
@@ -104,6 +107,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
       requestedQuantity: requestedQuantity,
       paymentPriceFiat:paymentPriceFiat,
       paymentTxHashCrypto: paymentTxHashCrypto,
+      offererName:offererName,
     };
 
     // Validation des paramètres de base

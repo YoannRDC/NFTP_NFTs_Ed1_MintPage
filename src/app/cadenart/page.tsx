@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType, StripeMode } from "../constants";
+import { client, DistributionType, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
@@ -17,11 +17,10 @@ import { balanceOf } from "thirdweb/extensions/erc1155";
 const NFT_PRICE_EUR = 5; // Prix fixe en Euros
 const DISPLAYED_NFT_PRICE_POL = 49; // Only for display, real price in POL in set in the claim conditions.
 
-const contractAddress = "0x2d4108d38b19b8acc72b83b7facb46db0ecce237";
 const theContract = getContract({
   client,
   chain: defineChain(137),
-  address: contractAddress,
+  address: projectMappings.CADENART.contractAddress,
 });
 
 // const videoPresentationLink =
@@ -35,7 +34,6 @@ const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "TBD";
 const distributionType=DistributionType.ClaimToERC1155;
 const stripeMode=StripeMode.Live;
-const projectName = "CADENART";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
 const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n, 13n, 14n, 15n, 16n, 17n, 18n, 19n];
@@ -75,7 +73,7 @@ async function getNFTmetadata(url: string): Promise<any | null> {
   }
 }
 
-function NFTPed1Content() {
+function PageContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
@@ -222,7 +220,7 @@ function NFTPed1Content() {
               previewImage={`/cadenart/oeuvres/${tokenId.toString()}.jpg`}
               redirectPage={collectionPageRef}
               distributionType={distributionType}
-              projectName={projectName}
+              projectName={projectMappings.CADENART.projectName}
               showSupply={false}
             />
           </div>
@@ -272,10 +270,10 @@ function NFTPed1Content() {
   );
 }
 
-export default function NFTPed1() {
+export default function Page() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <PageContent />
     </Suspense>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { ConnectButton, useActiveAccount } from "thirdweb/react";
+import { useActiveAccount } from "thirdweb/react";
 import Link from "next/link";
 import authenArt_Logo from "@public/AuthenArt_Logo_v2.png";
 import youtube_logo from "@public/youtube_logo.png";
 import MenuItem from "./components/MenuItem";
-import { accountAbstraction, client, nftpPubKey } from "./constants";
+import { nftpPubKey } from "./constants";
+import { ConnectButtonSimple } from "./components/ConnectButtonSimple";
 
 export default function Home() {
   const account = useActiveAccount();
@@ -18,11 +18,7 @@ export default function Home() {
     <div className="py-20">
       <Header />
       <div className="flex justify-center">
-        <ConnectButton
-          client={client}
-          accountAbstraction={accountAbstraction}
-          locale="fr_FR"
-        />
+        <ConnectButtonSimple />
       </div>
       <br />
       <p className="text-center text-sm text-gray-400 mb-10">

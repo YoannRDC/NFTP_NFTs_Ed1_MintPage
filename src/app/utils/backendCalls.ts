@@ -10,6 +10,7 @@ interface TransferNFTParams {
   tokenId: string;
   requestedQuantity: string;
   paymentTxHashCrypto: string;
+  offererName: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export async function callBackEndTransferNFT(params: TransferNFTParams): Promise
       tokenId: params.tokenId,
       requestedQuantity: params.requestedQuantity,
       paymentTxHashCrypto: params.paymentTxHashCrypto,
+      offererName: params.offererName,
     }),
   });
   const data = await response.json();

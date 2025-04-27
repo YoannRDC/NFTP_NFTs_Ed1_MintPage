@@ -36,11 +36,10 @@ interface NFTMetadata {
 }
 
 // Récupération du contrat
-const contractAddress = "0xA943ff4f15203efF9af71782c5AA9C2CcC899516";
 const contract = getContract({
   client,
-  chain: defineChain(137),
-  address: contractAddress,
+  chain: defineChain(projectMappings.NATETGITES.blockchain.id),
+  address: projectMappings.NATETGITES.contractAddress,
 });
 
 // Constantes d'affichage
@@ -54,11 +53,9 @@ const collectionShortDescription = "Les NFTs de Nature & Gîtes.";
 const artistProjectWebsite = "TBD";
 const artistProjectWebsitePrettyPrint = "Site en construction";
 const distributionType = DistributionType.SafeTransferFromERC721;
-const projectName = "NATETGITES"; // défini dans .env et constants.tsx.
-const blockchain = "Polygon";
 const requestedQuantity = "1";
 
-function NFTPed1Content() {
+function PageContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
@@ -144,7 +141,7 @@ function NFTPed1Content() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName, i.toString());
+          const euroPrice = getNFTEuroPrice(projectMappings.NATETGITES.projectName, i.toString());
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
@@ -272,7 +269,7 @@ function NFTPed1Content() {
       if (contract) {
         const balance = await getNFTBalance(
           contract,
-          projectMappings["NATETGITES"].publicKey
+          projectMappings.NATETGITES.minterPublicKey
         );
         setNFTBalance(balance ?? 0);
       }
@@ -347,7 +344,7 @@ function NFTPed1Content() {
       </div>
 
       <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
+        <InfoBlockchain chainName={projectMappings.NATETGITES.blockchain.name} contractAddress={projectMappings.NATETGITES.contractAddress} />
       </div>
 
       <div className="decorative-title mb-4">-- NFTs à vendre --</div>
@@ -428,7 +425,7 @@ function NFTPed1Content() {
                 <ItemERC721transfert
                   tokenId={BigInt(tokenIndex)}
                   priceInPol={pricesInPol[tokenIndex] ?? null}
-                  priceInEur={getNFTEuroPrice(projectName, tokenIndex.toString())}
+                  priceInEur={getNFTEuroPrice(projectMappings.NATETGITES.projectName, tokenIndex.toString())}
                   contract={contract}
                   stripeMode={stripeMode}
                   previewImage={`${collectionPageRef}/${nftImagesFolder}/${tokenIndex
@@ -436,7 +433,7 @@ function NFTPed1Content() {
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
                   distributionType={distributionType}
-                  projectName={projectName}
+                  projectName={projectMappings.NATETGITES.projectName}
                   requestedQuantity={requestedQuantity} 
                   buyerWalletAddress={smartAccount?.address ?? ""} 
                   recipientWalletAddressOrEmail={smartAccount?.address ?? ""}                
@@ -510,10 +507,10 @@ function NFTPed1Content() {
   );
 }
 
-export default function NFTPed1() {
+export default function Page() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <PageContent />
     </Suspense>
   );
 }

@@ -3,8 +3,8 @@ import { sendDownloadEmail } from "../ApiEmailCodes"
 
 export async function POST(req: Request) {
     try {
-      const { email, downloadCode } = await req.json()
-      await sendDownloadEmail(email, downloadCode)
+      const { email, downloadCode, offererName } = await req.json();
+      await sendDownloadEmail(email, downloadCode, offererName)
       return NextResponse.json({ success: true })
     } catch (err: any) {
       console.error('[ApiEmailCodes]', err)

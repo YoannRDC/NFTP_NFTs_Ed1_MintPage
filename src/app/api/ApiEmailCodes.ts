@@ -2,11 +2,12 @@ import nodemailer from 'nodemailer'
 
 import fs from 'fs/promises'
 import path from 'path'
-import crypto from 'crypto'
 
 interface DownloadCode {
   email: string
+  nftId: string
   code: string
+  offererName: string
   downloaded: boolean
   createdAt: string
 }
@@ -18,12 +19,13 @@ const FILE_PATH = path.join(DATA_DIR, 'emailCodes.json')
  * Génère un code unique lié à l'email fourni,
  * l'enregistre dans le fichier JSON et renvoie ce code.
  */
-export async function generateDownloadCode(email: string): Promise<string> {
+export async function storeCode(email: string, nftId: string, code:string, offererName:string): Promise<string> {
   // Générer un code hexadécimal aléatoire de 32 caractères
-  const code = crypto.randomBytes(16).toString('hex')
   const record: DownloadCode = {
     email,
+    nftId,
     code,
+    offererName,
     downloaded: false,
     createdAt: new Date().toISOString(),
   }
@@ -42,6 +44,8 @@ export async function generateDownloadCode(email: string): Promise<string> {
   // Ajouter le nouvel enregistrement et sauvegarder
   all.push(record)
   await fs.writeFile(FILE_PATH, JSON.stringify(all, null, 2), 'utf-8')
+
+  console.log("storeCode. Email:",email,", nftId:", nftId, ", code:", code, ", offererName:", offererName);
 
   return code
 }
@@ -78,7 +82,8 @@ export async function markNFTAsDownloaded(code: string): Promise<boolean> {
 
 export async function sendDownloadEmail(
   toEmail: string,
-  downloadCode: string
+  downloadCode: string,
+  offererName: string,
 ): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST_NFTP,
@@ -93,10 +98,11 @@ export async function sendDownloadEmail(
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;">
       <h2 style="color:#333;">Bonjour,</h2>
-      <p>Merci pour votre achat ! Voici votre code unique pour télécharger votre NFT :</p>
+      <p><strong>${offererName}</strong> vous a offert un NFT pour votre anniversaire !</p>
+      <p>Voici le lien pour le télécharger :</p>
       <p style="text-align:center;">
         <a 
-          href="https://www.authentart.com/happy_birthday_cake_download?code=${downloadCode}" 
+          href="https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}"
           style="
             display:inline-block;
             background-color:#0050ef;
@@ -111,27 +117,36 @@ export async function sendDownloadEmail(
         </a>
       </p>
       <p style="font-size:0.9em;color:#666;">
-        Ou copiez-collez ce code : <code>${downloadCode}</code>
+        Ou copiez-collez ce lien :<br>
+        <code>https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}</code>
       </p>
-      <p>Bonne journée,<br>L’équipe MonNFTShop</p>
+      <p>Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes faciles !</p>
+      <p>Tout le monde se souvient de son premier NFT !<br>
+      Vous aurez désormais le vôtre :)</p>
+      <p>Bonne journée,<br>L’équipe AuthentArt.com</p>
     </div>
-  `
+  `;
 
   const text = `
-Bonjour,
+    Bonjour,
 
-Merci pour votre achat ! Voici votre code pour télécharger votre NFT : ${downloadCode}
+    ${offererName} vous a offert un NFT pour votre anniversaire !
 
-Copiez-collez ce code à : https://www.authentart.com/download?code=${downloadCode}
+    Voici le lien pour le télécharger : https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}
 
-Bonne journée,
-L’équipe MonNFTShop
-  `
+    Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes facile !
+
+    Tout le monde se souvient de son premier NFT !
+    Vous aurez désormais le votre :)
+
+    Bonne journée,
+    L’équipe AuthentArt.com
+      `
 
   await transporter.sendMail({
-    from: `"Happy Birthday Cakes !" <${process.env.SMTP_USER_NFTP}>`,
+    from: `<${offererName} "Happy Birthday Cakes !" <${process.env.SMTP_USER_NFTP}>`,
     to: toEmail,
-    subject: '🎨 Votre NFT vous attend !',
+    subject: '🎨 ${offererName} vous a offert un NFT !',
     html,
     text
   })

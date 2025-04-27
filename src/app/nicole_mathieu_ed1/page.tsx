@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType, StripeMode } from "../constants";
+import { client, DistributionType, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
 import { convertEurToPOL } from "../utils/conversion";
@@ -20,7 +20,7 @@ const DISPLAYED_NFT_PRICE_POL = 49; // Only for display, real price in POL in se
 const nicoleMathieuEd1Address = "0xE5603958Fd35eB9a69aDf8E5b24e9496d6aC038e";
 const nicoleMathieuEd1Contract = getContract({
   client,
-  chain: defineChain(80002),
+  chain: defineChain(projectMappings.NMMATHIEU.blockchain.id),
   address: nicoleMathieuEd1Address,
 });
 
@@ -35,7 +35,6 @@ const artistProjectWebsite = "https://www.nmmathieu.com/";
 const artistProjectWebsitePrettyPrint = "NMMathieu.com";
 const distributionType=DistributionType.ClaimToERC1155;
 const stripeMode=StripeMode.Test;
-const projectName = "NMMATHIEU";
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
 const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n];
@@ -75,7 +74,7 @@ async function getNFTmetadata(url: string): Promise<any | null> {
   }
 }
 
-function NFTPed1Content() {
+function PageContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
@@ -221,7 +220,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_49.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -235,7 +234,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_53.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -249,7 +248,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_76.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -263,7 +262,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_79.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -277,7 +276,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_83.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -291,7 +290,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_95.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -305,7 +304,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_96.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -319,7 +318,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_103.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -333,7 +332,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_104.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -347,7 +346,7 @@ function NFTPed1Content() {
             previewImage={`${collectionPageRef}/Vitrail_Rythmes_107.jpg`}
             redirectPage={collectionPageRef}
             distributionType={distributionType}
-            projectName={projectName}
+            projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
           />
         </div>
@@ -395,10 +394,10 @@ function NFTPed1Content() {
   );
 }
 
-export default function NFTPed1() {
+export default function Page() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <PageContent />
     </Suspense>
   );
 }

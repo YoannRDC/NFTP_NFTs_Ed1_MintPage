@@ -4,8 +4,9 @@ import { prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
-import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName } from "../constants";
-import { generateDownloadCode } from "./ApiEmailCodes";
+import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName  } from "../constants";
+import { storeCode, sendDownloadEmail } from "./ApiEmailCodes";
+import crypto from 'crypto'
 
 export interface DistributionResult {
   transaction: any; 
@@ -62,7 +63,9 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
       ],
     });
   } else if (paymentMetadata.distributionType === DistributionType.EmailCode) {
-    generateDownloadCode(paymentMetadata.recipientWalletAddressOrEmail);
+    const code = crypto.randomBytes(16).toString('hex');
+    storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
+    sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, paymentMetadata.offererName ?? '' )
   } else {
     throw new Error(`Unknown distributionType: ${paymentMetadata.distributionType}`);
   }

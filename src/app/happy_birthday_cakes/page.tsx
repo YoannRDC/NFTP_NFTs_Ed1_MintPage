@@ -36,11 +36,10 @@ interface NFTMetadata {
 }
 
 // Récupération du contrat
-const contractAddress = "0xc58b841A353ab2b288d8C79AA1F3307F32f77cbf";
 const contract = getContract({
   client,
-  chain: defineChain(137),
-  address: contractAddress,
+  chain: defineChain(projectMappings.HAPPYBIRTHDAYCAKES.blockchain.id),
+  address: projectMappings.HAPPYBIRTHDAYCAKES.contractAddress,
 });
 
 // Constantes d'affichage
@@ -56,10 +55,8 @@ const collectionShortDescription =
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoART.art";
 const distributionType = DistributionType.ClaimToERC1155;
-const projectName = "HAPPYBIRTHDAYCAKES"; // défini dans constants.tsx.
-const blockchain = "Polygon";
 
-function NFTPed1Content() {
+function PageContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
@@ -145,7 +142,7 @@ function NFTPed1Content() {
       if (totalNFTcount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < totalNFTcount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName, i.toString());
+          const euroPrice = getNFTEuroPrice(projectMappings.HAPPYBIRTHDAYCAKES.projectName, i.toString());
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
         }
         setPricesInPol(newPrices);
@@ -234,7 +231,7 @@ function NFTPed1Content() {
       if (contract) {
         const balance = await getNFTBalance(
           contract,
-          projectMappings["HAPPYBIRTHDAYCAKES"].publicKey
+          projectMappings["HAPPYBIRTHDAYCAKES"].minterPublicKey
         );
         setNFTBalance(balance ?? 0);
       }
@@ -378,7 +375,7 @@ function NFTPed1Content() {
                 <ItemERC1155_HBC
                   tokenId={BigInt(tokenIndex)}
                   priceInPol={pricesInPol[tokenIndex] ?? null}
-                  priceInEur={getNFTEuroPrice(projectName, tokenIndex.toString())}
+                  priceInEur={getNFTEuroPrice(projectMappings.HAPPYBIRTHDAYCAKES.projectName, tokenIndex.toString())}
                   contract={contract}
                   blockchainId={contract.chain.id}
                   stripeMode={stripeMode}
@@ -387,7 +384,7 @@ function NFTPed1Content() {
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
                   distributionType={distributionType}
-                  projectName={projectName}
+                  projectName={projectMappings.HAPPYBIRTHDAYCAKES.projectName}
                 />
               </div>
             );
@@ -407,7 +404,7 @@ function NFTPed1Content() {
       )}
       
       <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
+        <InfoBlockchain chainName={projectMappings.HAPPYBIRTHDAYCAKES.blockchain.name} contractAddress={projectMappings.HAPPYBIRTHDAYCAKES.contractAddress} />
       </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>
@@ -467,10 +464,10 @@ function NFTPed1Content() {
   );
 }
 
-export default function HBC() {
+export default function Page() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <PageContent />
     </Suspense>
   );
 }

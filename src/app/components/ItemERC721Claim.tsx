@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
-  ConnectButton,
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
@@ -12,6 +11,8 @@ import { client, DistributionType, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
+import { ConnectButtonSimple } from "./ConnectButtonSimple";
+import { ConnectButtonSimpleWithAccAbstraction } from "./ConnectButtonSimpleWithAccAbstraction";
 
 interface ItemERC721ClaimProps {
   totalSupply: number;
@@ -24,6 +25,7 @@ interface ItemERC721ClaimProps {
   distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
+  withAccAbstraction: boolean;
 }
 
 export default function ItemERC721Claim({
@@ -37,6 +39,7 @@ export default function ItemERC721Claim({
   distributionType,
   tokenId,
   projectName,
+  withAccAbstraction,
 }: ItemERC721ClaimProps) {
   const smartAccount = useActiveAccount();
   const [mintedCount, setMintedCount] = useState<number>(0);
@@ -134,12 +137,7 @@ export default function ItemERC721Claim({
       </div>
 
       <div className="text-center mt-10">
-        <ConnectButton
-          client={client}
-          wallets={wallets}
-          connectModal={{ size: "compact" }}
-          locale="fr_FR"
-        />
+        {withAccAbstraction} (<ConnectButtonSimpleWithAccAbstraction/>) : (<ConnectButtonSimple/>)
       </div>
 
       <div className="flex flex-col m-10">
@@ -195,6 +193,7 @@ export default function ItemERC721Claim({
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               redirectPage={redirectPage}
+              offererName=""
             />
             <p>{totalPriceEur} Euros</p>
           </div>

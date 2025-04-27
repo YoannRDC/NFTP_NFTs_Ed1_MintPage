@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
-import { client, DistributionType, getNFTEuroPrice, StripeMode } from "../constants";
+import { client, DistributionType, getNFTEuroPrice, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
@@ -15,11 +15,10 @@ import ItemERC721transfert from "../components/ItemERC721transfert";
 import { getPolEuroRate } from "../utils/conversion";
 import InfoBlockchain from "../components/InfoBlockchain";
 
-const contractAddress = "0x6DF0863afA7b9A81e6ec3AC89f2CD893d2812E47";
 const contract = getContract({
   client,
   chain: defineChain(137),
-  address: contractAddress,
+  address: projectMappings["ARTCARDS"].contractAddress,
 });
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
@@ -31,12 +30,10 @@ const collectionShortDescription = "Art cards by YoArt.";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoArt.art";
 const distributionType = DistributionType.SafeTransferFromERC721;
-const projectName = "ARTCARDS" // define in .env and constant.tsx.
-const blockchain = "Polygon";
 const requestedQuantity = "1";
 
 // Composant principal
-function NFTPed1Content() {
+function ArtcardsContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   // Récupère un éventuel message d'erreur détaillé dans l'URL
@@ -98,7 +95,7 @@ function NFTPed1Content() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectName,i.toString());
+          const euroPrice = getNFTEuroPrice(projectMappings.ARTCARDS.projectName,i.toString());
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
           // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
@@ -183,7 +180,7 @@ function NFTPed1Content() {
               <ItemERC721transfert 
                 tokenId={BigInt(index)}
                 priceInPol={pricesInPol[index] ?? null}
-                priceInEur={getNFTEuroPrice(projectName, index.toString())}
+                priceInEur={getNFTEuroPrice(projectMappings.ARTCARDS.projectName, index.toString())}
                 contract={contract}
                 stripeMode={stripeMode}
                 previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
@@ -191,7 +188,7 @@ function NFTPed1Content() {
                 distributionType={distributionType}
                 buyerWalletAddress={smartAccount?.address || ""}
                 recipientWalletAddressOrEmail={smartAccount?.address || ""}
-                projectName={projectName}
+                projectName={projectMappings.ARTCARDS.projectName}
                 requestedQuantity={requestedQuantity}
               />
             </div>
@@ -202,7 +199,7 @@ function NFTPed1Content() {
       </div>
 
       <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
+        <InfoBlockchain chainName={projectMappings.ARTCARDS.blockchain.name} contractAddress={projectMappings["ARTCARDS"].contractAddress} />
       </div>
 
       <div className="decorative-title">
@@ -250,10 +247,10 @@ function NFTPed1Content() {
   );
 }
 
-export default function NFTPed1() {
+export default function Artcards() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <ArtcardsContent />
     </Suspense>
   );
 }

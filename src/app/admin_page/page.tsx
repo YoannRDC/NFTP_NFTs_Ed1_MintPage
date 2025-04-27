@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  ConnectButton,
   useActiveAccount,
   useSendTransaction,
 } from "thirdweb/react";
@@ -16,6 +15,7 @@ import ClaimSnapshotERC1155 from "../components/ClaimSnapshotERC1155";
 import MailchimpAccount from "../components/MailchimpAccount";
 import ClaimConditionFormERC721 from "../components/ClaimConditionFormERC721";
 import ClaimConditionFormERC1155 from "../components/ClaimConditionFormERC1155";
+import { ConnectButtonSimple } from "../components/ConnectButtonSimple";
 
 // Note: "ipfs://QmW82G6PvfRFbb17r1a125MaGMxHnEP3dA83xGs1Mr4Z4f/0" contient {"name":"Public (With Allowlist) phase"} et peut être utilisé part tous les contrat.
 
@@ -195,16 +195,7 @@ const AdminPage: React.FC = () => {
       <div className="decorative-title">-- Admin Page --</div>
 
       <div className="m-10">
-        <ConnectButton
-          client={client}
-          wallets={[
-            inAppWallet({
-              auth: { options: ["google", "email", "passkey", "phone"] },
-            }),
-          ]}
-          connectModal={{ size: "compact" }}
-          locale="fr_FR"
-        />
+        <ConnectButtonSimple />
       </div>
 
       {isAdmin && <MailchimpAccount />}

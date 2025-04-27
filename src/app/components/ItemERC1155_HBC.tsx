@@ -22,6 +22,7 @@ import { performCryptoPayment } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
 import { callBackEndTransferNFT } from "../utils/backendCalls";
 import TestEmailButton from "./Test_callSendEmail";
+import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
 interface ItemERC1155_HBCProps {
   priceInPol: number;
@@ -55,6 +56,7 @@ export default function ItemERC1155_HBC({
   const [selectedOption, setSelectedOption] = useState<NFTrecipient>(NFTrecipient.BuyerAddress);
   const [specificWalletAddress, setSpecificWalletAddress] = useState<string>("");
   const [recipientEmail, setRecipientEmail] = useState<string>("");
+  const [offererName, setOffererName] = useState<string>("");
 
   const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
   const minterAddress = getProjectMinterAddress(projectName);
@@ -63,14 +65,11 @@ export default function ItemERC1155_HBC({
   const totalPriceEur = (priceInEur ?? 0) * Number(requestedQuantity);
   const totalPriceEurCents = Math.round(totalPriceEur * 100);
 
-  const wallets = [
-    inAppWallet({ auth: { options: ["google", "email", "passkey", "phone"] } }),
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("io.rabby"),
-    createWallet("io.zerion.wallet"),
-  ];
+  const recipientWalletAddressOrEmail = selectedOption === NFTrecipient.BuyerAddress
+    ? smartAccount?.address
+    : selectedOption === NFTrecipient.SpecificWallet
+      ? specificWalletAddress
+      : recipientEmail;
 
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
@@ -100,12 +99,6 @@ export default function ItemERC1155_HBC({
     setRequestedQuantity(BigInt(e.target.value));
   };
 
-  const recipientWalletAddressOrEmail = selectedOption === NFTrecipient.BuyerAddress
-    ? smartAccount?.address
-    : selectedOption === NFTrecipient.SpecificWallet
-      ? specificWalletAddress
-      : recipientEmail;
-
   const handleEmailCryptoPayment = async () => {
     if (!smartAccount || !recipientWalletAddressOrEmail) {
       console.error("Informations incomplètes pour envoyer le NFT.");
@@ -132,6 +125,7 @@ export default function ItemERC1155_HBC({
           tokenId: tokenId.toString(),
           requestedQuantity: requestedQuantity.toString(),
           paymentTxHashCrypto: paymentTxHash,
+          offererName,
         });
         window.location.href = `${redirectPage}?paymentResult=success`;
       } else {
@@ -149,7 +143,7 @@ export default function ItemERC1155_HBC({
 
   return (
     <div>
-      {/* Aperçu de l'image */}
+      {/* Aperçu image */}
       <div className="mt-10 flex justify-center">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>
           <Image
@@ -163,14 +157,10 @@ export default function ItemERC1155_HBC({
         </div>
       </div>
 
-      {/* Modal plein écran avec bouton de téléchargement */}
+      {/* Modal plein écran */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
-          onClick={toggleModal}
-        >
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50" onClick={toggleModal}>
           <div className="relative w-screen h-screen">
-            {/* Bouton télécharger */}
             <a
               href={previewImage}
               download
@@ -181,8 +171,6 @@ export default function ItemERC1155_HBC({
             >
               Télécharger l’image en haute définition
             </a>
-
-            {/* Image plein écran */}
             <Image
               src={previewImage}
               alt="NFT agrandi"
@@ -196,26 +184,22 @@ export default function ItemERC1155_HBC({
         </div>
       )}
 
-      {/* Nombre de NFTs vendus */}
+      {/* Nombre vendus */}
       <div className="text-gray-500 mt-2 flex justify-center">
         Offered {soldCount} times
       </div>
 
       {/* Connexion */}
       <div className="text-center mt-5">
-        <ConnectButton
-          client={client}
-          wallets={wallets}
-          connectModal={{ size: "compact" }}
-          locale="fr_FR"
-        />
+        <ConnectButtonSimple />
       </div>
 
       {/* Achat */}
       <div className="flex flex-col m-2">
         {smartAccount ? (
           <div className="text-center">
-            {/* Sélecteur de quantité (actuellement masqué) */}
+
+            {/* Sélecteur quantité */}
             <div className="mb-4 hidden">
               <label htmlFor="quantity" className="mr-2">
                 Quantity:
@@ -226,20 +210,13 @@ export default function ItemERC1155_HBC({
                 onChange={handleQuantityChange}
                 className="border rounded px-2 py-1 text-black"
               >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
+                {[...Array(10)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>{i + 1}</option>
+                ))}
               </select>
             </div>
 
-            {/* Boutons radio pour choisir le destinataire */}
+            {/* Choix destinataire */}
             <div className="my-4 text-left">
               <div className="mb-2">
                 <label className="inline-flex items-center">
@@ -262,7 +239,7 @@ export default function ItemERC1155_HBC({
                     checked={selectedOption === NFTrecipient.SpecificWallet}
                     onChange={() => setSelectedOption(NFTrecipient.SpecificWallet)}
                   />
-                  Send to this wallet address
+                  Send to a specific wallet address
                 </label>
                 {selectedOption === NFTrecipient.SpecificWallet && (
                   <input
@@ -270,7 +247,6 @@ export default function ItemERC1155_HBC({
                     placeholder="0x..."
                     value={specificWalletAddress}
                     onChange={(e) => setSpecificWalletAddress(e.target.value)}
-                    pattern="^0x[a-fA-F0-9]{40}$"
                     className="border rounded px-2 py-1 text-black mt-2 w-full"
                   />
                 )}
@@ -296,12 +272,25 @@ export default function ItemERC1155_HBC({
                   />
                 )}
               </div>
+
+              {/* Champ "De la part de" */}
+              <div className="mb-2">
+                <label className="inline-flex items-center">
+                  De la part de :
+                </label>
+                <input
+                  type="text"
+                  placeholder="Votre prénom"
+                  value={offererName}
+                  onChange={(e) => setOffererName(e.target.value)}
+                  className="border rounded px-2 py-1 text-black mt-2 w-full"
+                />
+              </div>
             </div>
 
-            {/* Bouton de paiement crypto */}
+            {/* Boutons d'achat */}
             <div className="mb-4">
               {selectedOption === NFTrecipient.Email ? (
-                // Bouton personnalisé pour l'option Email
                 <button
                   onClick={handleEmailCryptoPayment}
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -309,42 +298,35 @@ export default function ItemERC1155_HBC({
                   Acheter en Crypto
                 </button>
               ) : (
-                // TransactionButton pour les options Buyer et Specific Wallet
                 <TransactionButton
                   transaction={async () => {
-                    if (selectedOption === NFTrecipient.BuyerAddress) {
-                      return claimTo({
-                        contract: contract,
-                        to: smartAccount.address,
-                        tokenId: tokenId,
-                        quantity: BigInt(requestedQuantity),
-                      });
-                    } else if (selectedOption === NFTrecipient.SpecificWallet) {
+                    if (selectedOption === NFTrecipient.SpecificWallet) {
                       const walletRegex = /^0x[a-fA-F0-9]{40}$/;
                       if (!walletRegex.test(specificWalletAddress)) {
                         throw new Error("Adresse de wallet non valide.");
                       }
                       return claimTo({
-                        contract: contract,
+                        contract,
                         to: specificWalletAddress,
-                        tokenId: tokenId,
-                        quantity: BigInt(requestedQuantity),
+                        tokenId,
+                        quantity: requestedQuantity,
+                      });
+                    } else {
+                      return claimTo({
+                        contract,
+                        to: smartAccount.address!,
+                        tokenId,
+                        quantity: requestedQuantity,
                       });
                     }
-                    // Cas de secours (rarement atteint)
-                    return claimTo({
-                      contract: contract,
-                      to: smartAccount.address,
-                      tokenId: tokenId,
-                      quantity: BigInt(requestedQuantity),
-                    });
                   }}
+                
                   onError={(error: Error) => {
                     console.error(error);
                     const errorMessage = encodeURIComponent(error.message);
                     window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
                   }}
-                  onTransactionConfirmed={async () => {
+                  onTransactionConfirmed={() => {
                     window.location.href = `${redirectPage}?paymentResult=success`;
                   }}
                 >
@@ -353,8 +335,10 @@ export default function ItemERC1155_HBC({
               )}
             </div>
 
+            {/* Prix */}
             <p className="mb-2">{totalPricePol} POL</p>
 
+            {/* Paiement par Stripe */}
             <StripePurchasePage
               projectName={projectName}
               distributionType={distributionType}
@@ -366,11 +350,12 @@ export default function ItemERC1155_HBC({
               paymentPriceFiat={totalPriceEurCents}
               stripeMode={stripeMode}
               redirectPage={redirectPage}
+              offererName={offererName}
             />
             <p>{totalPriceEur} Euros</p>
-            <br></br>
-            <div>
-              <TestEmailButton/>
+
+            <div className="mt-5">
+              <TestEmailButton />
             </div>
           </div>
         ) : (
@@ -384,4 +369,3 @@ export default function ItemERC1155_HBC({
     </div>
   );
 }
-

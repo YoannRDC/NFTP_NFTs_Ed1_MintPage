@@ -21,6 +21,7 @@ interface StripePurchasePageProps {
   paymentPriceFiat: number; // montant en centimes
   redirectPage: string;
   stripeMode: StripeMode;
+  offererName: string;
 }
 
 export default function StripePurchasePage({
@@ -33,7 +34,8 @@ export default function StripePurchasePage({
   requestedQuantity,
   paymentPriceFiat,
   stripeMode,
-  redirectPage,
+  redirectPage, 
+  offererName,
 }: StripePurchasePageProps) {
   
   console.log("StripePurchasePage called");
@@ -60,6 +62,7 @@ export default function StripePurchasePage({
   console.log("distributionType.toString():", distributionType.toString());
   console.log("tokenId.toString():", tokenId.toString());
   console.log("projectName:", projectName);
+  console.log("offererName:", offererName);
 
   // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {
@@ -78,6 +81,7 @@ export default function StripePurchasePage({
           requestedQuantity: requestedQuantity.toString(),
           paymentPriceFiat: paymentPriceFiat.toString(),
           stripeMode: stripeMode.toString(),
+          offererName:offererName,
         }),
       });
       if (!response.ok) {

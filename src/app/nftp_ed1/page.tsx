@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType, StripeMode } from "../constants";
+import { client, DistributionType, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 
 import { getOwnedERC721 } from "../components/getOwnedERC721";
@@ -27,7 +27,7 @@ const contractAddress = "0x4d857dD092d3d7b6c0Ad1b5085f5ad3CA8A5C7C9";
 // connect to your contract
 const nftpNftsEd1Contract = getContract({
   client,
-  chain: defineChain(137),
+  chain: defineChain(projectMappings.NFTPED1.blockchain.id),
   address: contractAddress,
 });
 
@@ -40,13 +40,11 @@ const collectionShortDescription="First NFT collection of NFT Propulsion.";
 const artistProjectWebsite="https://nftpropulsion.fr";
 const artistProjectWebsitePrettyPrint="NFTpropulsion.fr";
 const distributionType=DistributionType.ClaimToERC721;
-const projectName="NFTPED1";
-const blockchain = "Polygon";
 
 // useless in this context:
 const tokenId= 0n;
 
-function NFTPed1Content() {
+function PageContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   const smartAccount = useActiveAccount();
@@ -137,7 +135,7 @@ function NFTPed1Content() {
       </div>
 
       <div>
-        <InfoBlockchain chainName={blockchain} contractAddress={contractAddress} />
+        <InfoBlockchain chainName={projectMappings.NFTPED1.blockchain.name} contractAddress={contractAddress} />
       </div>
       
       <div className="flex flex-col items-center w-full md:w-[100%] rounded-[10px]">
@@ -151,7 +149,8 @@ function NFTPed1Content() {
           redirectPage={collectionPageRef}
           distributionType={distributionType}
           tokenId={tokenId}
-          projectName={projectName}
+          projectName={projectMappings.NFTPED1.projectName}
+          withAccAbstraction={true}
         />
       </div>
       
@@ -201,10 +200,10 @@ function NFTPed1Content() {
 }
 
 // Wrap the content in a Suspense boundary to satisfy Next.js requirements
-export default function NFTPed1() {
+export default function Page() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <NFTPed1Content />
+      <PageContent />
     </Suspense>
   );
 }
