@@ -94,10 +94,6 @@ export default function ItemERC1155_HBC({
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRequestedQuantity(BigInt(e.target.value));
-  };
-
   const sendEmailGift = async () => {
     setStatus('⏳ Envoi de l’email en cours...');
     try {
@@ -106,7 +102,6 @@ export default function ItemERC1155_HBC({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: recipientEmail,
-          downloadCode: 'TEST_CODE_123', // ⚡ À remplacer par un vrai code plus tard
           offererName: offererName || "Quelqu'un",
         })
       });

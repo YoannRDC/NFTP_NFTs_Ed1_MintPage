@@ -82,6 +82,7 @@ export async function markNFTAsDownloaded(code: string): Promise<boolean> {
 
 export async function sendDownloadEmail(
   toEmail: string,
+  tokenId: string,
   downloadCode: string,
   offererName: string,
 ): Promise<void> {
@@ -132,7 +133,7 @@ export async function sendDownloadEmail(
 
     ${offererName} vous a offert un NFT pour votre anniversaire !
 
-    Voici le lien pour le télécharger : https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}
+    Voici le lien pour le télécharger : https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}&tokenId=${tokenId}
 
     Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes facile !
 
@@ -146,8 +147,9 @@ export async function sendDownloadEmail(
   await transporter.sendMail({
     from: `<${offererName} "Happy Birthday Cakes !" <${process.env.SMTP_USER_NFTP}>`,
     to: toEmail,
-    subject: '🎨 ${offererName} vous a offert un NFT !',
+    subject: `🎨 ${offererName} vous a offert un NFT !`, // <-- corrigé ici
     html,
     text
-  })
+  });
+
 }
