@@ -3,7 +3,6 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
-  ConnectButton,
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
@@ -14,14 +13,12 @@ import {
   NFTrecipient,
   StripeMode,
 } from "../constants";
-import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPayment } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
 import { callBackEndTransferNFT } from "../utils/backendCalls";
-import TestEmailButton from "./Test_callSendEmail";
 import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
 interface ItemERC1155_HBCProps {
@@ -353,10 +350,6 @@ export default function ItemERC1155_HBC({
               offererName={offererName}
             />
             <p>{totalPriceEur} Euros</p>
-
-            <div className="mt-5">
-              <TestEmailButton />
-            </div>
           </div>
         ) : (
           <div className="text-center">
