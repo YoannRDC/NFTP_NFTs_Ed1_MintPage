@@ -101,7 +101,7 @@ export default function ItemERC1155_HBC({
   const sendEmailGift = async () => {
     setStatus('⏳ Envoi de l’email en cours...');
     try {
-      const res = await fetch('/api/test-email-code', {
+      const res = await fetch('/api/happy-birthday-cakes-send-email-gift', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
