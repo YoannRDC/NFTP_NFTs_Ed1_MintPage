@@ -103,7 +103,7 @@ export async function sendDownloadEmail(
       <p>Voici le lien pour le télécharger :</p>
       <p style="text-align:center;">
         <a 
-          href="https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}"
+          href="https://www.authentart.com/happy_birthday_cakes_download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}&tokenId=${tokenId}"
           style="
             display:inline-block;
             background-color:#0050ef;
@@ -119,7 +119,7 @@ export async function sendDownloadEmail(
       </p>
       <p style="font-size:0.9em;color:#666;">
         Ou copiez-collez ce lien :<br>
-        <code>https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}</code>
+        <code>https://www.authentart.com/happy_birthday_cakes_download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}&tokenId=${tokenId}</code>
       </p>
       <p>Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes faciles !</p>
       <p>Tout le monde se souvient de son premier NFT !<br>
@@ -133,7 +133,7 @@ export async function sendDownloadEmail(
 
     ${offererName} vous a offert un NFT pour votre anniversaire !
 
-    Voici le lien pour le télécharger : https://www.authentart.com/download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}&tokenId=${tokenId}
+    Voici le lien pour le télécharger : https://www.authentart.com/happy_birthday_cakes_download?code=${downloadCode}&offererName=${encodeURIComponent(offererName)}&tokenId=${tokenId}
 
     Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes facile !
 
@@ -147,7 +147,7 @@ export async function sendDownloadEmail(
   await transporter.sendMail({
     from: `<${offererName} "Happy Birthday Cakes !" <${process.env.SMTP_USER_NFTP}>`,
     to: toEmail,
-    subject: `🎨 ${offererName} vous a offert un NFT !`, // <-- corrigé ici
+    subject: `🎨 ${offererName} vous a offert un NFT !`,
     html,
     text
   });
