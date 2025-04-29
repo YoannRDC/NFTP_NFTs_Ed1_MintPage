@@ -300,7 +300,7 @@ function PageContent() {
       <div className="decorative-title mb-4">-- Cakes à offrir --</div>
 
       <div className="decorative-description text-gray-500 mt-2 mb-10 flex justify-center">
-        {soldCount} / {totalNFTcount} cakes offert
+        {soldCount} cakes offert
       </div>
 
       {/* Dropdowns de filtres */}

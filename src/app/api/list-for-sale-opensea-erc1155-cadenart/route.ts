@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
 
     const PRIVATE_KEY = process.env.PRIVATE_KEY_CADENART!;
     const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY_CADENART!;
-    // const RPC_URL = process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL!;
-    const RPC_URL = "https://polygon-rpc.com"
+    const RPC_URL = process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL!;
+    // const RPC_URL = "https://polygon-rpc.com"
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
     const address = await wallet.getAddress();
