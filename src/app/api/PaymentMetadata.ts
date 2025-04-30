@@ -56,7 +56,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     console.error("Invalid buyer wallet address");
     return NextResponse.json({ error: "Invalid buyer wallet address" }, { status: 400 });
   }
-  if (!isValidEthereumAddress(paymentMetadata.recipientWalletAddressOrEmail)) {
+  if (!isValidEthereumAddressOrEmail(paymentMetadata.recipientWalletAddressOrEmail)) {
     console.error("Invalid recipient wallet address");
     return NextResponse.json({ error: "Invalid recipient wallet address" }, { status: 400 });
   }
