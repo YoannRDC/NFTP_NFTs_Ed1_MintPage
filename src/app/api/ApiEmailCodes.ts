@@ -3,6 +3,9 @@ import nodemailer from 'nodemailer'
 import fs from 'fs/promises'
 import path from 'path'
 
+import { createClient } from 'redis';
+import { NextResponse } from 'next/server';
+
 interface DownloadCode {
   email: string
   nftId: string
@@ -15,12 +18,9 @@ interface DownloadCode {
 const DATA_DIR = path.join(process.cwd(), 'data')
 const FILE_PATH = path.join(DATA_DIR, 'emailCodes.json')
 
-/**
- * Génère un code unique lié à l'email fourni,
- * l'enregistre dans le fichier JSON et renvoie ce code.
- */
-export async function storeCode(email: string, nftId: string, code:string, offererName:string): Promise<string> {
-  // Générer un code hexadécimal aléatoire de 32 caractères
+const redis = await createClient().connect();
+
+export async function storeCode(email: string, nftId: string, code: string, offererName: string): Promise<string> {
   const record: DownloadCode = {
     email,
     nftId,
@@ -30,63 +30,32 @@ export async function storeCode(email: string, nftId: string, code:string, offer
     createdAt: new Date().toISOString(),
   }
 
-  // Lire l'ancien fichier (ou initialiser un tableau vide)
-  let all: DownloadCode[] = []
-  try {
-    const raw = await fs.readFile(FILE_PATH, 'utf-8')
-    all = JSON.parse(raw) as DownloadCode[]
-  } catch (err: any) {
-    if (err.code !== 'ENOENT') throw err
-    // sinon le fichier n'existait pas → on part sur un tableau vide
-    await fs.mkdir(DATA_DIR, { recursive: true })
-  }
+  // On stocke l'objet dans Redis avec la clé "nft_code:{code}"
+  await redis.set(`nft_code:${code}`, JSON.stringify(record))
 
-  // Ajouter le nouvel enregistrement et sauvegarder
-  all.push(record)
-  await fs.writeFile(FILE_PATH, JSON.stringify(all, null, 2), 'utf-8')
-
-  console.log("storeCode: Email:",email,", nftId:", nftId, ", code:", code, ", offererName:", offererName);
-
-  //log display file content
-  const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
-  console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
+  console.log("storeCode:", record)
 
   return code
 }
 
-/**
- * Marque le NFT comme téléchargé pour le code fourni.
- * Retourne true si la mise à jour a eu lieu, false si le code est introuvable.
- */
+
 export async function markNFTAsDownloaded(code: string): Promise<boolean> {
-  // Charger les enregistrements existants
-  let all: DownloadCode[] = []
-  try {
-    const raw = await fs.readFile(FILE_PATH, 'utf-8')
-    all = JSON.parse(raw) as DownloadCode[]
-  } catch (err: any) {
-    // si le fichier n'existe pas, aucun code à mettre à jour
-    if (err.code === 'ENOENT') return false
-    throw err
+  const key = `nft_code:${code}`
+  const data = await redis.get(key)
+  if (!data) return false
+
+  const record: DownloadCode = JSON.parse(data)
+
+  if (!record.downloaded) {
+    record.downloaded = true
+    await redis.set(key, JSON.stringify(record))
   }
 
-  // Trouver l'entrée correspondante
-  const idx = all.findIndex(r => r.code === code)
-  if (idx === -1) return false
-
-  // Mettre à jour le flag downloaded
-  if (!all[idx].downloaded) {
-    all[idx].downloaded = true
-    // (optionnel) ajouter une date de téléchargement : all[idx].downloadedAt = new Date().toISOString()
-    await fs.writeFile(FILE_PATH, JSON.stringify(all, null, 2), 'utf-8')
-  }
-
-  //log display file content
-  const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
-  console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
+  console.log("markNFTAsDownloaded:", record)
 
   return true
 }
+
 
 export async function sendDownloadEmail(
   toEmail: string,
