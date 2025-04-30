@@ -60,7 +60,7 @@ const CreditCardForm = ({ redirectPage }: CreditCardFormProps) => {
   if (showTransactionMessage) {
     return (
       <div className="bg-white p-5 rounded mx-auto" style={{ maxWidth: "400px" }}>
-        <p>Transaction en cours ...</p>
+        <p className="text-black">Transaction en cours ...</p>
       </div>
     );
   }

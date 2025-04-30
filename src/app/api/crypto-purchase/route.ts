@@ -5,13 +5,16 @@ import {
   getProjectMinterPrivateKeyEnvName,
   getNFTEuroPrice,
   getNFTPolPriceInWei,
-  parseProjectName
+  parseProjectName,
+  DistributionType
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
 import { distributeNFT } from "../ApiRequestDistribution";
 import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
-import { getNftContract, initializeThirdwebClient } from "../ApiPaymentReception";
+import { initializeThirdwebClient } from "../ApiPaymentReception";
+import crypto from 'crypto'
+import { sendDownloadEmail, storeCode } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,11 +50,20 @@ export async function POST(req: NextRequest) {
       return validationResponse;
     }
     
-    // Distribution du NFT via la fonction dédiée
-    const distributionResult = await distributeNFT(client, paymentMetadata);
-    
-    // Retour du hash de transaction dans la réponse JSON
-    return NextResponse.json({ transactionHash: distributionResult.transaction });
+    if (paymentMetadata.distributionType === DistributionType.EmailCode) {
+        const code = crypto.randomBytes(16).toString('hex');
+        storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
+        sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
+        
+        return NextResponse.json({ transactionHash: "Un email à été envoyé à la personne." });
+      
+    } else {
+      // Distribution du NFT via la fonction dédiée
+      const distributionResult = await distributeNFT(client, paymentMetadata);
+      
+      // Retour du hash de transaction dans la réponse JSON
+      return NextResponse.json({ transactionHash: distributionResult.transaction });
+    }
   } catch (error) {
     console.error("Erreur dans la route crypto-purchase :", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
