@@ -5,10 +5,17 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName  } from "../constants";
-
+import crypto from 'crypto'
+import { sendDownloadEmail, storeCode } from "./ApiEmailCodes";
 
 export interface DistributionResult {
   transaction: any; 
+}
+
+export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
+    const code = crypto.randomBytes(16).toString('hex');
+    storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
+    sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
 }
 
 /**
@@ -103,3 +110,4 @@ export async function distributeNFT(client: any, paymentMetadata: PaymentMetadat
     transaction: safeResult,
   };
 }
+

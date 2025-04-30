@@ -10,11 +10,9 @@ import {
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
-import { distributeNFT } from "../ApiRequestDistribution";
+import { distributeNFT, proceedSendGiftEmail } from "../ApiRequestDistribution";
 import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
-import crypto from 'crypto'
-import { sendDownloadEmail, storeCode } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,11 +49,9 @@ export async function POST(req: NextRequest) {
     }
     
     if (paymentMetadata.distributionType === DistributionType.EmailCode) {
-        const code = crypto.randomBytes(16).toString('hex');
-        storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
-        sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
-        
-        return NextResponse.json({ transactionHash: "Un email à été envoyé à la personne." });
+
+      proceedSendGiftEmail(paymentMetadata)
+      return NextResponse.json({ transactionHash: "Un email à été envoyé à la personne." });
       
     } else {
       // Distribution du NFT via la fonction dédiée

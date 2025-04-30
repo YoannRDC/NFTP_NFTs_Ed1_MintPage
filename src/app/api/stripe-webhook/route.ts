@@ -4,8 +4,9 @@ import {
   extractPaymentMetadataStripe,
   PaymentMetadata,
 } from "../PaymentMetadata";
-import { distributeNFT } from "../ApiRequestDistribution";
+import { distributeNFT, proceedSendGiftEmail } from "../ApiRequestDistribution";
 import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentReception";
+import { DistributionType } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
   // Vérification et extraction de l'événement Stripe
@@ -31,10 +32,15 @@ export async function POST(req: NextRequest) {
       return client;
     }
 
-    // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)
-    const safeResult = await distributeNFT(client, paymentMetadata);
-    console.log("Transaction result:", safeResult);
-  }
+    if (paymentMetadata.distributionType === DistributionType.EmailCode) {
+      proceedSendGiftEmail(paymentMetadata);
+    } else {
+        // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)
+        const safeResult = await distributeNFT(client, paymentMetadata);
+        console.log("Transaction result:", safeResult);
+      }
 
-  return NextResponse.json({ message: "OK" });
+    return NextResponse.json({ message: "OK" });
+  }
+  return NextResponse.json({ message: "Stripe paiement failed" });
 }
