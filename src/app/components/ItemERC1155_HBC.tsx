@@ -27,7 +27,6 @@ interface ItemERC1155_HBCProps {
   stripeMode: StripeMode;
   previewImage: string;
   redirectPage: string;
-  distributionType: DistributionType;
   tokenId: bigint;
   projectName: string;
   blockchainId: number;
@@ -40,7 +39,6 @@ export default function ItemERC1155_HBC({
   stripeMode,
   previewImage,
   redirectPage,
-  distributionType,
   tokenId,
   projectName,
   blockchainId,
@@ -56,6 +54,11 @@ export default function ItemERC1155_HBC({
   const [offererName, setOffererName] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("");
+
+  const distributionType: DistributionType = selectedOption === NFTrecipient.Email
+  ? DistributionType.EmailCode
+  : DistributionType.ClaimToERC1155;
+
 
   const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
   const minterAddress = getProjectMinterAddress(projectName);
@@ -148,7 +151,7 @@ export default function ItemERC1155_HBC({
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   return (
-    <div className="p-4">
+    <div>
       {/* Image Preview */}
       <div className="flex justify-center mt-10">
         <div onClick={toggleModal} style={{ cursor: "pointer" }}>

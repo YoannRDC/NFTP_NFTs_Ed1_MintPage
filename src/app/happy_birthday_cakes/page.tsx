@@ -54,7 +54,6 @@ const collectionShortDescription =
   "Because every birthday deserves a cake, even a digital one !";
 const artistProjectWebsite = "https://yoart.art";
 const artistProjectWebsitePrettyPrint = "YoART.art";
-const distributionType = DistributionType.ClaimToERC1155;
 
 function PageContent() {
   const searchParams = useSearchParams();
@@ -383,7 +382,6 @@ function PageContent() {
                     .toString()
                     .padStart(4, "0")}.jpg`}
                   redirectPage={collectionPageRef}
-                  distributionType={distributionType}
                   projectName={projectMappings.HAPPYBIRTHDAYCAKES.projectName}
                 />
               </div>
