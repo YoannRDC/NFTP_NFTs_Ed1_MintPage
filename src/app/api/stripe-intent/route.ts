@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     requestedQuantity,
     paymentPriceFiat,
     stripeMode,
+    offererName,
   } = await req.json();
 
   console.log("projectName:", projectName);
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
   console.log("requestedQuantity:", requestedQuantity);
   console.log("paymentPriceFiat:", paymentPriceFiat);
   console.log("stripeMode:", stripeMode);
+  console.log("offererName:", offererName);
 
   // Sélection de la clé Stripe en fonction du mode demandé
   const stripeSecretKey =
@@ -58,7 +60,8 @@ export async function POST(req: Request) {
       tokenId, 
       requestedQuantity,
       paymentPriceFiat,
-      stripeMode
+      stripeMode,
+      offererName,
     },
   });
 

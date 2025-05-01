@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code ou adresse manquant." }, { status: 400 });
     }
 
-    const codeDataRaw = await redis.get(code);
+    const redisKey = `nft_code:${code}`;
+    const codeDataRaw = await redis.get(redisKey);
 
     if (!codeDataRaw) {
       return NextResponse.json({ error: "Code invalide." }, { status: 400 });
