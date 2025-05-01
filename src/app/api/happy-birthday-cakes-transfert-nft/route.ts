@@ -3,13 +3,12 @@ import { distributeNFT } from "../ApiRequestDistribution";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
 import { PaymentMetadata } from "../PaymentMetadata";
 import { DistributionType, projectMappings } from "@/app/constants";
-import fs from 'fs/promises';
-import path from 'path';
+import { createClient } from 'redis';
 import { markNFTAsDownloaded } from "../ApiEmailCodes";
 
 export const dynamic = "force-dynamic";
 
-const FILE_PATH = path.join(process.cwd(), 'data', 'emailCodes.json'); // <-- Pour lire les codes
+const redisClient = await createClient().connect();
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,34 +19,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code ou adresse manquant." }, { status: 400 });
     }
 
-    //log display file content
-    const updatedRaw = await fs.readFile(FILE_PATH, 'utf-8')
-    console.log('Contenu actuel de emailCodes.json après ajout :\n', updatedRaw)
+    const codeDataRaw = await redisClient.get(code);
 
-    // Vérification du code
-    let allCodes: any[] = [];
-    try {
-      const raw = await fs.readFile(FILE_PATH, 'utf-8');
-      allCodes = JSON.parse(raw) as any[];
-    } catch (err: any) {
-      if (err.code === 'ENOENT') {
-        return NextResponse.json({ error: "Aucun code enregistré." }, { status: 400 });
-      }
-      throw err;
-    }
-
-    const matchingCode = allCodes.find(r => r.code === code);
-    if (!matchingCode) {
+    if (!codeDataRaw) {
       return NextResponse.json({ error: "Code invalide." }, { status: 400 });
     }
-    if (matchingCode.downloaded) {
+
+    const codeData = JSON.parse(codeDataRaw);
+
+    if (codeData.downloaded) {
       return NextResponse.json({ error: "Code déjà utilisé." }, { status: 400 });
     }
 
-    // Initialisation du client Thirdweb
     const client = initializeThirdwebClient();
     if (client instanceof NextResponse) {
-      return client; 
+      return client;
     }
 
     const paymentMetadata: PaymentMetadata = {
@@ -66,10 +52,14 @@ export async function POST(req: NextRequest) {
     const result = await distributeNFT(client, paymentMetadata);
 
     if (result.transaction) {
+      // codeData.downloaded = true;
+      // await redisClient.set(code, JSON.stringify(codeData));
+
       const updated = await markNFTAsDownloaded(code);
       if (!updated) {
-        console.error("Erreur lors de la mise à jour du statut du code.");
+        console.error("Erreur lors de la mise à jour du statut du code dans la base Redis.");
       }
+
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json({ error: "Échec de la distribution." }, { status: 400 });
