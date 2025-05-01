@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import Link from "next/link";
 
-import { client, DistributionType, getNFTEuroPrice, StripeMode } from "../constants";
+import { client, getNFTEuroPrice, StripeMode } from "../constants";
 import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";

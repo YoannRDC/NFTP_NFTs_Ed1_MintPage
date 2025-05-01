@@ -9,6 +9,8 @@ import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentRec
 import { DistributionType } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
+
+  console.log("stripe-webhook starts ...")
   // Vérification et extraction de l'événement Stripe
   const result = await assertValidityStripe(req);
   if (result instanceof NextResponse) {
@@ -19,6 +21,7 @@ export async function POST(req: NextRequest) {
 
   // Traitement uniquement pour certains types d'événements (ici "charge.succeeded")
   if (stripeEvent.type === "charge.succeeded") {
+    console.log("stripe-webhook charge.succeeded ...")
     const paymentIntent = stripeEvent.data.object as any;
     const metadataOrError = extractPaymentMetadataStripe(paymentIntent);
     // Si une erreur survient dans l'extraction des métadonnées, on renvoie la réponse d'erreur directement
@@ -31,8 +34,10 @@ export async function POST(req: NextRequest) {
     if (client instanceof NextResponse) {
       return client;
     }
+    console.log("stripe-webhook initializeThirdwebClient done ...")
 
     if (paymentMetadata.distributionType === DistributionType.EmailCode) {
+      console.log("stripe-webhook DistributionType.EmailCode ...")
       proceedSendGiftEmail(paymentMetadata);
     } else {
         // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)

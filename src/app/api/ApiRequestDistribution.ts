@@ -15,6 +15,7 @@ export interface DistributionResult {
 export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
     const code = crypto.randomBytes(16).toString('hex');
     storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
+    console.log("stripe-webhook proceedSendGiftEmail ...")
     sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
 }
 
