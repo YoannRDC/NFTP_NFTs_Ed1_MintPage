@@ -16,6 +16,12 @@ export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
     const code = crypto.randomBytes(16).toString('hex');
     storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
     console.log("stripe-webhook proceedSendGiftEmail ...")
+
+    console.log("email: ", paymentMetadata.recipientWalletAddressOrEmail)
+    console.log("tokenId: ", paymentMetadata.tokenId)
+    console.log("downloadCode: ", code)
+    console.log("offererName: ", paymentMetadata.offererName)
+
     sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
 }
 
