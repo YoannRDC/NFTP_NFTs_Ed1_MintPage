@@ -887,6 +887,33 @@
   resolved "https://registry.npmjs.org/@radix-ui/rect/-/rect-1.1.0.tgz"
   integrity sha512-A9+lCBZoaMJlVKcRBz2YByCG+Cp2t6nAnMnNba+XiWxnj6r4JUFqfsgwocMBZU9LPtdxC6wB56ySYpc7LQIoJg==
 
+"@redis/bloom@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/@redis/bloom/-/bloom-5.0.0.tgz"
+  integrity sha512-YHlra6a7+brJ3Ustqa+jC68Pdnw2/wbnVLeULN0llP3gHpKxOSmiDyLwuHq5t/jFi6QUgjSprUQi2a8CieKFIA==
+
+"@redis/client@^5.0.0", "@redis/client@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/@redis/client/-/client-5.0.0.tgz"
+  integrity sha512-1MqfzOOoFBwWprigJ3S5hM+LuzaWwxyyx+74NDzCpmjKWyjjC07xkWsd5E9fr+61NUDtvUivRiyAxGiRIwJCaQ==
+  dependencies:
+    cluster-key-slot "1.1.2"
+
+"@redis/json@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/@redis/json/-/json-5.0.0.tgz"
+  integrity sha512-8YFjshsvWR9dWjOiQ50TfBxfl+z1mjCae8jDnfOYN1aCvUZWJXqM1OpL56v6mWRyXwZ5C9qJJKDGmHTr4PVskQ==
+
+"@redis/search@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/@redis/search/-/search-5.0.0.tgz"
+  integrity sha512-oEop/S/0NB5p7vpTTlp5X5LQO4oTomJnFEOaKhQ5xZWROLXTgEVvPSfXVNBbtr9maU2+OupxXQR63HW3MGeTUg==
+
+"@redis/time-series@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/@redis/time-series/-/time-series-5.0.0.tgz"
+  integrity sha512-DNsP4DH5CRfXlQDyvLJm2DltZm3kjpVKZsNTI3SPdbRxhc9i2c0NehUbM/gDECnEfG+jkNN/LUv6Em4LaLwPBQ==
+
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz"
@@ -1897,6 +1924,11 @@ clsx@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
   integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
+
+cluster-key-slot@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz"
+  integrity sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==
 
 color-convert@^2.0.1:
   version "2.0.1"
@@ -4240,6 +4272,17 @@ real-require@^0.1.0:
   version "0.1.0"
   resolved "https://registry.npmjs.org/real-require/-/real-require-0.1.0.tgz"
   integrity sha512-r/H9MzAWtrv8aSVjPCMFpDMl5q66GqtmmRkRjpHTsp4zBAa+snZyiQNlMONiUmEJcsnaw0wCauJ2GWODr/aFkg==
+
+redis@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/redis/-/redis-5.0.0.tgz"
+  integrity sha512-J/fzf0cYeFw5NP4aYIvv9owYOcNUsaDqF4qmwbSuaV4yKBLaIHJQIFbAKLgjn99GDXdJBbfqCRXE7+BIlkpATA==
+  dependencies:
+    "@redis/bloom" "5.0.0"
+    "@redis/client" "5.0.0"
+    "@redis/json" "5.0.0"
+    "@redis/search" "5.0.0"
+    "@redis/time-series" "5.0.0"
 
 reflect.getprototypeof@^1.0.6, reflect.getprototypeof@^1.0.9:
   version "1.0.10"

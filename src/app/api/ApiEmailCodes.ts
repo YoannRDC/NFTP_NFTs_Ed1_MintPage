@@ -1,10 +1,6 @@
 import nodemailer from 'nodemailer'
 
-import fs from 'fs/promises'
-import path from 'path'
-
 import { createClient } from 'redis';
-import { NextResponse } from 'next/server';
 
 interface DownloadCode {
   email: string
@@ -14,9 +10,6 @@ interface DownloadCode {
   downloaded: boolean
   createdAt: string
 }
-
-const DATA_DIR = path.join(process.cwd(), 'data')
-const FILE_PATH = path.join(DATA_DIR, 'emailCodes.json')
 
 const redis = await createClient().connect();
 
