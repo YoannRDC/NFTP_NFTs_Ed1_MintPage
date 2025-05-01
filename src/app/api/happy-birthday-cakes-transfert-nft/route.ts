@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const paymentMetadata: PaymentMetadata = {
       projectName: "HAPPYBIRTHDAYCAKES",
-      distributionType: DistributionType.EmailCode,
+      distributionType: DistributionType.ClaimToERC1155,
       buyerWalletAddress: "",
       recipientWalletAddressOrEmail: giftedWalletAddress,
       nftContractAddress: projectMappings.HAPPYBIRTHDAYCAKES.contractAddress,
