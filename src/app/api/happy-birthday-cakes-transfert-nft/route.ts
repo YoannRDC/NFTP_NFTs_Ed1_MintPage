@@ -3,12 +3,12 @@ import { distributeNFT } from "../ApiRequestDistribution";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
 import { PaymentMetadata } from "../PaymentMetadata";
 import { DistributionType, projectMappings } from "@/app/constants";
-import { createClient } from 'redis';
 import { markNFTAsDownloaded } from "../ApiEmailCodes";
+import { createClient } from "redis";
 
 export const dynamic = "force-dynamic";
 
-const redisClient = await createClient().connect();
+const redis =  await createClient({ url: process.env.REDIS_URL }).connect();
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code ou adresse manquant." }, { status: 400 });
     }
 
-    const codeDataRaw = await redisClient.get(code);
+    const codeDataRaw = await redis.get(code);
 
     if (!codeDataRaw) {
       return NextResponse.json({ error: "Code invalide." }, { status: 400 });

@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer'
 
 import { createClient } from 'redis';
 
+const redis =  await createClient({ url: process.env.REDIS_URL }).connect();
+
 interface DownloadCode {
   email: string
   nftId: string
@@ -10,8 +12,6 @@ interface DownloadCode {
   downloaded: boolean
   createdAt: string
 }
-
-const redis = await createClient().connect();
 
 export async function storeCode(email: string, nftId: string, code: string, offererName: string): Promise<string> {
   const record: DownloadCode = {
