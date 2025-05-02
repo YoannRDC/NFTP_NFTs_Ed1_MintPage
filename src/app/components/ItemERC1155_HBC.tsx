@@ -278,8 +278,6 @@ export default function ItemERC1155_HBC({
             {selectedOption === NFTrecipient.Email ? (
               <div className="bg-yellow-100 text-yellow-800 border border-yellow-300 rounded p-4 my-4 text-sm">
                   🚧 La fonctionnalité <strong>’Acheter en crypto & envoyer par email’</strong> est en cours de développement.
-                  <br />
-                  Elle sera bientôt disponible. En attendant, vous pouvez choisir une autre méthode de livraison.
                 </div>
               ) : (
                 <TransactionButton

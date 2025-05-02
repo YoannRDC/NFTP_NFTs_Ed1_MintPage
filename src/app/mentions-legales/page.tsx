@@ -1,6 +1,6 @@
 export default function MentionsLegales() {
     return (
-      <main className="container mx-auto p-6 max-w-screen-md text-gray-800">
+        <main className="container mx-auto p-6 max-w-screen-md text-gray-800">
         <h1 className="text-3xl font-bold mb-4">Mentions légales</h1>
   
         <section className="mb-6">
