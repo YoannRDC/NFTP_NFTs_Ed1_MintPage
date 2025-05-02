@@ -53,8 +53,6 @@ export async function POST(req: NextRequest) {
     const result = await distributeNFT(client, paymentMetadata);
 
     if (result.transaction) {
-      // codeData.downloaded = true;
-      // await redisClient.set(code, JSON.stringify(codeData));
 
       const updated = await markNFTAsDownloaded(code);
       if (!updated) {

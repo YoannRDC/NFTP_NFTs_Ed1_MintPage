@@ -13,7 +13,7 @@ import {
   NFTrecipient,
   StripeMode,
 } from "../constants";
-import { readContract } from "thirdweb";
+import { getGasPrice, readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPayment } from "../utils/cryptoOperation";
@@ -126,6 +126,13 @@ export default function ItemERC1155_HBC({
       return;
     }
 
+    // Supposons que vous avez déjà une instance de client Thirdweb
+    const gasPrice = await getGasPrice({
+      client,
+      chain: polygon,
+      percentMultiplier: 2,
+    });
+
     try {
       const paymentTxHash = await performCryptoPayment({
         client,
@@ -133,6 +140,7 @@ export default function ItemERC1155_HBC({
         priceInPol: priceInPol,
         minterAddress: minterAddress,
         account: smartAccount,
+        gasPrice: gasPrice,
       });
 
       if (paymentTxHash) {

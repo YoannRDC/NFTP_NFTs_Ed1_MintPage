@@ -35,7 +35,7 @@ function HappyBirthdayCakeDownload() {
       const data = await response.json();
 
       if (data.success) {
-        setImageUrl(data.imageUrl);
+        alert("NFT téléchargé avec succès, mais aucune image n’a été trouvée.");
       } else {
         alert("Erreur lors du transfert : " + (data.error || "Inconnue"));
       }

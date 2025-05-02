@@ -21,6 +21,13 @@ export default function RootLayout({
         <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
           <ThirdwebProvider>{children}</ThirdwebProvider>
         </main>
+        <footer className="bg-gray-100 text-sm text-gray-600 p-6 mt-auto border-t border-gray-300">
+          <div className="max-w-screen-lg mx-auto">
+            <p><a href="/mentions-legales" className="text-blue-600">Mentions légales</a></p>
+            <p><a href="mailto:contact@nftpropulsion.fr" className="text-blue-500">contact@nftpropulsion.fr</a></p>
+            <p>© {new Date().getFullYear()} NFT Propulsion – Tous droits réservés.</p>
+          </div>
+        </footer>
       </body>
     </html>
   );
