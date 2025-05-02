@@ -12,12 +12,15 @@ export interface CryptoPaymentParams {
   gasPrice?: bigint;           // Optionnel : le gasPrice à utiliser pour la transaction
 }
 
+export interface CryptoPaymentResult {
+  hash: string;
+  status: "confirmed" | "pending";
+}
+
 /**
- * Effectue la transaction crypto pour le paiement et retourne la transaction confirmée.
+ * Effectue la transaction crypto pour le paiement et vérifie si elle est confirmée.
  *
- * @param params Les paramètres pour effectuer le paiement.
- * @returns La transaction de paiement une fois confirmée.
- * @throws Une erreur si la transaction n'est pas confirmée.
+ * @returns Un objet contenant le hash et le statut de confirmation.
  */
 export async function performCryptoPayment({
   client,
@@ -26,8 +29,7 @@ export async function performCryptoPayment({
   minterAddress,
   account,
   gasPrice = 30000000000n,
-}: CryptoPaymentParams): Promise<string> {
-  // Préparation de la transaction : envoi de la valeur convertie en wei vers le minter
+}: CryptoPaymentParams): Promise<CryptoPaymentResult> {
   const transaction = prepareTransaction({
     to: minterAddress,
     chain: chain,
@@ -36,27 +38,34 @@ export async function performCryptoPayment({
     gasPrice: gasPrice,
   });
 
-  // Envoi de la transaction via sendTransaction
   const receipt = await sendTransaction({ transaction, account });
-  const paymentTxHashCrypto = receipt.transactionHash;
-  console.log("Transaction de paiement envoyée:", paymentTxHashCrypto);
+  const paymentTxHash = receipt.transactionHash;
+  console.log("Transaction envoyée :", paymentTxHash);
 
-  // Attente d'environ 15 secondes pour laisser le temps à la transaction de se confirmer
-  await new Promise((resolve) => setTimeout(resolve, 15000));
-  console.log("15 secondes écoulées, vérification de la transaction...");
-
-  // Récupération d'un client RPC et vérification de la transaction via son hash
   const rpcRequest = getRpcClient({ client, chain });
-  const paymentTx = await eth_getTransactionByHash(rpcRequest, {
-    hash: paymentTxHashCrypto,
-  });
-  console.log("Détails de la transaction de paiement:", paymentTx);
 
-  // Si aucun numéro de bloc n'est présent, la transaction n'est pas confirmée
-  if (!paymentTx.blockNumber) {
-    throw new Error("La transaction de paiement n'est pas confirmée");
+  // 🔁 On vérifie jusqu’à 5 fois toutes les 15 secondes (total ~75s)
+  for (let attempt = 0; attempt < 5; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 15000));
+
+    const paymentTx = await eth_getTransactionByHash(rpcRequest, {
+      hash: paymentTxHash,
+    });
+
+    if (paymentTx?.blockNumber) {
+      console.log("Transaction confirmée :", paymentTxHash);
+      return {
+        hash: paymentTxHash,
+        status: "confirmed",
+      };
+    }
+
+    console.log(`Tentative ${attempt + 1} : transaction toujours en attente...`);
   }
-  console.log("Transaction de paiement confirmée :", paymentTxHashCrypto);
 
-  return paymentTx.hash;
+  console.warn("Transaction non confirmée après délai :", paymentTxHash);
+  return {
+    hash: paymentTxHash,
+    status: "pending",
+  };
 }

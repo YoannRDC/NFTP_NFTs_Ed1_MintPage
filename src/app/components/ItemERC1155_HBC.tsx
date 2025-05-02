@@ -125,16 +125,15 @@ export default function ItemERC1155_HBC({
       console.error("Informations incomplètes pour envoyer le NFT.");
       return;
     }
-
-    // Supposons que vous avez déjà une instance de client Thirdweb
+  
     const gasPrice = await getGasPrice({
       client,
       chain: polygon,
       percentMultiplier: 2,
     });
-
+  
     try {
-      const paymentTxHash = await performCryptoPayment({
+      const result = await performCryptoPayment({
         client,
         chain: polygon,
         priceInPol: priceInPol,
@@ -142,19 +141,27 @@ export default function ItemERC1155_HBC({
         account: smartAccount,
         gasPrice: gasPrice,
       });
-
-      if (paymentTxHash) {
+  
+      if (result.status === "confirmed") {
         await sendEmailGift();
         window.location.href = `${redirectPage}?paymentResult=success`;
       } else {
-        throw new Error("La transaction crypto n'a pas été confirmée.");
+        // Montre une alerte + lien vers vérification future
+        const message = `⏳ Votre transaction est en cours. Si elle est bien confirmée plus tard, votre NFT sera envoyé. Conservez cet identifiant : ${result.hash}`;
+        window.location.href = `${redirectPage}?paymentResult=pending&txHash=${result.hash}&message=${encodeURIComponent(message)}`;
       }
     } catch (error: any) {
-      console.error(error);
-      const errorMessage = encodeURIComponent(error.message);
-      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${errorMessage}`;
+      const txHash = error?.transactionHash || error?.data?.hash || null;
+  
+      // 👇 Encodage du message et du hash
+      const baseErrorMessage = encodeURIComponent(error.message || "Transaction échouée");
+      const hashParam = txHash ? `&txHash=${txHash}` : "";
+  
+      // 👇 Redirection avec info utile
+      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }
   };
+  
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -268,16 +275,12 @@ export default function ItemERC1155_HBC({
 
             {/* Crypto purchase button */}
             <div className="mb-4">
-              {selectedOption === NFTrecipient.Email ? (
-                <>
-                  <button
-                    onClick={handleEmailCryptoPayment}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Acheter en Crypto & Envoyer par Email
-                  </button>
-                  {status && <p className="text-sm mt-2">{status}</p>}
-                </>
+            {selectedOption === NFTrecipient.Email ? (
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-300 rounded p-4 my-4 text-sm">
+                  🚧 La fonctionnalité <strong>’Acheter en crypto & envoyer par email’</strong> est en cours de développement.
+                  <br />
+                  Elle sera bientôt disponible. En attendant, vous pouvez choisir une autre méthode de livraison.
+                </div>
               ) : (
                 <TransactionButton
                   transaction={async () => {

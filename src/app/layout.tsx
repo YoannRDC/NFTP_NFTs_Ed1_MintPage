@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Script
+            src="https://cdn.cookie-script.com/s/47db04bac0d39f93c370091f61349c03.js"
+            strategy="afterInteractive"
+            type="text/javascript"
+            charSet="UTF-8"
+          />
         <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
           <ThirdwebProvider>{children}</ThirdwebProvider>
         </main>

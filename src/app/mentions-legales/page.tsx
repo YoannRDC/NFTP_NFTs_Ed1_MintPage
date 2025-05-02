@@ -31,7 +31,7 @@ export default function MentionsLegales() {
           <p>
             Le contenu du site authentart.com, incluant, de façon non limitative, les graphismes, images, textes, vidéos,
             animations, sons, logos, gifs et icônes ainsi que leur mise en forme sont la propriété exclusive de NFT PROPULSION,
-            à l’exception des marques, logos ou contenus appartenant à d'autres sociétés partenaires ou auteurs.
+            à l’exception des marques, logos ou contenus appartenant à d’autres sociétés partenaires ou auteurs.
           </p>
           <p>
             Toute reproduction, distribution, modification, adaptation, retransmission ou publication, même partielle,
@@ -69,7 +69,7 @@ export default function MentionsLegales() {
         <section className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Cookies</h2>
           <p>
-            Le site peut utiliser des cookies afin d’améliorer l’expérience utilisateur. L'utilisateur est informé que lors
+            Le site peut utiliser des cookies afin d’améliorer l’expérience utilisateur. L’utilisateur est informé que lors
             de ses visites sur le site, un cookie peut s’installer automatiquement sur son logiciel de navigation. 
             Il peut à tout moment désactiver ces cookies depuis les paramètres de son navigateur.
           </p>
