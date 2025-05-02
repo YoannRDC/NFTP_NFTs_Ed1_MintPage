@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
           price: "0",
         },
         {
-          address: "0x7b471306691dee8FC1322775a997E1a6CA29Eee1",
-          maxClaimable: "1000000",
+          address: "0xC80F8C3C2CD988b1098809F8728b70b1038ba5b9",
+          maxClaimable: "100",
           price: "0",
         },
       ],
