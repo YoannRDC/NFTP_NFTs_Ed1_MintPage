@@ -121,6 +121,12 @@ function Menu({ isAdmin }: MenuProps) {
           description="Passionné de nature, Loïc Radenac saisis des instants simples lors de ses randonnées."
           imageSrc="/cadenart/cadenart.jpg"
         />
+        <MenuItem
+          title="Happy Birthday Cakes"
+          href="/happy_birthday_cakes"
+          description="🎂 Offrez un gâteau d’anniversaire NFT unique et joyeux"
+          imageSrc="/happy_birthday_cakes/preview.gif"
+        />
         {isAdmin && (
           <MenuItem
             title="Nicole Mathieu"
