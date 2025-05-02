@@ -99,8 +99,8 @@ function HappyBirthdayCakeDownload() {
             Pour voir votre NFT dans MetaMask :
           </p>
           <ol className="list-decimal list-inside text-sm space-y-1">
-            <li>Ouvrez MetaMask et allez dans l'onglet <b>NFTs</b>.</li>
-            <li>Cliquez sur <b>"Importer un NFT"</b>.</li>
+            <li>Ouvrez MetaMask et allez dans l’onglet <b>NFTs</b>.</li>
+            <li>Cliquez sur <b>’Importer un NFT’</b>.</li>
             <li>Collez cette adresse de contrat :<br />
               <code className="break-all">{project.contractAddress}</code>
             </li>
