@@ -124,7 +124,7 @@ function Menu({ isAdmin }: MenuProps) {
         <MenuItem
           title="Happy Birthday Cakes"
           href="/happy_birthday_cakes"
-          description="🎂 Offrez un gâteau d’anniversaire NFT unique et joyeux"
+          description="🎂 Offrez un gâteau d’anniversaire en NFT !"
           imageSrc="/happy_birthday_cakes/preview.gif"
         />
         {isAdmin && (

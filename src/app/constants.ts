@@ -1,6 +1,5 @@
 import { createThirdwebClient } from "thirdweb";  
 import { convertEurToPOL } from "./utils/conversion";
-import { createClient } from "redis";
 
 export const MAILCHIMP_LIST_ID="c642fe82cc";
 

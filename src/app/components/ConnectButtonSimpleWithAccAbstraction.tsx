@@ -3,10 +3,7 @@ import { polygon } from "thirdweb/chains";
 import { ConnectButton } from "thirdweb/react";
 
 import { inAppWallet, createWallet, SmartWalletOptions } from "thirdweb/wallets";
-
-const client = createThirdwebClient({
-  clientId: "....",
-});
+import { client } from "../constants";
 
 const wallets = [
   inAppWallet({
