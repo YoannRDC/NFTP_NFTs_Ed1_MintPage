@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TransactionStatus } from "@/app/constants";
 import { createGiftInBDD } from "@/app/api/ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
-    const { paymentTxHash, email, tokenId, offererName } = await req.json();
+    const { paymentTxHash, email, tokenId, offererName, txStatus } = await req.json();
 
-    if (!paymentTxHash || !email || !tokenId || !offererName) {
+    if (!paymentTxHash || !email || !tokenId || !offererName || !txStatus) {
       return NextResponse.json(
-        { error: "Champs requis manquants : paymentTxHash, email, tokenId, offererName" },
+        { error: "Champs requis manquants : paymentTxHash, email, tokenId, offererName, txStatus" },
         { status: 400 }
       );
     }
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
       email,
       tokenId,
       offererName,
-      TransactionStatus.TX_PENDING
+      txStatus
     );
 
     if (!saved) {
