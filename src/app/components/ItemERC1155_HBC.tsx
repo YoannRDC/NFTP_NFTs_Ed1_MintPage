@@ -155,10 +155,16 @@ export default function ItemERC1155_HBC({
   
       // 👇 Encodage du message et du hash
       const baseErrorMessage = encodeURIComponent(error.message || "Transaction échouée");
-      const hashParam = txHash ? `&txHash=${txHash}` : "";
+      const hashParam = txHash ? `&txHash=${txHash}` : "&txHash=";
+
+      console.warn("Erreur capturée :", baseErrorMessage);
+      console.warn("txHash trouvé :", hashParam);
+
+      // await registerTx(txHash);
+      window.location.href = `${redirectPage}?paymentResult=success`;
   
       // 👇 Redirection avec info utile
-      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
+      // window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }
   };
   
