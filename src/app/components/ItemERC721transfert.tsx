@@ -16,7 +16,7 @@ import {
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { polygon } from "thirdweb/chains";
 import StripePurchasePage from "./StripePurchasePage";
-import { performCryptoPayment } from "../utils/cryptoOperation";
+import { performCryptoPaymentAndStoreTxInBdd } from "../utils/cryptoOperation";
 
 interface ItemERC721transfertProps {
   priceInPol: number | string | null;
@@ -92,7 +92,7 @@ export default function ItemERC721transfert({
     try {
       setIsProcessing(true);
 
-      const paymentTxHashCrypto = await performCryptoPayment({
+      const paymentTxHashCrypto = await performCryptoPaymentAndStoreTxInBdd({
         client,
         chain: polygon,
         priceInPol: parsedPricePol,

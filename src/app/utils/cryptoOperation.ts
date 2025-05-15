@@ -2,6 +2,8 @@
 
 import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
+import { createGiftInBDD, updateGiftStatus } from "../api/ApiEmailCodes";
+import { TransactionStatus } from "../constants";
 
 export interface CryptoPaymentParams {
   client: any;                 // Instance du client thirdweb
@@ -10,6 +12,9 @@ export interface CryptoPaymentParams {
   minterAddress: string;       // Adresse du minter (destinataire du paiement)
   account: any;                // L'objet account (issu de useActiveAccount)
   gasPrice?: bigint;           // Optionnel : le gasPrice à utiliser pour la transaction
+  email?:string;
+  tokenId: string,
+  offererName?: string,
 }
 
 export interface CryptoPaymentResult {
@@ -22,13 +27,16 @@ export interface CryptoPaymentResult {
  *
  * @returns Un objet contenant le hash et le statut de confirmation.
  */
-export async function performCryptoPayment({
+export async function performCryptoPaymentAndStoreTxInBdd({
   client,
   chain,
   priceInPol,
   minterAddress,
   account,
   gasPrice = 30000000000n,
+  email,
+  tokenId,
+  offererName,
 }: CryptoPaymentParams): Promise<CryptoPaymentResult> {
   const transaction = prepareTransaction({
     to: minterAddress,
@@ -42,6 +50,13 @@ export async function performCryptoPayment({
   const paymentTxHash = receipt.transactionHash;
   console.log("Transaction envoyée :", paymentTxHash);
 
+  const cryptoPaymentResult: CryptoPaymentResult = {
+    hash: paymentTxHash,
+    status: "pending",
+  }
+
+  await createGiftInBDD(paymentTxHash, email!, tokenId, offererName!, TransactionStatus.TX_PENDING );
+
   const rpcRequest = getRpcClient({ client, chain });
 
   // 🔁 On vérifie jusqu’à 5 fois toutes les 15 secondes (total ~75s)
@@ -54,6 +69,9 @@ export async function performCryptoPayment({
 
     if (paymentTx?.blockNumber) {
       console.log("Transaction confirmée :", paymentTxHash);
+
+      await updateGiftStatus(cryptoPaymentResult.hash, TransactionStatus.TX_CONFIRMED);
+
       return {
         hash: paymentTxHash,
         status: "confirmed",

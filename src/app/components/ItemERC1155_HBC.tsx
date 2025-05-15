@@ -16,7 +16,7 @@ import {
 import { getGasPrice, readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
-import { CryptoPaymentResult, performCryptoPayment } from "../utils/cryptoOperation";
+import { performCryptoPaymentAndStoreTxInBdd } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
 import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
@@ -97,33 +97,6 @@ export default function ItemERC1155_HBC({
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
-  const registerTx = async (txResult: CryptoPaymentResult) => {
-    setStatus('⏳ Traitement de la transaction ...');
-    try {
-      const res = await fetch('/api/happy-birthday-cakes-crypto-payment-email-treatment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: recipientEmail,
-          tokenId,
-          offererName: offererName || "Quelqu'un",
-          tx_result: txResult,
-        })
-      });
-
-      //email, tokenId, downloadCode, offererName, txResult
-
-      const json = await res.json();
-      if (res.ok) {
-        setStatus('✅ Achat traité avec succès !');
-      } else {
-        setStatus(`❌ Erreur serveur : ${json.error || JSON.stringify(json)}`);
-      }
-    } catch (err: any) {
-      setStatus(`❌ Erreur réseau : ${err.message}`);
-    }
-  };
-
   const handleEmailCryptoPayment = async () => {
     // here recipientWalletAddressOrEmail contains email.
     if (!smartAccount || !recipientWalletAddressOrEmail) {
@@ -136,18 +109,22 @@ export default function ItemERC1155_HBC({
       chain: polygon,
       percentMultiplier: 2,
     });
+
+    let txResult;
   
     try {
-      const txResult = await performCryptoPayment({
+      txResult = await performCryptoPaymentAndStoreTxInBdd({
         client,
         chain: polygon,
         priceInPol: priceInPol,
         minterAddress: minterAddress,
         account: smartAccount,
-        gasPrice: gasPrice,
+        gasPrice,
+        email: "", // TODO: Add from Mon compte.
+        tokenId: tokenId.toString(),
+        offererName,
       });
-  
-      await registerTx(txResult);
+
       window.location.href = `${redirectPage}?paymentResult=success`;
 
     } catch (error: any) {
@@ -164,8 +141,9 @@ export default function ItemERC1155_HBC({
       window.location.href = `${redirectPage}?paymentResult=success`;
   
       // 👇 Redirection avec info utile
-      // window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
+      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }
+    
   };
   
 
