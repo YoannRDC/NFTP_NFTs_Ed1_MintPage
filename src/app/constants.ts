@@ -1,5 +1,6 @@
-import { createThirdwebClient } from "thirdweb";  
+import { createThirdwebClient, getGasPrice, ThirdwebClient } from "thirdweb";  
 import { convertEurToPOL } from "./utils/conversion";
+import { ChainOptions, polygon } from "thirdweb/chains";
 
 export const MAILCHIMP_LIST_ID="c642fe82cc";
 
@@ -162,3 +163,5 @@ export async function getNFTPolPriceInWei(projectName: ProjectName, tokenId: str
 	SpecificWallet= "specificWallet",
 	Email= "email"
   }
+
+

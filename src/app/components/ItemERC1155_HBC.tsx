@@ -103,12 +103,6 @@ export default function ItemERC1155_HBC({
       console.error("Informations incomplètes pour envoyer le NFT.");
       return;
     }
-  
-    const gasPrice = await getGasPrice({
-      client,
-      chain: polygon,
-      percentMultiplier: 2,
-    });
 
     let txResult;
   
@@ -119,7 +113,6 @@ export default function ItemERC1155_HBC({
         priceInPol: priceInPol,
         minterAddress: minterAddress,
         account: smartAccount,
-        gasPrice,
         email: "", // TODO: Add from Mon compte.
         tokenId: tokenId.toString(),
         offererName,

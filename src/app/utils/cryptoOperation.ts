@@ -1,9 +1,10 @@
 "use client";
 
-import { prepareTransaction, sendTransaction, toWei } from "thirdweb";
+import { getGasPrice, prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { createGiftInBDD, updateGiftStatus } from "../api/ApiEmailCodes";
 import { TransactionStatus } from "../constants";
+import { polygon } from "thirdweb/chains";
 
 export interface CryptoPaymentParams {
   client: any;                 // Instance du client thirdweb
@@ -33,11 +34,18 @@ export async function performCryptoPaymentAndStoreTxInBdd({
   priceInPol,
   minterAddress,
   account,
-  gasPrice = 30000000000n,
   email,
   tokenId,
   offererName,
 }: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+
+  // twice the gasPrice
+  const gasPrice = await getGasPrice({
+    client,
+    chain: polygon,
+    percentMultiplier: 2,
+  });
+
   const transaction = prepareTransaction({
     to: minterAddress,
     chain: chain,
@@ -50,12 +58,7 @@ export async function performCryptoPaymentAndStoreTxInBdd({
   const paymentTxHash = receipt.transactionHash;
   console.log("Transaction envoyée :", paymentTxHash);
 
-  const cryptoPaymentResult: CryptoPaymentResult = {
-    hash: paymentTxHash,
-    status: "pending",
-  }
-
-  await createGiftInBDD(paymentTxHash, email!, tokenId, offererName!, TransactionStatus.TX_PENDING );
+  await createGiftInBDD_backend(paymentTxHash, email!, tokenId, offererName!, TransactionStatus.TX_PENDING );
 
   const rpcRequest = getRpcClient({ client, chain });
 
@@ -70,7 +73,7 @@ export async function performCryptoPaymentAndStoreTxInBdd({
     if (paymentTx?.blockNumber) {
       console.log("Transaction confirmée :", paymentTxHash);
 
-      await updateGiftStatus(cryptoPaymentResult.hash, TransactionStatus.TX_CONFIRMED);
+      await updateGiftStatus_backend(paymentTxHash, TransactionStatus.TX_PENDING );
 
       return {
         hash: paymentTxHash,
@@ -87,3 +90,32 @@ export async function performCryptoPaymentAndStoreTxInBdd({
     status: "pending",
   };
 }
+
+async function createGiftInBDD_backend(paymentTxHash: string, email: string, tokenId: string, offererName: string, txStatus: TransactionStatus) {
+    try {
+    const res = await fetch("/api/dao-create-nft-transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentTxHash, email, tokenId, offererName, txStatus}),
+    });
+
+    console.log(`${paymentTxHash} stored successfully.`);
+  } catch (err: any) {
+    console.log(`❌ Erreur during dao-create-nft-transaction call from front end. : ${err.message}`);
+  }
+}
+
+async function updateGiftStatus_backend(paymentTxHash: string, txStatus: TransactionStatus) {
+    try {
+    const res = await fetch("/api/dao-update-nft-transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentTxHash, txStatus}),
+    });
+
+    console.log(`${paymentTxHash} updated successfully.`);
+  } catch (err: any) {
+    console.log(`❌ Erreur during dao-update-nft-transaction call from front end. : ${err.message}`);
+  }
+}
+

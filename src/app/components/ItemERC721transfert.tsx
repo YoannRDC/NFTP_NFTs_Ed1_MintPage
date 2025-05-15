@@ -98,6 +98,9 @@ export default function ItemERC721transfert({
         priceInPol: parsedPricePol,
         minterAddress,
         account: smartAccount,
+        email: "", // TODO: Add from Mon compte.
+        tokenId: tokenId.toString(),
+        offererName,
       });
 
       console.log("Transaction de paiement confirmée :", paymentTxHashCrypto);
