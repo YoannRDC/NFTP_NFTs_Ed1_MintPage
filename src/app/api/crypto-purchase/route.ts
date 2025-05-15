@@ -10,7 +10,7 @@ import {
 } from "@/app/constants"; // Adaptez le chemin si nécessaire
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
 import { polygon } from "thirdweb/chains";
-import { distributeNFT, proceedSendGiftEmail } from "../ApiRequestDistribution";
+import { distributeNFT } from "../ApiRequestDistribution";
 import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     // Initialisation du client Thirdweb
     const client = initializeThirdwebClient();
     if (client instanceof NextResponse) {
-      return client; 
+      return client;
     }
 
     // Récupération de l'adresse du minter
@@ -50,12 +50,13 @@ export async function POST(req: NextRequest) {
     
     if (paymentMetadata.distributionType === DistributionType.EmailCode) {
 
-      proceedSendGiftEmail(paymentMetadata)
-      return NextResponse.json({ transactionHash: "Un email à été envoyé à la personne." });
+      // Not supposed to go through this code.
+      return NextResponse.json({ error: "Internal Error: not a valid situation." }, { status: 500 });
       
     } else {
       // Distribution du NFT via la fonction dédiée
       const distributionResult = await distributeNFT(client, paymentMetadata);
+      
       
       // Retour du hash de transaction dans la réponse JSON
       return NextResponse.json({ transactionHash: distributionResult.transaction });

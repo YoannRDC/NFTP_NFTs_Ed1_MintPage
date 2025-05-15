@@ -12,6 +12,7 @@ export interface PaymentMetadata {
   requestedQuantity: string;
   paymentPriceFiat?: string;
   paymentTxHashCrypto?: string;
+  paymentTxRefStripe?: string;
   offererName?: string;
 }
   
@@ -48,6 +49,7 @@ export function extractPaymentMetadataStripe(paymentIntent: any): PaymentMetadat
     tokenId: paymentIntent.metadata.tokenId,
     requestedQuantity: paymentIntent.metadata.requestedQuantity,
     paymentPriceFiat: paymentIntent.metadata.paymentPriceFiat,
+    paymentTxRefStripe: paymentIntent.id,
     offererName: paymentIntent.metadata.offererName
   };
 

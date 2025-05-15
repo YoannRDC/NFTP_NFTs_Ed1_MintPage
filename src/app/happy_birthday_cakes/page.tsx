@@ -18,6 +18,7 @@ import InfoBlockchain from "../components/InfoBlockchain";
 import { projectMappings } from "../constants";
 import { getNFTBalance } from "../utils/fetchBlockchainData";
 import { getOwnedERC1155 } from "../components/getOwnedERC1155";
+import CheckTransactionForm from "../components/CheckTransactionForm";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -401,8 +402,12 @@ function PageContent() {
         />
       )}
       
-      <div>
+      <div className="mt-5">
         <InfoBlockchain chainName={projectMappings.HAPPYBIRTHDAYCAKES.blockchain.name} contractAddress={projectMappings.HAPPYBIRTHDAYCAKES.contractAddress} />
+      </div>
+
+      <div className="mt-5">
+        <CheckTransactionForm />
       </div>
 
       <div className="decorative-title">-- Mes NFTs --</div>

@@ -4,25 +4,32 @@ import { prepareContractCall, sendTransaction } from "thirdweb";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
-import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName  } from "../constants";
-import crypto from 'crypto'
-import { sendDownloadEmail, storeCode } from "./ApiEmailCodes";
+import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName, TransactionStatus  } from "../constants";
+import { sendDownloadEmail, createGiftInBDD, GiftRecord } from "./ApiEmailCodes";
 
 export interface DistributionResult {
   transaction: any; 
 }
 
 export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
-    const code = crypto.randomBytes(16).toString('hex');
-    storeCode(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName?? '' );
-    console.log("stripe-webhook proceedSendGiftEmail ...")
+  // be sure to call only when TransactionStatus.TX_CONFIRMED or stripe.
+  if (!paymentMetadata.paymentTxRefStripe) {
+    throw new Error("paymentTxRefStripe est requis pour enregistrer le cadeau.");
+  }
 
-    console.log("email: ", paymentMetadata.recipientWalletAddressOrEmail)
-    console.log("tokenId: ", paymentMetadata.tokenId)
-    console.log("downloadCode: ", code)
-    console.log("offererName: ", paymentMetadata.offererName)
+  const giftRecord: GiftRecord = await createGiftInBDD(
+    paymentMetadata.paymentTxRefStripe,
+    paymentMetadata.recipientWalletAddressOrEmail,
+    paymentMetadata.tokenId,
+    paymentMetadata.offererName ?? '',
+    TransactionStatus.TX_CONFIRMED
+  );
 
-    sendDownloadEmail(paymentMetadata.recipientWalletAddressOrEmail, paymentMetadata.tokenId, code, paymentMetadata.offererName ?? '' )
+  console.log("✅ stripe-webhook proceedSendGiftEmail ...");
+  console.log("email:", giftRecord.email);
+  console.log("tokenId:", giftRecord.tokenId);
+  console.log("downloadCode:", giftRecord.code);
+  console.log("offererName:", giftRecord.offererName);
 }
 
 /**

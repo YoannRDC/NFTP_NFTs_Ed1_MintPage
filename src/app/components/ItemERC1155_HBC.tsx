@@ -16,7 +16,7 @@ import {
 import { getGasPrice, readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
-import { performCryptoPayment } from "../utils/cryptoOperation";
+import { CryptoPaymentResult, performCryptoPayment } from "../utils/cryptoOperation";
 import { polygon } from "thirdweb/chains";
 import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
@@ -97,21 +97,25 @@ export default function ItemERC1155_HBC({
     fetchSupplyAndSold();
   }, [contract, tokenId, minterAddress]);
 
-  const sendEmailGift = async () => {
-    setStatus('⏳ Envoi de l’email en cours...');
+  const registerTx = async (txResult: CryptoPaymentResult) => {
+    setStatus('⏳ Traitement de la transaction ...');
     try {
-      const res = await fetch('/api/happy-birthday-cakes-send-email-gift', {
+      const res = await fetch('/api/happy-birthday-cakes-crypto-payment-email-treatment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: recipientEmail,
+          tokenId,
           offererName: offererName || "Quelqu'un",
+          tx_result: txResult,
         })
       });
 
+      //email, tokenId, downloadCode, offererName, txResult
+
       const json = await res.json();
       if (res.ok) {
-        setStatus('✅ Email envoyé avec succès !');
+        setStatus('✅ Achat traité avec succès !');
       } else {
         setStatus(`❌ Erreur serveur : ${json.error || JSON.stringify(json)}`);
       }
@@ -121,6 +125,7 @@ export default function ItemERC1155_HBC({
   };
 
   const handleEmailCryptoPayment = async () => {
+    // here recipientWalletAddressOrEmail contains email.
     if (!smartAccount || !recipientWalletAddressOrEmail) {
       console.error("Informations incomplètes pour envoyer le NFT.");
       return;
@@ -133,7 +138,7 @@ export default function ItemERC1155_HBC({
     });
   
     try {
-      const result = await performCryptoPayment({
+      const txResult = await performCryptoPayment({
         client,
         chain: polygon,
         priceInPol: priceInPol,
@@ -142,14 +147,9 @@ export default function ItemERC1155_HBC({
         gasPrice: gasPrice,
       });
   
-      if (result.status === "confirmed") {
-        await sendEmailGift();
-        window.location.href = `${redirectPage}?paymentResult=success`;
-      } else {
-        // Montre une alerte + lien vers vérification future
-        const message = `⏳ Votre transaction est en cours. Si elle est bien confirmée plus tard, votre NFT sera envoyé. Conservez cet identifiant : ${result.hash}`;
-        window.location.href = `${redirectPage}?paymentResult=pending&txHash=${result.hash}&message=${encodeURIComponent(message)}`;
-      }
+      await registerTx(txResult);
+      window.location.href = `${redirectPage}?paymentResult=success`;
+
     } catch (error: any) {
       const txHash = error?.transactionHash || error?.data?.hash || null;
   
@@ -276,9 +276,12 @@ export default function ItemERC1155_HBC({
             {/* Crypto purchase button */}
             <div className="mb-4">
             {selectedOption === NFTrecipient.Email ? (
-              <div className="bg-yellow-100 text-yellow-800 border border-yellow-300 rounded p-4 my-4 text-sm">
-                  🚧 La fonctionnalité <strong>’Acheter en crypto & envoyer par email’</strong> est en cours de développement.
-                </div>
+                <button
+                  onClick={handleEmailCryptoPayment}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Acheter en Crypto
+                  </button>
               ) : (
                 <TransactionButton
                   transaction={async () => {

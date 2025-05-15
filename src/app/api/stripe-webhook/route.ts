@@ -4,9 +4,10 @@ import {
   extractPaymentMetadataStripe,
   PaymentMetadata,
 } from "../PaymentMetadata";
-import { distributeNFT, proceedSendGiftEmail } from "../ApiRequestDistribution";
+import { distributeNFT } from "../ApiRequestDistribution";
 import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentReception";
-import { DistributionType } from "@/app/constants";
+import { DistributionType, TransactionStatus } from "@/app/constants";
+import { createGiftInBDD, GiftRecord, sendDownloadEmail, updateGiftStatus } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
 
@@ -37,8 +38,32 @@ export async function POST(req: NextRequest) {
     console.log("stripe-webhook initializeThirdwebClient done ...")
 
     if (paymentMetadata.distributionType === DistributionType.EmailCode) {
+
+      if (!paymentMetadata.paymentTxRefStripe) {
+        throw new Error("paymentTxRefStripe est requis pour enregistrer le cadeau.");
+      }
+
+      const giftRecord: GiftRecord = await createGiftInBDD(
+        paymentMetadata.paymentTxRefStripe,
+        paymentMetadata.recipientWalletAddressOrEmail,
+        paymentMetadata.tokenId,
+        paymentMetadata.offererName!,
+        TransactionStatus.TX_CONFIRMED
+      );
+
       console.log("stripe-webhook DistributionType.EmailCode ...")
-      proceedSendGiftEmail(paymentMetadata);
+      const sendMailRes = await sendDownloadEmail(giftRecord);
+
+      if (sendMailRes === "ok") {
+        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_SENT);
+        return NextResponse.json({ success: true });
+      } else {
+        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_FAILED);
+        return NextResponse.json(
+          { error: `L'envoi de l'email a échoué. Contactez le support avec la référence Tx hash: ${giftRecord.txHashRef}` },
+          { status: 500 }
+        );
+      }
     } else {
         // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)
         const safeResult = await distributeNFT(client, paymentMetadata);

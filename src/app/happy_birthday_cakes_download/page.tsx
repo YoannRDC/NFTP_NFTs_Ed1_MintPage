@@ -9,6 +9,7 @@ import { projectMappings } from "../constants";
 
 function HappyBirthdayCakeDownload() {
   const searchParams = useSearchParams();
+  const txHash = searchParams.get("txHash");
   const code = searchParams.get("code");
   const offererName = searchParams.get("offererName");
   const tokenId = searchParams.get("tokenId");
@@ -23,7 +24,7 @@ function HappyBirthdayCakeDownload() {
     tokenId && `/assets/images/happy-birthday-cakes/${tokenId.toString().padStart(4, "0")}.jpg`;
 
   const handleDownloadNFT = async () => {
-    if (!account?.address || !code || !tokenId) {
+    if (!account?.address || !code || !tokenId || !txHash) {
       alert("Veuillez connecter votre wallet et vérifier les paramètres !");
       return;
     }
@@ -34,6 +35,7 @@ function HappyBirthdayCakeDownload() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          txHash,
           code,
           giftedWalletAddress: account.address,
           tokenId,

@@ -2,34 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import { distributeNFT } from "../ApiRequestDistribution";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
 import { PaymentMetadata } from "../PaymentMetadata";
-import { DistributionType, projectMappings } from "@/app/constants";
-import { markNFTAsDownloaded } from "../ApiEmailCodes";
+import { DistributionType, projectMappings, TransactionStatus } from "@/app/constants";
 import { createClient } from "redis";
+import { updateGiftStatus } from "../ApiEmailCodes"; // assure-toi que c’est bien exporté
 
 export const dynamic = "force-dynamic";
 
-const redis =  await createClient({ url: process.env.REDIS_URL }).connect();
+const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { code, giftedWalletAddress, tokenId } = body;
+    const { txHash, code, giftedWalletAddress, tokenId } = body;
 
-    if (!code || !giftedWalletAddress || !tokenId) {
-      return NextResponse.json({ error: "Code ou adresse manquant." }, { status: 400 });
+    if (!txHash || !code || !giftedWalletAddress || !tokenId) {
+      return NextResponse.json({ error: "Données manquantes." }, { status: 400 });
     }
 
-    const redisKey = `nft_code:${code}`;
+    const redisKey = `nft_gift:${txHash}`;
     const codeDataRaw = await redis.get(redisKey);
 
     if (!codeDataRaw) {
-      return NextResponse.json({ error: "Code invalide." }, { status: 400 });
+      return NextResponse.json({ error: "Transaction inconnue." }, { status: 400 });
     }
 
     const codeData = JSON.parse(codeDataRaw);
 
-    if (codeData.downloaded) {
-      return NextResponse.json({ error: "Code déjà utilisé." }, { status: 400 });
+    if (codeData.status === TransactionStatus.NFT_DOWNLOADED) {
+      return NextResponse.json({ error: "Ce NFT a déjà été téléchargé." }, { status: 400 });
     }
 
     const client = initializeThirdwebClient();
@@ -47,24 +47,22 @@ export async function POST(req: NextRequest) {
       tokenId: tokenId,
       requestedQuantity: "1",
       paymentPriceFiat: "0",
-      offererName: "",
+      offererName: codeData.offererName || "",
     };
 
     const result = await distributeNFT(client, paymentMetadata);
 
     if (result.transaction) {
-
-      const updated = await markNFTAsDownloaded(code);
+      const updated = await updateGiftStatus(txHash, TransactionStatus.NFT_DOWNLOADED);
       if (!updated) {
-        console.error("Erreur lors de la mise à jour du statut du code dans la base Redis.");
+        console.error("⚠️ Impossible de mettre à jour le statut NFT_DOWNLOADED dans Redis.");
       }
-
       return NextResponse.json({ success: true });
     } else {
-      return NextResponse.json({ error: "Échec de la distribution." }, { status: 400 });
+      return NextResponse.json({ error: "Échec de la distribution du NFT." }, { status: 400 });
     }
   } catch (error: any) {
-    console.error("Erreur serveur dans transfert NFT :", error);
+    console.error("❌ Erreur serveur transfert NFT :", error);
     return NextResponse.json({ error: "Erreur interne." }, { status: 500 });
   }
 }
