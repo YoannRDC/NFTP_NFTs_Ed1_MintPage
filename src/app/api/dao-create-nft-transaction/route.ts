@@ -3,9 +3,11 @@ import { createGiftInBDD } from "@/app/api/ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("▶ Requête reçue :", await req.json());
+    
+    const body = await req.json(); // ✅ Lire une seule fois
+    console.log("▶ Requête reçue :", body);
 
-    const { paymentTxHash, email, tokenId, offererName, txStatus } = await req.json();
+    const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
 
     if (!["TX_PENDING", "TX_CONFIRMED"].includes(txStatus)) {
       return NextResponse.json({ error: "txStatus invalide" }, { status: 400 });
