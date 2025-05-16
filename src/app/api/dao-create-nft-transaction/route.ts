@@ -10,20 +10,15 @@ export async function POST(req: NextRequest) {
 
     const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
 
-    if (!["pending", "confirmed"].includes(txStatus)) {
-      return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
-    }
-
     let txStatusEnum: TransactionStatus;
 
-    if (txStatus === "TX_PENDING") {
+    if (txStatus === "pending") {
       txStatusEnum = TransactionStatus.TX_PENDING;
-    } else if (txStatus === "TX_CONFIRMED") {
+    } else if (txStatus === "confirmed") {
       txStatusEnum = TransactionStatus.TX_CONFIRMED;
     } else {
-      throw new Error("txStatus invalide");
+      return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
     }
-
 
     if (!paymentTxHash || !email || !tokenId || !offererName || !txStatus) {
       return NextResponse.json(
