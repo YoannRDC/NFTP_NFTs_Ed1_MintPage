@@ -118,7 +118,8 @@ export default function ItemERC1155_HBC({
         offererName,
       });
 
-      window.location.href = `${redirectPage}?paymentResult=success`;
+      // TEMP redir
+      // window.location.href = `${redirectPage}?paymentResult=success`;
 
     } catch (error: any) {
       const paymentTxHash = error?.transactionHash || error?.data?.hash || null;
@@ -130,7 +131,8 @@ export default function ItemERC1155_HBC({
       console.warn("Erreur capturée :", baseErrorMessage);
       console.warn("paymentTxHash trouvé :", hashParam);
 
-      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
+      // TEMP redir
+      //window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }
     
   };

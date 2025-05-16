@@ -75,12 +75,18 @@ export async function performCryptoPaymentAndStoreTxInBdd({
     if (paymentTx?.blockNumber) {
       console.log("Transaction confirmée :", paymentTxHash);
 
-      await processTx_backend(paymentTxHash);
+      const success = await processTx_backend(paymentTxHash);
+
+      if (!success) {
+        console.warn("🚨 Transaction confirmée mais le traitement backend a échoué.");
+      }
 
       return {
         hash: paymentTxHash,
         status: "confirmed",
       };
+    } else {
+      console.log("Transaction non confirmée :", paymentTxHash);
     }
 
     console.log(`Tentative ${attempt + 1} : transaction toujours en attente...`);
@@ -113,17 +119,33 @@ async function createGiftInBDD_backend(paymentTxHash: string, email: string, tok
   }
 }
 
-async function processTx_backend(paymentTxHash: string) {
-    try {
-    const res = await fetch("/api/dao-process-transaction", {
+export async function processTx_backend(paymentTxHash: string): Promise<boolean> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const endpoint = `${baseUrl}/api/dao-process-transaction`;
+
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentTxHash}),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ paymentTxHash }),
     });
 
-    console.log(`${paymentTxHash} updated successfully.`);
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      console.error(`❌ Erreur API processTx_backend (${response.status}): ${responseText}`);
+      return false;
+    }
+
+    console.log(`✅ processTx_backend : traitement effectué pour ${paymentTxHash}. Réponse : ${responseText}`);
+    return true;
+
   } catch (err: any) {
-    console.log(`❌ Erreur during dao-update-nft-transaction call from front end. : ${err.message}`);
+    console.error(`❌ Erreur réseau dans processTx_backend : ${err.message}`);
+    return false;
   }
 }
+
 
