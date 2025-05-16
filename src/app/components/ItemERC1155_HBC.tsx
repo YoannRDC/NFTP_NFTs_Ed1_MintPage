@@ -130,9 +130,9 @@ export default function ItemERC1155_HBC({
 
       console.warn("Erreur capturée :", baseErrorMessage);
       console.warn("txHash trouvé :", hashParam);
-  
-      // 👇 Redirection avec info utile
-      window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
+
+      // TEMP: remove redirect for debugging
+      // window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }
     
   };
