@@ -76,7 +76,7 @@ export async function performCryptoPaymentAndStoreTxInBdd({
     if (paymentTx?.blockNumber) {
       console.log("Transaction confirmée :", paymentTxHash);
 
-      await processTx_backend(paymentTxHash, TransactionStatus.TX_CONFIRMED );
+      await processTx_backend(paymentTxHash);
 
       return {
         hash: paymentTxHash,
