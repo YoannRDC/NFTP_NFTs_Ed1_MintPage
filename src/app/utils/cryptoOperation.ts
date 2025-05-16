@@ -57,6 +57,9 @@ export async function performCryptoPaymentAndStoreTxInBdd({
   const receipt = await sendTransaction({ transaction, account });
   const paymentTxHash = receipt.transactionHash;
   console.log("Transaction envoyée :", paymentTxHash);
+  console.log("Transaction envoyée :", email);
+  console.log("Transaction envoyée :", tokenId);
+  console.log("Transaction envoyée :", offererName);
 
   await createGiftInBDD_backend(paymentTxHash, email!, tokenId, offererName!, TransactionStatus.TX_PENDING );
 
