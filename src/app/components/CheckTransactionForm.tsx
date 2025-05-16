@@ -13,7 +13,7 @@ export default function CheckTransactionForm() {
     setStatus(null);
 
     try {
-      const res = await fetch("/api/happy-birthday-cakes-check-transaction", {
+      const res = await fetch("/api/dao-process-transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ txHash }),

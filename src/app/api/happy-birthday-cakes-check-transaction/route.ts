@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result.body, { status: result.status });
 
   } catch (err: any) {
-    console.error("❌ Erreur dans /api/check-transaction :", err);
+    console.error("❌ Erreur dans /api/dao-process-transaction :", err);
     return NextResponse.json({ error: err.message || "Erreur interne" }, { status: 500 });
   }
 }
