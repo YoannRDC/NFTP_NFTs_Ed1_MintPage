@@ -102,7 +102,13 @@ async function createGiftInBDD_backend(paymentTxHash: string, email: string, tok
       body: JSON.stringify({ paymentTxHash, email, tokenId, offererName, txStatus: txStatus.toString()}),
     });
 
-    console.log(`${paymentTxHash} stored successfully.`);
+    const text = await res.text();
+    if (!res.ok) {
+      console.error(`❌ Erreur API /dao-create-nft-transaction : ${res.status} - ${text}`);
+    } else {
+      console.log(`${paymentTxHash} stored successfully.`);
+    }
+
   } catch (err: any) {
     console.log(`❌ Erreur during dao-create-nft-transaction call from front end. : ${err.message}`);
   }
