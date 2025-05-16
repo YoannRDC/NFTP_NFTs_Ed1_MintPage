@@ -99,7 +99,7 @@ async function createGiftInBDD_backend(paymentTxHash: string, email: string, tok
     const res = await fetch("/api/dao-create-nft-transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentTxHash, email, tokenId, offererName, txStatus}),
+      body: JSON.stringify({ paymentTxHash, email, tokenId, offererName, txStatus: txStatus.toString()}),
     });
 
     console.log(`${paymentTxHash} stored successfully.`);
@@ -113,7 +113,7 @@ async function updateGiftStatus_backend(paymentTxHash: string, txStatus: Transac
     const res = await fetch("/api/dao-update-nft-transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentTxHash, txStatus}),
+      body: JSON.stringify({ paymentTxHash, txStatus: txStatus.toString()}),
     });
 
     console.log(`${paymentTxHash} updated successfully.`);
