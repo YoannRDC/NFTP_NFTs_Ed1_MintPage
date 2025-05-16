@@ -39,6 +39,7 @@ export async function processTransaction(txHash: string): Promise<{ status: numb
 
   // Si transaction confirmée
   if (
+    giftRecord.status === TransactionStatus.TX_CONFIRMED ||
     giftRecord.status === TransactionStatus.EMAIL_FAILED ||
     giftRecord.status === TransactionStatus.EMAIL_SENT
   ) {

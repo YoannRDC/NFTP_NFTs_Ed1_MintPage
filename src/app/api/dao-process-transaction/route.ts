@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TransactionStatus } from "@/app/constants";
-import { createGiftInBDD, sendDownloadEmail, updateGiftStatus } from "@/app/api/ApiEmailCodes";
 import { createClient } from "redis";
 import { processTransaction } from "../TransactionService";
 
-const redis = await createClient({ url: process.env.REDIS_URL }).connect();
-
+// Redis déjà instancié dans processTransaction, donc pas utile ici
 export async function POST(req: NextRequest) {
   try {
-
-    const body = await req.json(); // ✅ Lire une seule fois
+    const body = await req.json();
     console.log("▶ Requête reçue :", body);
 
     const { paymentTxHash } = body;
@@ -21,7 +17,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    processTransaction(paymentTxHash);
+    // ✅ On attend et retourne le résultat de processTransaction
+    const result = await processTransaction(paymentTxHash);
+    return NextResponse.json(result.body, { status: result.status });
 
   } catch (err: any) {
     console.error("❌ Erreur dans /api/check-transaction :", err);
