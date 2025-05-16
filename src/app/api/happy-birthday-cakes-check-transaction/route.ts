@@ -3,10 +3,6 @@ import { createClient } from "redis";
 import { ethers } from "ethers";
 import { processTransaction } from "../TransactionService";
 
-// Connexions Redis et Provider à instancier une fois
-const redis = await createClient({ url: process.env.REDIS_URL }).connect();
-const provider = new ethers.JsonRpcProvider(process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL); // adapte au réseau utilisé
-
 export async function POST(req: NextRequest) {
   try {
     const { txHash } = await req.json();

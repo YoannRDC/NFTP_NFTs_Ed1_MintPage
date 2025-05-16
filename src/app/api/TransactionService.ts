@@ -4,7 +4,7 @@ import { GiftRecord, sendDownloadEmail, updateGiftStatus } from "./ApiEmailCodes
 import { ethers } from "ethers";
 
 const redis = await createClient({ url: process.env.REDIS_URL }).connect();
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL); // adapte au réseau utilisé
+const provider = new ethers.JsonRpcProvider(process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL);
 
 export async function processTransaction(txHash: string): Promise<{ status: number; body: any }> {
   const key = `nft_gift:${txHash}`;

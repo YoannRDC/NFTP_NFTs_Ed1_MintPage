@@ -2,7 +2,6 @@
 
 import { getGasPrice, prepareTransaction, sendTransaction, toWei } from "thirdweb";
 import { getRpcClient, eth_getTransactionByHash } from "thirdweb/rpc";
-import { createGiftInBDD, updateGiftStatus } from "../api/ApiEmailCodes";
 import { TransactionStatus } from "../constants";
 import { polygon } from "thirdweb/chains";
 
