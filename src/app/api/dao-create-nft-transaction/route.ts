@@ -20,13 +20,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
     }
 
-    if (!paymentTxHash || !email || !tokenId || !offererName || !txStatus) {
-      return NextResponse.json(
-        { error: "Champs requis manquants : paymentTxHash, email, tokenId, offererName, txStatus" },
-        { status: 400 }
-      );
-    }
-
     const saved = await createGiftInBDD(
       paymentTxHash,
       email,
