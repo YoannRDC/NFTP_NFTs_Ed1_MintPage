@@ -72,14 +72,14 @@ export async function sendDownloadEmail(giftRecord: GiftRecord): Promise<"ok" | 
       <p>Voici le lien pour le télécharger :</p>
       <p style="text-align:center;">
         <a 
-          href="https://www.authentart.com/happy_birthday_cakes_download?txHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}"
+          href="https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}"
           style="display:inline-block;background-color:#0050ef;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
           Télécharger mon NFT 🚀
         </a>
       </p>
       <p style="font-size:0.9em;color:#666;">
         Ou copiez-collez ce lien :<br>
-        <code>https://www.authentart.com/happy_birthday_cakes_download?txHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}</code>
+        <code>https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}</code>
       </p>
       <p>Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes faciles !</p>
       <p>Tout le monde se souvient de son premier NFT !<br>Vous aurez désormais le vôtre :)</p>
@@ -94,7 +94,7 @@ Bonjour,
 ${giftRecord.offererName} vous a offert un NFT pour votre anniversaire !
 
 Voici le lien pour le télécharger :
-https://www.authentart.com/happy_birthday_cakes_download?txHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}
+https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}
 
 Tout le monde se souvient de son premier NFT 😉
 

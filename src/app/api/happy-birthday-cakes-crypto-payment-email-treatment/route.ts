@@ -10,10 +10,10 @@ export async function POST(req: Request) {
       email, tokenId, offererName, txResult
     });
 
-    const txHash = txResult.hash;
+    const paymentTxHash = txResult.hash;
     const txStatus = txResult.status;
 
-    if (!txHash || !txStatus || !["confirmed", "pending"].includes(txStatus)) {
+    if (!paymentTxHash || !txStatus || !["confirmed", "pending"].includes(txStatus)) {
       return NextResponse.json({ error: "txResult invalide" }, { status: 400 });
     }
 
@@ -42,10 +42,10 @@ export async function POST(req: Request) {
       }
     } else {
       // txStatus === "pending"
-      await createGiftInBDD(txHash, email, tokenId, offererName, TransactionStatus.TX_PENDING);
+      await createGiftInBDD(paymentTxHash, email, tokenId, offererName, TransactionStatus.TX_PENDING);
       return NextResponse.json({
         success: false,
-        error: `La transaction est encore en cours. Utilisez le formulaire en bas de page avec le hash: ${txHash} pour demander le renvoie de l'email`
+        error: `La transaction est encore en cours. Utilisez le formulaire en bas de page avec le hash: ${paymentTxHash} pour demander le renvoie de l'email`
       });
     }
 

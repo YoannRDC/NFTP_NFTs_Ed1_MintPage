@@ -6,8 +6,8 @@ import { ethers } from "ethers";
 const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 const provider = new ethers.JsonRpcProvider(process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL);
 
-export async function processTransaction(txHash: string): Promise<{ status: number; body: any }> {
-  const key = `nft_gift:${txHash}`;
+export async function processTransaction(paymentTxHash: string): Promise<{ status: number; body: any }> {
+  const key = `nft_gift:${paymentTxHash}`;
   const raw = await redis.get(key);
 
   if (!raw) {
@@ -18,7 +18,7 @@ export async function processTransaction(txHash: string): Promise<{ status: numb
   }
 
   const giftRecord: GiftRecord = JSON.parse(raw);
-  const receipt = await provider.getTransactionReceipt(txHash);
+  const receipt = await provider.getTransactionReceipt(paymentTxHash);
 
   if (!receipt) {
     return {
@@ -29,7 +29,7 @@ export async function processTransaction(txHash: string): Promise<{ status: numb
 
   if (receipt.status === 0) {
     if (giftRecord.status !== TransactionStatus.TX_FAILED) {
-      await updateGiftStatus(txHash, TransactionStatus.TX_FAILED);
+      await updateGiftStatus(paymentTxHash, TransactionStatus.TX_FAILED);
     }
     return {
       status: 400,
@@ -46,13 +46,13 @@ export async function processTransaction(txHash: string): Promise<{ status: numb
     const result = await sendDownloadEmail(giftRecord);
 
     if (result === "ok") {
-      await updateGiftStatus(txHash, TransactionStatus.EMAIL_SENT);
+      await updateGiftStatus(paymentTxHash, TransactionStatus.EMAIL_SENT);
       return {
         status: 200,
         body: { message: "✅ Email (re)envoyé avec succès." }
       };
     } else {
-      await updateGiftStatus(txHash, TransactionStatus.EMAIL_FAILED);
+      await updateGiftStatus(paymentTxHash, TransactionStatus.EMAIL_FAILED);
       return {
         status: 500,
         body: { error: "La transaction est confirmée, mais l'envoi de l'email a échoué. Veuillez réessayer plus tard." }

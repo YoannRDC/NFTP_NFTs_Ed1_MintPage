@@ -121,14 +121,14 @@ export default function ItemERC1155_HBC({
       window.location.href = `${redirectPage}?paymentResult=success`;
 
     } catch (error: any) {
-      const txHash = error?.transactionHash || error?.data?.hash || null;
+      const paymentTxHash = error?.transactionHash || error?.data?.hash || null;
   
       // 👇 Encodage du message et du hash
       const baseErrorMessage = encodeURIComponent(error.message || "Transaction échouée");
-      const hashParam = txHash ? `&txHash=${txHash}` : "&txHash=";
+      const hashParam = paymentTxHash ? `&paymentTxHash=${paymentTxHash}` : "&paymentTxHash=";
 
       console.warn("Erreur capturée :", baseErrorMessage);
-      console.warn("txHash trouvé :", hashParam);
+      console.warn("paymentTxHash trouvé :", hashParam);
 
       window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;
     }

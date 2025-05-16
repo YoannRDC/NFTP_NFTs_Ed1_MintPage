@@ -13,13 +13,13 @@ const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { txHash, code, giftedWalletAddress, tokenId } = body;
+    const { paymentTxHash, code, giftedWalletAddress, tokenId } = body;
 
-    if (!txHash || !code || !giftedWalletAddress || !tokenId) {
+    if (!paymentTxHash || !code || !giftedWalletAddress || !tokenId) {
       return NextResponse.json({ error: "Données manquantes." }, { status: 400 });
     }
 
-    const redisKey = `nft_gift:${txHash}`;
+    const redisKey = `nft_gift:${paymentTxHash}`;
     const codeDataRaw = await redis.get(redisKey);
 
     if (!codeDataRaw) {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const result = await distributeNFT(client, paymentMetadata);
 
     if (result.transaction) {
-      const updated = await updateGiftStatus(txHash, TransactionStatus.NFT_DOWNLOADED);
+      const updated = await updateGiftStatus(paymentTxHash, TransactionStatus.NFT_DOWNLOADED);
       if (!updated) {
         console.error("⚠️ Impossible de mettre à jour le statut NFT_DOWNLOADED dans Redis.");
       }
