@@ -76,7 +76,7 @@ export async function performCryptoPaymentAndStoreTxInBdd({
     if (paymentTx?.blockNumber) {
       console.log("Transaction confirmée :", paymentTxHash);
 
-      await updateGiftStatus_backend(paymentTxHash, TransactionStatus.TX_PENDING );
+      await processTx_backend(paymentTxHash, TransactionStatus.TX_CONFIRMED );
 
       return {
         hash: paymentTxHash,
@@ -114,12 +114,12 @@ async function createGiftInBDD_backend(paymentTxHash: string, email: string, tok
   }
 }
 
-async function updateGiftStatus_backend(paymentTxHash: string, txStatus: TransactionStatus) {
+async function processTx_backend(paymentTxHash: string) {
     try {
-    const res = await fetch("/api/dao-update-nft-transaction", {
+    const res = await fetch("/api/dao-process-transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentTxHash, txStatus: txStatus.toString()}),
+      body: JSON.stringify({ paymentTxHash}),
     });
 
     console.log(`${paymentTxHash} updated successfully.`);
