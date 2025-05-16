@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
 
     if (!["pending", "confirmed"].includes(txStatus)) {
-      return NextResponse.json({ error: "txStatus invalide" }, { status: 400 });
+      return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
     }
 
     let txStatusEnum: TransactionStatus;
