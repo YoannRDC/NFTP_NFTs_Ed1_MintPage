@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TransactionStatus } from "@/app/constants";
-import { createGiftInBDD, updateGiftStatus } from "@/app/api/ApiEmailCodes";
+import { updateGiftStatus } from "@/app/api/ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
-    const { paymentTxHash, txStatus } = await req.json();
+
+    const body = await req.json(); // ✅ Lire une seule fois
+    console.log("▶ Requête reçue :", body);
+
+    const { paymentTxHash, txStatus } = body;
 
     if (!paymentTxHash || !txStatus) {
       return NextResponse.json(

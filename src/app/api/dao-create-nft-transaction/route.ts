@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGiftInBDD } from "@/app/api/ApiEmailCodes";
+import { TransactionStatus } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,18 @@ export async function POST(req: NextRequest) {
 
     const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
 
-    if (!["TX_PENDING", "TX_CONFIRMED"].includes(txStatus)) {
+    if (!["pending", "confirmed"].includes(txStatus)) {
       return NextResponse.json({ error: "txStatus invalide" }, { status: 400 });
+    }
+
+    let txStatusEnum: TransactionStatus;
+
+    if (txStatus === "TX_PENDING") {
+      txStatusEnum = TransactionStatus.TX_PENDING;
+    } else if (txStatus === "TX_CONFIRMED") {
+      txStatusEnum = TransactionStatus.TX_CONFIRMED;
+    } else {
+      throw new Error("txStatus invalide");
     }
 
 
