@@ -29,6 +29,8 @@ export async function processNFTtx(paymentTxHash: string): Promise<{ status: num
     };
   }
 
+  console.log('receipt:', receipt);
+
   if (receipt.status === 0) {
     if (nftTxRecord.status !== TransactionStatus.TX_FAILED) {
       await updateNFTtxStatus(paymentTxHash, TransactionStatus.TX_FAILED);
