@@ -5,7 +5,7 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName, TransactionStatus  } from "../constants";
-import { sendDownloadEmail, createGiftInBDD, GiftRecord } from "./ApiEmailCodes";
+import { sendDownloadEmail, createNFTtxInBDD, NFTtxRecord } from "./ApiEmailCodes";
 
 export interface DistributionResult {
   transaction: any; 
@@ -17,7 +17,7 @@ export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
     throw new Error("paymentTxRefStripe est requis pour enregistrer le cadeau.");
   }
 
-  const giftRecord: GiftRecord = await createGiftInBDD(
+  const giftRecord: NFTtxRecord = await createNFTtxInBDD(
     paymentMetadata.paymentTxRefStripe,
     paymentMetadata.recipientWalletAddressOrEmail,
     paymentMetadata.tokenId,

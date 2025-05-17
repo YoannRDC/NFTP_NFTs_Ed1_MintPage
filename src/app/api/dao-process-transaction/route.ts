@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "redis";
-import { processTransaction } from "../TransactionService";
+import { processNFTtx } from "../ApiTransactionService";
 
 // Redis déjà instancié dans processTransaction, donc pas utile ici
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("▶ Requête reçue :", body);
+    console.log("Requête reçue :", body);
 
     const { paymentTxHash } = body;
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ On attend et retourne le résultat de processTransaction
-    const result = await processTransaction(paymentTxHash);
+    const result = await processNFTtx(paymentTxHash);
     return NextResponse.json(result.body, { status: result.status });
 
   } catch (err: any) {

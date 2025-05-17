@@ -23,13 +23,13 @@ export enum Blockchain {
   }
 
 export enum TransactionStatus {
-  TX_PENDING = "pending",            // Tx en attente de confirmation
-  TX_CONFIRMED = "confirmed",        // Tx confirmée sur la blockchain
-  TX_FAILED = "failed",              // Tx en échec sur la blockchain
+  TX_PENDING = "tx_pending",            // Tx en attente de confirmation
+  TX_CONFIRMED = "tx_confirmed",        // Tx confirmée sur la blockchain
+  TX_FAILED = "tx_failed",              // Tx en échec sur la blockchain
   EMAIL_SENT = "email_sent",      // Email envoyé
   EMAIL_FAILED = "email_failed",  // Échec de l’envoi d’email
   NFT_DOWNLOADED = "nft_downloaded",  // Échec de l’envoi d’email. Last status
-  CANCELLED = "cancelled"
+  OPERATION_CANCELLED = "operation_cancelled"
 }
 
 

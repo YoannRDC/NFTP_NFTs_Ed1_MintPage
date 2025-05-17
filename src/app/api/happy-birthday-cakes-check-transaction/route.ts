@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { processTransaction } from "../TransactionService";
+import { processNFTtx } from "../ApiTransactionService";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "paymentTxHash requis" }, { status: 400 });
     }
 
-    const result = await processTransaction(paymentTxHash);
+    const result = await processNFTtx(paymentTxHash);
     return NextResponse.json(result.body, { status: result.status });
 
   } catch (err: any) {

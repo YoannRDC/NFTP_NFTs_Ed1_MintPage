@@ -5,7 +5,7 @@ import crypto from 'crypto'
 
 const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 
-export interface GiftRecord {
+export interface NFTtxRecord {
   txHashRef:string;
   email: string;
   tokenId: string;
@@ -15,16 +15,16 @@ export interface GiftRecord {
   createdAt: string;
 }
 
-export async function createGiftInBDD(
+export async function createNFTtxInBDD(
   txHashRef: string,
   email: string,
   tokenId: string,
   offererName: string,
   status: TransactionStatus
-): Promise<GiftRecord> {
+): Promise<NFTtxRecord> {
 
   const code = crypto.randomBytes(16).toString('hex');
-  const record: GiftRecord = {
+  const record: NFTtxRecord = {
     txHashRef,
     email,
     tokenId,
@@ -34,18 +34,18 @@ export async function createGiftInBDD(
     createdAt: new Date().toISOString(),
   };
 
-  await redis.set(`nft_gift:${txHashRef}`, JSON.stringify(record));
-  console.log("→ Gift enregistré en BDD :", record);
+  await redis.set(`nft_tx:${txHashRef}`, JSON.stringify(record));
+  console.log("→ NFT tx enregistrée en BDD :", record);
 
   return record;
 }
 
-export async function updateGiftStatus(txHashRef: string, status: TransactionStatus): Promise<boolean> {
-  const key = `nft_gift:${txHashRef}`;
+export async function updateNFTtxStatus(txHashRef: string, status: TransactionStatus): Promise<boolean> {
+  const key = `nft_tx:${txHashRef}`;
   const data = await redis.get(key);
   if (!data) return false;
 
-  const record: GiftRecord = JSON.parse(data);
+  const record: NFTtxRecord = JSON.parse(data);
   if (record.status !== status) {
     record.status = status;
     await redis.set(key, JSON.stringify(record));
@@ -54,7 +54,7 @@ export async function updateGiftStatus(txHashRef: string, status: TransactionSta
   return true;
 }
 
-export async function sendDownloadEmail(giftRecord: GiftRecord): Promise<"ok" | "error"> {
+export async function sendDownloadEmail(giftRecord: NFTtxRecord): Promise<"ok" | "error"> {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST_NFTP,
     port: parseInt(process.env.SMTP_PORT_NFTP || '465', 10),

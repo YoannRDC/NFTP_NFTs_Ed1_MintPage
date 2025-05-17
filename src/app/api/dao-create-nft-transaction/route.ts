@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGiftInBDD } from "@/app/api/ApiEmailCodes";
+import { createNFTtxInBDD } from "@/app/api/ApiEmailCodes";
 import { TransactionStatus } from "@/app/constants";
 
 export async function POST(req: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
     }
 
-    const saved = await createGiftInBDD(
+    const saved = await createNFTtxInBDD(
       paymentTxHash,
       email,
       tokenId,
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     if (!saved) {
       return NextResponse.json(
-        { error: `Échec lors de l'enregistrement du gift avec paymentTxHash: ${paymentTxHash}` },
+        { error: `Échec lors de l'enregistrement du NFTtx avec paymentTxHash: ${paymentTxHash}` },
         { status: 500 }
       );
     }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createGiftInBDD, GiftRecord, sendDownloadEmail, updateGiftStatus } from "../ApiEmailCodes";
+import { createNFTtxInBDD, NFTtxRecord, sendDownloadEmail, updateNFTtxStatus } from "../ApiEmailCodes";
 import { TransactionStatus } from "@/app/constants";
 
 export async function POST(req: Request) {
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     if (txStatus === "confirmed") {
 
-      const giftRecord: GiftRecord = await createGiftInBDD(
+      const NFTtxRecord: NFTtxRecord = await createNFTtxInBDD(
         txResult.hash,
         email,
         tokenId,
@@ -28,21 +28,21 @@ export async function POST(req: Request) {
       );
 
       console.log("stripe-webhook DistributionType.EmailCode ...")
-      const sendMailRes = await sendDownloadEmail(giftRecord);
+      const sendMailRes = await sendDownloadEmail(NFTtxRecord);
 
       if (sendMailRes === "ok") {
-        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_SENT);
+        await updateNFTtxStatus(NFTtxRecord.txHashRef, TransactionStatus.EMAIL_SENT);
         return NextResponse.json({ success: true });
       } else {
-        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_FAILED);
+        await updateNFTtxStatus(NFTtxRecord.txHashRef, TransactionStatus.EMAIL_FAILED);
         return NextResponse.json(
-          { error: `L'envoi de l'email a échoué. Contactez le support avec la référence Tx hash: ${giftRecord.txHashRef}` },
+          { error: `L'envoi de l'email a échoué. Contactez le support avec la référence Tx hash: ${NFTtxRecord.txHashRef}` },
           { status: 500 }
         );
       }
     } else {
       // txStatus === "pending"
-      await createGiftInBDD(paymentTxHash, email, tokenId, offererName, TransactionStatus.TX_PENDING);
+      await createNFTtxInBDD(paymentTxHash, email, tokenId, offererName, TransactionStatus.TX_PENDING);
       return NextResponse.json({
         success: false,
         error: `La transaction est encore en cours. Utilisez le formulaire en bas de page avec le hash: ${paymentTxHash} pour demander le renvoie de l'email`

@@ -7,7 +7,7 @@ import {
 import { distributeNFT } from "../ApiRequestDistribution";
 import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentReception";
 import { DistributionType, TransactionStatus } from "@/app/constants";
-import { createGiftInBDD, GiftRecord, sendDownloadEmail, updateGiftStatus } from "../ApiEmailCodes";
+import { createNFTtxInBDD, NFTtxRecord, sendDownloadEmail, updateNFTtxStatus } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         throw new Error("paymentTxRefStripe est requis pour enregistrer le cadeau.");
       }
 
-      const giftRecord: GiftRecord = await createGiftInBDD(
+      const NFTtxRecord: NFTtxRecord = await createNFTtxInBDD(
         paymentMetadata.paymentTxRefStripe,
         paymentMetadata.recipientWalletAddressOrEmail,
         paymentMetadata.tokenId,
@@ -52,15 +52,15 @@ export async function POST(req: NextRequest) {
       );
 
       console.log("stripe-webhook DistributionType.EmailCode ...")
-      const sendMailRes = await sendDownloadEmail(giftRecord);
+      const sendMailRes = await sendDownloadEmail(NFTtxRecord);
 
       if (sendMailRes === "ok") {
-        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_SENT);
+        await updateNFTtxStatus(NFTtxRecord.txHashRef, TransactionStatus.EMAIL_SENT);
         return NextResponse.json({ success: true });
       } else {
-        await updateGiftStatus(giftRecord.txHashRef, TransactionStatus.EMAIL_FAILED);
+        await updateNFTtxStatus(NFTtxRecord.txHashRef, TransactionStatus.EMAIL_FAILED);
         return NextResponse.json(
-          { error: `L'envoi de l'email a échoué. Contactez le support avec la référence Tx hash: ${giftRecord.txHashRef}` },
+          { error: `L'envoi de l'email a échoué. Contactez le support avec la référence Tx hash: ${NFTtxRecord.txHashRef}` },
           { status: 500 }
         );
       }
