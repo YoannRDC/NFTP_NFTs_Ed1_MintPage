@@ -6,19 +6,9 @@ export async function POST(req: NextRequest) {
   try {
     
     const body = await req.json(); // ✅ Lire une seule fois
-    console.log("▶ Requête reçue :", body);
+    console.log("Requête reçue :", body);
 
     const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
-
-    let txStatusEnum: TransactionStatus;
-
-    if (txStatus === "pending") {
-      txStatusEnum = TransactionStatus.TX_PENDING;
-    } else if (txStatus === "confirmed") {
-      txStatusEnum = TransactionStatus.TX_CONFIRMED;
-    } else {
-      return NextResponse.json({ error: `txStatus invalide: ${txStatus}.` }, { status: 400 });
-    }
 
     const saved = await createNFTtxInBDD(
       paymentTxHash,

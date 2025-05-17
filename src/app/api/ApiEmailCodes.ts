@@ -54,7 +54,7 @@ export async function updateNFTtxStatus(txHashRef: string, status: TransactionSt
   return true;
 }
 
-export async function sendDownloadEmail(giftRecord: NFTtxRecord): Promise<"ok" | "error"> {
+export async function sendDownloadEmail(nftTxRecord: NFTtxRecord): Promise<"ok" | "error"> {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST_NFTP,
     port: parseInt(process.env.SMTP_PORT_NFTP || '465', 10),
@@ -68,22 +68,22 @@ export async function sendDownloadEmail(giftRecord: NFTtxRecord): Promise<"ok" |
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;">
       <h2 style="color:#333;">Bonjour,</h2>
-      <p><strong>${giftRecord.offererName}</strong> vous a offert un NFT pour votre anniversaire !</p>
+      <p><strong>${nftTxRecord.offererName}</strong> vous a offert un NFT pour votre anniversaire !</p>
       <p>Voici le lien pour le télécharger :</p>
       <p style="text-align:center;">
         <a 
-          href="https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}"
+          href="https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${nftTxRecord.txHashRef}&code=${nftTxRecord.code}&offererName=${encodeURIComponent(nftTxRecord.offererName)}&tokenId=${nftTxRecord.tokenId}"
           style="display:inline-block;background-color:#0050ef;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
           Télécharger mon NFT 🚀
         </a>
       </p>
       <p style="font-size:0.9em;color:#666;">
         Ou copiez-collez ce lien :<br>
-        <code>https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}</code>
+        <code>https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${nftTxRecord.txHashRef}&code=${nftTxRecord.code}&offererName=${encodeURIComponent(nftTxRecord.offererName)}&tokenId=${nftTxRecord.tokenId}</code>
       </p>
       <p>Si vous ne connaissez rien au NFT, vous allez enfin découvrir ce que c'est en 2 étapes faciles !</p>
       <p>Tout le monde se souvient de son premier NFT !<br>Vous aurez désormais le vôtre :)</p>
-      <p><strong>Transaction ref:</strong> ${giftRecord.txHashRef}</p>
+      <p><strong>Transaction ref:</strong> ${nftTxRecord.txHashRef}</p>
       <p>Bonne journée,<br>L’équipe AuthentArt.com</p>
     </div>
   `;
@@ -91,14 +91,14 @@ export async function sendDownloadEmail(giftRecord: NFTtxRecord): Promise<"ok" |
   const text = `
 Bonjour,
 
-${giftRecord.offererName} vous a offert un NFT pour votre anniversaire !
+${nftTxRecord.offererName} vous a offert un NFT pour votre anniversaire !
 
 Voici le lien pour le télécharger :
-https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${giftRecord.txHashRef}&code=${giftRecord.code}&offererName=${encodeURIComponent(giftRecord.offererName)}&tokenId=${giftRecord.tokenId}
+https://www.authentart.com/happy_birthday_cakes_download?paymentTxHash=${nftTxRecord.txHashRef}&code=${nftTxRecord.code}&offererName=${encodeURIComponent(nftTxRecord.offererName)}&tokenId=${nftTxRecord.tokenId}
 
 Tout le monde se souvient de son premier NFT 😉
 
-Transaction ref: ${giftRecord.txHashRef}
+Transaction ref: ${nftTxRecord.txHashRef}
 
 Bonne journée,
 L’équipe AuthentArt.com
@@ -106,9 +106,9 @@ L’équipe AuthentArt.com
 
   try {
     const result = await transporter.sendMail({
-      from: `"${giftRecord.offererName} 🎉 Happy Birthday Cakes" <${process.env.SMTP_USER_NFTP}>`,
-      to: giftRecord.email,
-      subject: `🎨 ${giftRecord.offererName} vous a offert un NFT !`,
+      from: `"${nftTxRecord.offererName} 🎉 Happy Birthday Cakes" <${process.env.SMTP_USER_NFTP}>`,
+      to: nftTxRecord.email,
+      subject: `🎨 ${nftTxRecord.offererName} vous a offert un NFT !`,
       html,
       text,
     });

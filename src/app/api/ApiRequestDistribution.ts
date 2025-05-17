@@ -17,7 +17,7 @@ export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
     throw new Error("paymentTxRefStripe est requis pour enregistrer le cadeau.");
   }
 
-  const giftRecord: NFTtxRecord = await createNFTtxInBDD(
+  const nftTxRecord: NFTtxRecord = await createNFTtxInBDD(
     paymentMetadata.paymentTxRefStripe,
     paymentMetadata.recipientWalletAddressOrEmail,
     paymentMetadata.tokenId,
@@ -26,10 +26,10 @@ export async function proceedSendGiftEmail(paymentMetadata: PaymentMetadata) {
   );
 
   console.log("✅ stripe-webhook proceedSendGiftEmail ...");
-  console.log("email:", giftRecord.email);
-  console.log("tokenId:", giftRecord.tokenId);
-  console.log("downloadCode:", giftRecord.code);
-  console.log("offererName:", giftRecord.offererName);
+  console.log("email:", nftTxRecord.email);
+  console.log("tokenId:", nftTxRecord.tokenId);
+  console.log("downloadCode:", nftTxRecord.code);
+  console.log("offererName:", nftTxRecord.offererName);
 }
 
 /**
