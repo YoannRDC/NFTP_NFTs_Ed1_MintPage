@@ -64,6 +64,8 @@ export async function updateNFTtxStatus(txHashRef: string, status: TransactionSt
 }
 
 export async function sendDownloadEmail(nftTxRecord: NFTtxRecord): Promise<"ok" | "error"> {
+
+  console.log ("sending email: ", nftTxRecord)
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST_NFTP,
     port: parseInt(process.env.SMTP_PORT_NFTP || '465', 10),

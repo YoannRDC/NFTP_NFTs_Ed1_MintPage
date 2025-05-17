@@ -5,7 +5,7 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { getNftContract, maskSecretKey } from "./ApiPaymentReception";
 import { PaymentMetadata } from "./PaymentMetadata";
 import { DistributionType, getProjectMinterAddress, getProjectMinterPrivateKeyEnvName, TransactionStatus  } from "../constants";
-import { sendDownloadEmail, createNFTtxInBDD, NFTtxRecord } from "./ApiEmailCodes";
+import { createNFTtxInBDD, NFTtxRecord } from "./ApiEmailCodes";
 
 export interface DistributionResult {
   transaction: any; 

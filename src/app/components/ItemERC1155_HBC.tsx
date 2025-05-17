@@ -114,7 +114,7 @@ export default function ItemERC1155_HBC({
         priceInPol: priceInPol,
         minterAddress: minterAddress,
         account: smartAccount,
-        email: "", // TODO: Add from Mon compte.
+        email: recipientEmail || "", // TODO: Add from Mon compte.
         tokenId: tokenId.toString(),
         offererName,
       });
