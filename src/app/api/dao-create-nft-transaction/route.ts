@@ -10,6 +10,15 @@ export async function POST(req: NextRequest) {
 
     const { paymentTxHash, email, tokenId, offererName, txStatus } = body;
 
+    const allowedStatuses = Object.values(TransactionStatus); // ["TX_PENDING", "TX_CONFIRMED", ...]
+
+    if (!allowedStatuses.includes(txStatus)) {
+      return NextResponse.json(
+        { error: `(test) txStatus invalide: ${txStatus}` },
+        { status: 400 }
+      );
+    }
+
     const saved = await createNFTtxInBDD(
       paymentTxHash,
       email,

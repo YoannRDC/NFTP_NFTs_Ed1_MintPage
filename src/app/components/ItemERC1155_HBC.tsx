@@ -73,6 +73,9 @@ export default function ItemERC1155_HBC({
       ? specificWalletAddress
       : recipientEmail;
 
+  let txResult;
+  let paymentTxHash: string | null = null;
+
   useEffect(() => {
     const fetchSupplyAndSold = async () => {
       try {
@@ -104,8 +107,6 @@ export default function ItemERC1155_HBC({
       return;
     }
 
-    let txResult;
-  
     try {
       txResult = await performCryptoPaymentAndStoreTxInBdd({
         client,
@@ -118,15 +119,17 @@ export default function ItemERC1155_HBC({
         offererName,
       });
 
+      paymentTxHash = txResult.hash;
+
       // TEMP redir
       // window.location.href = `${redirectPage}?paymentResult=success`;
 
     } catch (error: any) {
-      const paymentTxHash = error?.transactionHash || error?.data?.hash || null;
-  
-      // 👇 Encodage du message et du hash
+      // Si le hash n'a pas pu être récupéré du résultat, on le récupère du message d'erreur ou on garde null
+      const fallbackHash = error?.transactionHash || error?.data?.hash || paymentTxHash || null;
+
       const baseErrorMessage = encodeURIComponent(error.message || "Transaction échouée");
-      const hashParam = paymentTxHash ? `&paymentTxHash=${paymentTxHash}` : "&paymentTxHash=";
+      const hashParam = fallbackHash ? `&paymentTxHash=${fallbackHash}` : "&paymentTxHash=";
 
       console.warn("Erreur capturée :", baseErrorMessage);
       console.warn("paymentTxHash trouvé :", hashParam);
