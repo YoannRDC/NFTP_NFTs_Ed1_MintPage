@@ -23,6 +23,15 @@ export async function createNFTtxInBDD(
   status: TransactionStatus
 ): Promise<NFTtxRecord> {
 
+  const redisKey = `nft_tx:${txHashRef}`;
+
+  // 🔍 Vérifie si l'entrée existe déjà
+  const existing = await redis.get(redisKey);
+  if (existing) {
+    console.log("⚠️ Enregistrement déjà existant pour cette transaction. Retour de l'entrée existante.");
+    return JSON.parse(existing) as NFTtxRecord;
+  }
+
   const code = crypto.randomBytes(16).toString('hex');
   const record: NFTtxRecord = {
     txHashRef,

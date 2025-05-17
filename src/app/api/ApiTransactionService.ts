@@ -4,7 +4,9 @@ import { NFTtxRecord, sendDownloadEmail, updateNFTtxStatus as updateNFTtxStatus 
 import { ethers } from "ethers";
 
 const redis = await createClient({ url: process.env.REDIS_URL }).connect();
-const provider = new ethers.JsonRpcProvider(process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL);
+// const RPC_URL = process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL!;
+const RPC_URL = "https://polygon-rpc.com"
+const provider = new ethers.JsonRpcProvider(RPC_URL);
 
 export async function processNFTtx(paymentTxHash: string): Promise<{ status: number; body: any }> {
   const key = `nft_tx:${paymentTxHash}`;
