@@ -121,15 +121,11 @@ async function createGiftInBDD_backend(paymentTxHash: string, email: string, tok
 
 export async function processTx_backend(paymentTxHash: string): Promise<boolean> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const endpoint = `${baseUrl}/api/dao-process-transaction`;
 
-    const response = await fetch(endpoint, {
+    const response = await fetch("/api/dao-create-nft-transaction", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ paymentTxHash }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentTxHash}),
     });
 
     const responseText = await response.text();
