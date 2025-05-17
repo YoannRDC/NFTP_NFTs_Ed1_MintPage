@@ -71,7 +71,7 @@ export async function processTx_backend(paymentTxHash: string): Promise<boolean>
 
     console.log("paymentTxHash: ", paymentTxHash);
 
-    const response = await fetch("/api/dao-create-nft-transaction", {
+    const response = await fetch("/api/dao-process-transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ paymentTxHash}),
