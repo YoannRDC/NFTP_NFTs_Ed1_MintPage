@@ -13,7 +13,7 @@ import {
   NFTrecipient,
   StripeMode,
 } from "../constants";
-import { getGasPrice, readContract } from "thirdweb";
+import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPaymentAndStoreTxInBdd } from "../utils/cryptoOperation";
@@ -129,10 +129,10 @@ export default function ItemERC1155_HBC({
       const fallbackHash = error?.transactionHash || error?.data?.hash || paymentTxHash || null;
 
       const baseErrorMessage = encodeURIComponent(error.message || "Transaction échouée");
-      const hashParam = fallbackHash ? `&paymentTxHash=${fallbackHash}` : "&paymentTxHash=";
+      const hashParam = fallbackHash ? `&paymentTxHash=${fallbackHash}` : "";
 
       console.warn("Erreur capturée :", baseErrorMessage);
-      console.warn("paymentTxHash trouvé :", hashParam);
+      console.warn("paymentTxHash trouvé :", fallbackHash);
 
       // TEMP redir
       //window.location.href = `${redirectPage}?paymentResult=error&errorMessage=${baseErrorMessage}${hashParam}`;

@@ -38,64 +38,86 @@ export async function performCryptoPaymentAndStoreTxInBdd({
   tokenId,
   offererName,
 }: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+  let paymentTxHash: string = "";
 
-  // twice the gasPrice
-  const gasPrice = await getGasPrice({
-    client,
-    chain: polygon,
-    percentMultiplier: 2,
-  });
-
-  const transaction = prepareTransaction({
-    to: minterAddress,
-    chain: chain,
-    client: client,
-    value: toWei(priceInPol.toString()),
-    gasPrice: gasPrice,
-  });
-
-  const receipt = await sendTransaction({ transaction, account });
-  const paymentTxHash = receipt.transactionHash;
-  console.log("Transaction envoyée :", paymentTxHash);
-  console.log("Transaction envoyée :", email);
-  console.log("Transaction envoyée :", tokenId);
-  console.log("Transaction envoyée :", offererName);
-
-  await createNFTtxInBDD_backend(paymentTxHash, email!, tokenId, offererName!, TransactionStatus.TX_PENDING );
-
-  const rpcRequest = getRpcClient({ client, chain });
-
-  // 🔁 On vérifie jusqu’à 5 fois toutes les 15 secondes (total ~75s)
-  for (let attempt = 0; attempt < 5; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 15000));
-
-    const paymentTx = await eth_getTransactionByHash(rpcRequest, {
-      hash: paymentTxHash,
+  try {
+    console.debug("▶️ Récupération du gasPrice...");
+    const gasPrice = await getGasPrice({
+      client,
+      chain: polygon,
+      percentMultiplier: 2,
     });
 
-    if (paymentTx?.blockNumber) {
-      console.log("Transaction confirmée :", paymentTxHash);
+    console.debug("✅ gasPrice récupéré :", gasPrice.toString());
 
-      const success = await processTx_backend(paymentTxHash);
+    console.debug("▶️ Préparation de la transaction...");
+    const transaction = prepareTransaction({
+      to: minterAddress,
+      chain,
+      client,
+      value: toWei(priceInPol.toString()),
+      gasPrice,
+    });
 
-      if (!success) {
-        console.warn("🚨 Transaction confirmée mais le traitement backend a échoué.");
+    console.debug("✅ Transaction préparée :", transaction);
+
+    console.debug("▶️ Envoi de la transaction...");
+    const receipt = await sendTransaction({ transaction, account });
+    paymentTxHash = receipt.transactionHash;
+
+    console.log("✅ Transaction envoyée avec succès :", paymentTxHash);
+    console.debug("📧 Email :", email);
+    console.debug("🆔 tokenId :", tokenId);
+    console.debug("🎁 offererName :", offererName);
+
+    console.debug("▶️ Enregistrement dans la BDD...");
+    await createNFTtxInBDD_backend(
+      paymentTxHash,
+      email!,
+      tokenId,
+      offererName!,
+      TransactionStatus.TX_PENDING
+    );
+    console.debug("✅ Enregistrement effectué");
+
+    const rpcRequest = getRpcClient({ client, chain });
+
+    console.debug("⏳ Vérification de la confirmation on-chain...");
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+
+      const paymentTx = await eth_getTransactionByHash(rpcRequest, {
+        hash: paymentTxHash as `0x${string}`,
+      });
+
+      if (paymentTx?.blockNumber) {
+        console.log("✅ Transaction confirmée :", paymentTxHash);
+
+        const success = await processTx_backend(paymentTxHash);
+
+        if (!success) {
+          console.warn("🚨 Transaction confirmée mais le traitement backend a échoué.");
+        }
+
+        return {
+          hash: paymentTxHash,
+          status: "confirmed",
+        };
       }
 
-      return {
-        hash: paymentTxHash,
-        status: "confirmed",
-      };
-    } else {
-      console.log("Transaction non confirmée :", paymentTxHash);
+      console.log(`🔁 Tentative ${attempt + 1} : transaction toujours en attente...`);
     }
 
-    console.log(`Tentative ${attempt + 1} : transaction toujours en attente...`);
+    console.warn("⚠️ Transaction non confirmée après délai :", paymentTxHash);
+    return {
+      hash: paymentTxHash,
+      status: "pending",
+    };
+  } catch (error: any) {
+    console.error("❌ Erreur dans performCryptoPaymentAndStoreTxInBdd :", error);
+    return {
+      hash: paymentTxHash,
+      status: "pending",
+    };
   }
-
-  console.warn("Transaction non confirmée après délai :", paymentTxHash);
-  return {
-    hash: paymentTxHash,
-    status: "pending",
-  };
 }
