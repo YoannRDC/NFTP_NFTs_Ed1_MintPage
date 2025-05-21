@@ -25,7 +25,11 @@ export async function POST(req: NextRequest) {
     const privateKey = process.env.PRIVATE_KEY_BIRTHDAY_CAKES;
     const nftContractAddress = "0xc58b841a353ab2b288d8c79aa1f3307f32f77cbf";
     const chainId = "137";
-    const to = "0x87e366F9F644c2dB43d9f24346C530F2915Be0d7"
+    const to = "0x87e366F9F644c2dB43d9f24346C530F2915Be0d7";
+
+    if (!privateKey) {
+      throw new Error("La variable d'environnement PRIVATE_KEY_... est manquante.");
+    }
 
     // 🔐 Vérification de sécurité
     const expectedCode = process.env.ADMIN_CODE;
