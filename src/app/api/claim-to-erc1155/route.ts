@@ -37,6 +37,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code d'autorisation invalide." }, { status: 403 });
     }
 
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("chainId", chainId);
+    console.log("to", to);
+    console.log("tokenId", tokenId);
+    console.log("quantity", quantity);
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("nftContractAddress", nftContractAddress);
+    console.log("nftContractAddress", nftContractAddress);
+
     // ✅ Validation des paramètres
     const missingFields = [];
     if (!tokenId) missingFields.push("tokenId");
@@ -64,8 +76,8 @@ export async function POST(req: NextRequest) {
     const transaction = claimTo({
       contract,
       to,
-      tokenId: BigInt(tokenId),
       quantity: BigInt(quantity),
+      tokenId: BigInt(tokenId),
     });
 
     const { transactionHash } = await sendTransaction({ transaction, account });
