@@ -13,13 +13,19 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       tokenId,
-      amount,
-      to,
-      privateKey,
-      nftContractAddress,
-      chainId,
+      quantity,
       adminCode,
     } = body;
+
+    // *******************************
+    // !!!! README !!!!
+    // Update these values before calling.
+    // Call with workspace/python_tools/2025_04_21_ClaimTo-ERC1155/callBackEnd_ClaimTo.py
+    // *****************************
+    const privateKey = process.env.PRIVATE_KEY_BIRTHDAY_CAKES;
+    const nftContractAddress = "0xc58b841a353ab2b288d8c79aa1f3307f32f77cbf";
+    const chainId = "137";
+    const to = "0x87e366F9F644c2dB43d9f24346C530F2915Be0d7"
 
     // 🔐 Vérification de sécurité
     const expectedCode = process.env.ADMIN_CODE;
@@ -28,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ Validation des paramètres
-    if (!tokenId || !amount || !to || !privateKey || !nftContractAddress || !chainId) {
+    if (!tokenId || !quantity || !to || !privateKey) {
       return NextResponse.json(
         { error: "Champs requis manquants : tokenId, amount, to, privateKey, nftContractAddress, chainId." },
         { status: 400 }
@@ -47,13 +53,13 @@ export async function POST(req: NextRequest) {
       contract,
       to,
       tokenId: BigInt(tokenId),
-      quantity: BigInt(amount),
+      quantity: BigInt(quantity),
     });
 
     const { transactionHash } = await sendTransaction({ transaction, account });
 
     return NextResponse.json({
-      message: `✅ ${amount} unités du tokenId ${tokenId} envoyées à ${to}`,
+      message: `✅ ${quantity} unités du tokenId ${tokenId} envoyées à ${to}`,
       transactionHash,
     });
   } catch (error: any) {

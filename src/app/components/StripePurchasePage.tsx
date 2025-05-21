@@ -39,7 +39,6 @@ export default function StripePurchasePage({
 }: StripePurchasePageProps) {
   
   console.log("StripePurchasePage called");
-  const smartAccount = useActiveAccount();
   const [clientSecret, setClientSecret] = useState<string>("");
 
   // Choix de la clé publishable en fonction du mode
@@ -50,19 +49,6 @@ export default function StripePurchasePage({
 
   // Chargement de Stripe avec la clé correspondante
   const stripePromise = loadStripe(stripePublishableKey);
-
-  console.log("smartAccount?.address:", smartAccount?.address);
-  console.log("buyerWalletAddress:", buyerWalletAddress);
-  console.log("recipientWalletAddressOrEmail:", recipientWalletAddressOrEmail);
-  console.log("contract?.address:", contract?.address);
-  console.log("contract.chain.id.toString():", contract.chain.id.toString());
-  console.log("requestedQuantity.toString():", requestedQuantity.toString());
-  console.log("paymentPriceFiat.toString():", paymentPriceFiat.toString());
-  console.log("stripeMode.toString():", stripeMode.toString());
-  console.log("distributionType.toString():", distributionType.toString());
-  console.log("tokenId.toString():", tokenId.toString());
-  console.log("projectName:", projectName);
-  console.log("offererName:", offererName);
 
   // Fonction pour récupérer le clientSecret depuis l'API Stripe
   const handleOnClick = async () => {

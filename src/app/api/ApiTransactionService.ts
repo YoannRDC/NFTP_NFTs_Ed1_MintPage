@@ -60,7 +60,7 @@ export async function processNFTtx(
     return {
       status: 200,
       body: {
-        message: "✅ Email envoyé avec succès après confirmation blockchain.",
+        message: "Email envoyé avec succès après confirmation blockchain.",
       },
     };
   } else {
