@@ -34,9 +34,17 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ Validation des paramètres
-    if (!tokenId || !quantity || !to || !privateKey) {
+    const missingFields = [];
+    if (!tokenId) missingFields.push("tokenId");
+    if (!quantity) missingFields.push("quantity");
+    if (!to) missingFields.push("to");
+    if (!privateKey) missingFields.push("privateKey");
+    if (!nftContractAddress) missingFields.push("nftContractAddress");
+    if (!chainId) missingFields.push("chainId");
+
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { error: "Champs requis manquants : tokenId, amount, to, privateKey, nftContractAddress, chainId." },
+        { error: `Champs requis manquants : ${missingFields.join(", ")}` },
         { status: 400 }
       );
     }
