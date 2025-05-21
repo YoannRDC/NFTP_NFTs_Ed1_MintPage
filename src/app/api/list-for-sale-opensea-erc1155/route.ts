@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
     const priceInMatic = "990" // !!!! Total en MATIC (saisir la somme des prix unitaires)
     const quantity= "10"
     const contractAddress = "0xc58b841a353ab2b288d8c79aa1f3307f32f77cbf"
-    const PRIVATE_KEY = process.env.PRIVATE_KEY_CADENART!;
-    const OPENSEA_API_KEY = process.env.PRIVATE_KEY_BIRTHDAY_CAKES!;
+    const PRIVATE_KEY = process.env.PRIVATE_KEY_BIRTHDAY_CAKES!;
+    const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY_CADENART!;
     const RPC_URL = process.env.THIRDWEB_POLYGON_MAINNET_RPC_URL!;
     // const RPC_URL = "https://polygon-rpc.com"
     const provider = new ethers.JsonRpcProvider(RPC_URL);
