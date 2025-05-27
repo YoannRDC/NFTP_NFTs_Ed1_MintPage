@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     const counter = await seaportContract.getCounter(address);
 
     const priceInWei =  ((price * 995n) / 1000n).toString();
+    const openseaFeesInWei =  ((price * 5n) / 1000n).toString();
 
     // Créer les paramètres
     const parameters = {
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
           itemType: 0, // 🟢 MATIC = native token
           token: "0x0000000000000000000000000000000000000000",
           identifier: "0",
-          amount: priceInWei,
+          amount: openseaFeesInWei,
           recipient: openseaFeeRecipient
         }
       ],
