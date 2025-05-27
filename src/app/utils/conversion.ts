@@ -17,6 +17,7 @@ export async function getPolEuroRate(): Promise<{ rate: number; datetime: string
   try {
     const tickerDirect = await exchange.fetchTicker(symbolDirect);
     priceInEur = tickerDirect.last;
+    console.log("priceInEur:", priceInEur);
     // Si le prix direct n'est pas valide, essayer avec prevClosePrice
     if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
       const prev = parseFloat((tickerDirect.info as any).prevClosePrice);

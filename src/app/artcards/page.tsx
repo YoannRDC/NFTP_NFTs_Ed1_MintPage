@@ -81,6 +81,7 @@ function ArtcardsContent() {
     async function fetchConversionRate() {
       try {
         const { rate } = await getPolEuroRate();
+        console.log("rate:", rate);
         setPolEurRate(rate);
       } catch (error) {
         console.error("Erreur lors de la récupération du taux de conversion POL/EUR:", error);
@@ -92,6 +93,8 @@ function ArtcardsContent() {
   // Calculer et stocker les prix en POL pour chaque token une fois que mintedCount et le taux de conversion sont disponibles
   useEffect(() => {
     async function fetchPrices() {
+      console.log("mintedCount:", mintedCount)
+      console.log("polEurRate:", polEurRate)
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
