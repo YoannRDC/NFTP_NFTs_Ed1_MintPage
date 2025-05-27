@@ -77,10 +77,16 @@ export async function POST(req: NextRequest) {
       allowPartialFills: true
     };
     
+    
+    console.log("parameters:", parameters)
 
     // Générer la signature
     const order = await seaport.createOrder(parameters);
     const signedOrder = await order.executeAllActions();
+
+    console.log("signedOrder.parameters:", signedOrder.parameters)
+    console.log("signedOrder.signature:", signedOrder.signature)
+    console.log("signedOrder.parameters:", signedOrder.parameters)
 
     // Appel à OpenSea API
     const response = await fetch("https://api.opensea.io/api/v2/orders/matic/seaport/listings", {
