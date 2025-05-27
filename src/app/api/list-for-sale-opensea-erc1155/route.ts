@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code d'autorisation invalide" }, { status: 403 });
     }
 
-    const priceInMatic = "1000" // !!!! Total en MATIC (saisir la somme des prix unitaires)
-    const quantity= "10"
+    const priceInMatic = "100" // !!!! Total en MATIC (saisir la somme des prix unitaires)
+    const quantity= "1"
     const contractAddress = "0xc58b841a353ab2b288d8c79aa1f3307f32f77cbf"
     const PRIVATE_KEY = process.env.PRIVATE_KEY_BIRTHDAY_CAKES!;
     const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY_CADENART!;
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     console.log("signedOrder.parameters:", signedOrder.parameters)
     console.log("signedOrder.signature:", signedOrder.signature)
     console.log("signedOrder.parameters:", signedOrder.parameters)
-
+ 
     // Appel à OpenSea API
     const response = await fetch("https://api.opensea.io/api/v2/orders/matic/seaport/listings", {
       method: "POST",
