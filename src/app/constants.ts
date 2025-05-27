@@ -119,8 +119,12 @@ export function getProjectMinterAddress(projectNameRaw: string): string {
   
 
 export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): number {
+	console.log("projectName:", projectName);
+	console.log("tokenId:", tokenId);
+	
 	switch (projectName) {
 		case projectMappings.ARTCARDS.projectName: {
+			console.log("project is ARTCARDS.");
 			const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
 			return artCardEuroPrices[Number(tokenId) % artCardEuroPrices.length];
 		}

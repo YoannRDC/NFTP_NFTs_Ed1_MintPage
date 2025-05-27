@@ -96,6 +96,8 @@ function ArtcardsContent() {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
           const euroPrice = getNFTEuroPrice(projectMappings.ARTCARDS.projectName,i.toString());
+          console.log("euroPrice:", euroPrice);
+          console.log("polEurRate:", polEurRate);
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
           // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
