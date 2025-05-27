@@ -16,7 +16,7 @@ export async function getPolEuroRate(): Promise<{ rate: number; datetime: string
   console.log("getPolEuroRate()_A");
   let priceInEur: number | undefined = undefined;
   let usedDatetime: string | undefined = undefined;
-  const symbolDirect = "MATIC/EUR";
+  const symbolDirect = "POL/EUR";
   try {
     console.log("getPolEuroRate()_1");
     const tickerDirect = await exchange.fetchTicker(symbolDirect);
