@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
     const now = Math.floor(Date.now() / 1000);
     const end = now + 90 * 24 * 60 * 60;
 
+    console.log("🕒 Date.now() =", Date.now());               // en ms
+    console.log("🕒 Math.floor(Date.now() / 1000) =", Math.floor(Date.now() / 1000)); // en s
+
+
     const conduitKey = "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000";
     const openseaFeeRecipient = "0x0000a26b00c1F0DF003000390027140000fAa719";
 
@@ -37,6 +41,8 @@ export async function POST(req: NextRequest) {
       provider
     );
     const counter = await seaportContract.getCounter(address);
+
+    const priceInWei =  ((price * 995n) / 1000n).toString();
 
     // Créer les paramètres
     const parameters = {
@@ -54,14 +60,14 @@ export async function POST(req: NextRequest) {
           itemType: 0, // 🟢 MATIC = native token
           token: "0x0000000000000000000000000000000000000000",
           identifier: "0",
-          amount: ((price * 995n) / 1000n).toString(),
+          amount: priceInWei,
           recipient: address
         },
         {
           itemType: 0, // 🟢 MATIC = native token
           token: "0x0000000000000000000000000000000000000000",
           identifier: "0",
-          amount: ((price * 5n) / 1000n).toString(),
+          amount: priceInWei,
           recipient: openseaFeeRecipient
         }
       ],
