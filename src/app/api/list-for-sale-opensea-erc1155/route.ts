@@ -93,7 +93,6 @@ export async function POST(req: NextRequest) {
 
     console.log("signedOrder.parameters:", signedOrder.parameters)
     console.log("signedOrder.signature:", signedOrder.signature)
-    console.log("signedOrder.parameters:", signedOrder.parameters)
  
     // Appel à OpenSea API
     const response = await fetch("https://api.opensea.io/api/v2/orders/matic/seaport/listings", {
@@ -108,7 +107,8 @@ export async function POST(req: NextRequest) {
         protocol_address: "0x0000000000000068f116a894984e2db1123eb395",
         metadata: {
           listing_type: "standard"
-        }
+        },
+        side: "ask"
       })
     });
 
