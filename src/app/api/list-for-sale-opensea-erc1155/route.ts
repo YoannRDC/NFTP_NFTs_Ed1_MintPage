@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
     const seaport = new Seaport(wallet);
 
     const price = ethers.parseUnits(priceInMatic.toString(), 18); // convert MATIC to wei
-    const now = Math.floor(Date.now() / 1000);
+    //const now = Math.floor(Date.now() / 1000);
+    const now = 1748353207;
     const end = now + 90 * 24 * 60 * 60;
 
     console.log("🕒 Date.now() =", Date.now());               // en ms
