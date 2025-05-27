@@ -74,14 +74,14 @@ export async function POST(req: NextRequest) {
       ],
       startTime: now.toString(),
       endTime: end.toString(),
-      orderType: 1,
+      orderType: 0,
       zone: "0x0000000000000000000000000000000000000000",
       zoneHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
       salt: Date.now().toString(),
       conduitKey,
       totalOriginalConsiderationItems: 2,
       counter: counter.toString(),
-      allowPartialFills: true
+      allowPartialFills: false
     };
     
     
@@ -105,7 +105,10 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         parameters: signedOrder.parameters,
         signature: signedOrder.signature,
-        protocol_address: "0x0000000000000068f116a894984e2db1123eb395"
+        protocol_address: "0x0000000000000068f116a894984e2db1123eb395",
+        metadata: {
+          listing_type: "standard"
+        }
       })
     });
 
