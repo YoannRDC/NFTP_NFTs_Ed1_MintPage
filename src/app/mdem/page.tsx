@@ -17,23 +17,23 @@ import InfoBlockchain from "../components/InfoBlockchain";
 
 const contract = getContract({
   client,
-  chain: defineChain(137),
-  address: projectMappings["ARTCARDS"].contractAddress,
+  chain: defineChain(projectMappings["MDEM"].blockchain.id),
+  address: projectMappings["MDEM"].contractAddress,
 });
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
-const videoPresentationTitle = "Présentation Art Cards";
-const collectionName = "Art cards";
-const collectionPageRef = "/artcards";
-const collectionImageSrc = "/ArtCards.gif";
-const collectionShortDescription = "Art cards by YoArt.";
-const artistProjectWebsite = "https://yoart.art";
-const artistProjectWebsitePrettyPrint = "YoArt.art";
+const videoPresentationTitle = "Présentation MdeM";
+const collectionName = "MdeM";
+const collectionPageRef = "/mdem";
+const collectionImageSrc = "/Maya_Profil_square.jpg";
+const collectionShortDescription = "NFT collection by MdeM";
+const artistProjectWebsite = "https://www.magalidemauroy.com/";
+const artistProjectWebsitePrettyPrint = "MagaliDeMauroy.com";
 const distributionType = DistributionType.SafeTransferFromERC721;
 const requestedQuantity = "1";
 
 // Composant principal
-function ArtcardsContent() {
+function MDEMContent() {
   const searchParams = useSearchParams();
   const paymentResult = searchParams.get("paymentResult");
   // Récupère un éventuel message d'erreur détaillé dans l'URL
@@ -95,7 +95,7 @@ function ArtcardsContent() {
       if (mintedCount > 0 && polEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
-          const euroPrice = getNFTEuroPrice(projectMappings.ARTCARDS.projectName,i.toString());
+          const euroPrice = getNFTEuroPrice(projectMappings.MDEM.projectName,i.toString());
           // Conversion : si 1 POL vaut "polEurRate" euros, alors:
           // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
           newPrices[i] = Math.ceil(euroPrice / polEurRate);
@@ -126,7 +126,7 @@ function ArtcardsContent() {
         -- Présentation de la collection --
       </div>
       <div className="decorative-subtitle">
-        Art cards by YoArt.
+        NFT collection by MdeM
       </div>
 
       <div className="mb-10">
@@ -140,28 +140,28 @@ function ArtcardsContent() {
 
       <div className="mb-10">
         <div className="decorative-description">
-          Cette collection comprend 52 œuvres d’arts, chacune marquée, en bas à droite de l’image par l’un des 4 symboles parmi trèfle, carreau, pique, ou cœur, et par une valeur, de 2 à 10 plus Valet (Jack), Dame (Queen), Roi (King) ou As (Ace).
+          Magali de Mauroy peint les animaux avec une intensité particulière, comme si leurs yeux fixaient directement le spectateur.
         </div>
         <div className="decorative-description">
-          Chaque symbole est lié à un sens humain spécifique : le trèfle représente la vue, le carreau le son, le cœur l’odorat, et le pique le goût.
+          Lors des expositions, les visiteurs sont frappés par la puissance des regards : « On dirait qu’ils nous regardent », « Il est vivant ! », « Quelle intensité ! ». Cette précision n’est pas un hasard : elle cherche à capturer l’authenticité d’un moment, d’un regard, d’un frisson.
         </div>
         <div className="decorative-description">
-          L’objectif central de cette collection est de réinventer et d’embellir ces quatre symboles universels et intemporels du jeu de cartes, qui nous sont familiers dès le plus jeune âge et qui sont reconnus à travers le monde, en leur attribuant une nouvelle dimension artistique à travers le prisme des sens humains.
+          Chaque toile témoigne d’une expérience vécue — un chien fidèle, un brocard surpris, une compagnie de sangliers figée, une bécasse qui fuse sous le nez du chien.
         </div>
         <div className="decorative-description">
-          Les quatre images ont été créées par une intelligence artificielle, à partir de photos reflétant les idées de l’artiste. Les textes sont de l’artiste et l’IA les a intégrés à l’image lors de la génération. Les couples uniques : symbole - valeur, ont été ajoutés manuellement aux œuvres.
+          Depuis des années, elle partage ces instants avec ses proches, au cœur des chasses familiales dans la Dombes, en Alsace ou dans le Caroux Espinouse.
         </div>
         <div className="decorative-description">
-          Chaque oeuvre est un NFT, garantissant son unicité, son authenticité, son attachement direct à l’artiste, et sa possession exclusive à un seul détenteur. Cette exclusivité vise à créer une communauté de propriétaires partageant un intérêt commun pour cette forme d’art.
+          Aujourd’hui, elle se lance dans les NFT avec une première série qui s’enrichira progressivement, chaque NFT étant calqué sur une œuvre réelle. L’œuvre physique et son double numérique forment un duo unique, offrant une nouvelle manière de collectionner et de partager ces instants d’émotion.
         </div>
       </div>
 
-      <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
+{/*       <div className="flex flex-col items-center w-full md:w-[60%] h-[300px] rounded-[10px]">
         <VideoPresentation
           src={videoPresentationLink}
           title={videoPresentationTitle}
         />
-      </div>
+      </div> */}
 
       <Link className="text-sm text-gray-400 mt-5" target="_blank" href={artistProjectWebsite}>
         Visit {artistProjectWebsitePrettyPrint}
@@ -180,7 +180,7 @@ function ArtcardsContent() {
               <ItemERC721transfert 
                 tokenId={BigInt(index)}
                 priceInPol={pricesInPol[index] ?? null}
-                priceInEur={getNFTEuroPrice(projectMappings.ARTCARDS.projectName, index.toString())}
+                priceInEur={getNFTEuroPrice(projectMappings.MDEM.projectName, index.toString())}
                 contract={contract}
                 stripeMode={stripeMode}
                 previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
@@ -188,7 +188,7 @@ function ArtcardsContent() {
                 distributionType={distributionType}
                 buyerWalletAddress={smartAccount?.address || ""}
                 recipientWalletAddressOrEmail={smartAccount?.address || ""}
-                projectName={projectMappings.ARTCARDS.projectName}
+                projectName={projectMappings.MDEM.projectName}
                 requestedQuantity={requestedQuantity}
                 offererName=""
               />
@@ -200,7 +200,7 @@ function ArtcardsContent() {
       </div>
 
       <div>
-        <InfoBlockchain chainName={projectMappings.ARTCARDS.blockchain.name} contractAddress={projectMappings["ARTCARDS"].contractAddress} />
+        <InfoBlockchain chainName={projectMappings.MDEM.blockchain.name} contractAddress={projectMappings.MDEM.contractAddress} />
       </div>
 
       <div className="decorative-title">
@@ -248,10 +248,10 @@ function ArtcardsContent() {
   );
 }
 
-export default function Artcards() {
+export default function MDEM() {
   return (
     <Suspense fallback={<div>Chargement de la page...</div>}>
-      <ArtcardsContent />
+      <MDEMContent />
     </Suspense>
   );
 }

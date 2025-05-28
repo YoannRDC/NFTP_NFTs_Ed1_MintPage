@@ -19,6 +19,7 @@ export enum Blockchain {
 	Polygon = "Polygon",
 	Ethereum = "Ethereum",
 	Amoy = "Amoy",
+	Base = "Base"
   }
 
 export enum TransactionStatus {
@@ -44,6 +45,10 @@ export const BlockchainInfo: Record<Blockchain, { name: string; id: number }> = 
 	[Blockchain.Amoy]: {
 		name: "Amoy",
 		id: 80002,
+	},
+	[Blockchain.Base]: {
+		name: "Amoy",
+		id: 8453,
 	},
 };
 
@@ -92,6 +97,13 @@ export const projectMappings = {
 	  minterPublicKey: "0x70fB670E902904f7BE7A7fd455c792f0B0C5Bccb",
 	  minterPrivateKeyEnvVarName: "PRIVATE_KEY_CADENART",
 	  blockchain: BlockchainInfo[Blockchain.Polygon],
+	},
+	MDEM: {
+	  projectName: "MDEM",
+	  contractAddress: "TBD",
+	  minterPublicKey: "0x430481956fb0e456b5Ad121c2606a2EfbAdb814a",
+	  minterPrivateKeyEnvVarName: "PRIVATE_KEY_MDEM",
+	  blockchain: BlockchainInfo[Blockchain.Base],
 	},
   } as const;
 

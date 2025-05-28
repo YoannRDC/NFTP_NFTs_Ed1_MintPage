@@ -10,7 +10,7 @@ export default function useMaticToEur() {
         const data = await res.json();
         setMaticPrice(data.polygon.eur);
       } catch (error) {
-        console.error("Erreur lors de la récupération du prix MATIC/EUR", error);
+        console.error("Erreur lors de la récupération du prix POL/EUR", error);
       }
     }
 

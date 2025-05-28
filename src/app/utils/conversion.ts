@@ -3,26 +3,20 @@ import ccxt from "ccxt";
 /**
  * Retourne le taux de conversion de POL (MATIC) en EUR.
  * La valeur retournée correspond au prix d'une unité de POL en EUR.
- * Si la paire "MATIC/EUR" ne fournit pas de prix valide, un fallback est utilisé via "MATIC/USDT" et "USDT/EUR".
+ * Si la paire "POL/EUR" ne fournit pas de prix valide, un fallback est utilisé via "MATIC/USDT" et "USDT/EUR".
  * Cette fonction doit être exécutée côté serveur.
  *
  * @returns Un objet contenant le taux de conversion (rate) et le datetime associé.
  */
 export async function getPolEuroRate(): Promise<{ rate: number; datetime: string }> {
-    console.log("getPolEuroRate()");
   const exchange = new ccxt.kraken();
-  console.log("getPolEuroRate()_0");
   await exchange.loadMarkets();
-  console.log("getPolEuroRate()_A");
   let priceInEur: number | undefined = undefined;
   let usedDatetime: string | undefined = undefined;
   const symbolDirect = "POL/EUR";
   try {
-    console.log("getPolEuroRate()_1");
     const tickerDirect = await exchange.fetchTicker(symbolDirect);
-    console.log("getPolEuroRate()_2");
     priceInEur = tickerDirect.last;
-    console.log("priceInEur:", priceInEur);
     // Si le prix direct n'est pas valide, essayer avec prevClosePrice
     if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
       const prev = parseFloat((tickerDirect.info as any).prevClosePrice);
