@@ -183,7 +183,7 @@ function MDEMContent() {
                 priceInEur={getNFTEuroPrice(projectMappings.MDEM.projectName, index.toString())}
                 contract={contract}
                 stripeMode={stripeMode}
-                previewImage={`${collectionPageRef}/${index.toString().padStart(2, '0')}.jpg`}
+                previewImage={`${collectionPageRef}/oeuvres/${index.toString()}.jpg`}
                 redirectPage={collectionPageRef}
                 distributionType={distributionType}
                 buyerWalletAddress={smartAccount?.address || ""}
