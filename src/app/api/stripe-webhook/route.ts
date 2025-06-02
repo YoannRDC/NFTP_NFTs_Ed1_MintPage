@@ -7,7 +7,7 @@ import {
 import { distributeNFT } from "../ApiRequestDistribution";
 import { assertValidityStripe, initializeThirdwebClient } from "../ApiPaymentReception";
 import { DistributionType, TransactionStatus } from "@/app/constants";
-import { createNFTtxInBDD, NFTtxRecord, sendDownloadEmail, updateNFTtxStatus } from "../ApiEmailCodes";
+import { createNFTtxInBDD, NFTtxRecord, sendDownloadEmail, sendTraceEmailToAdmin, updateNFTtxStatus } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
 
@@ -67,6 +67,9 @@ export async function POST(req: NextRequest) {
     } else {
         // On lance la distribution du NFT (attention à gérer le cas asynchrone et les erreurs potentielles)
         const safeResult = await distributeNFT(client, paymentMetadata);
+
+        sendTraceEmailToAdmin(paymentMetadata);
+        
         console.log("Transaction result:", safeResult);
       }
 

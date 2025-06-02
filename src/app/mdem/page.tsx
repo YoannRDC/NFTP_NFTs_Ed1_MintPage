@@ -43,7 +43,7 @@ function MDEMContent() {
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   const [priceInCrypto, setpriceInCrypto] = useState<{ [tokenId: number]: number }>({});
   const [cryptoEurRate, setCryptoEurRate] = useState<number | null>(null);
-  const stripeMode=StripeMode.Test;
+  const stripeMode=StripeMode.Live;
 
   // Récupérer le nombre total de tokens mintés
   const { data: totalMinted, isPending: isMintedLoading } = useReadContract({
