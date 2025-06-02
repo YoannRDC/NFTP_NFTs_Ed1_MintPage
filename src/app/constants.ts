@@ -134,6 +134,7 @@ export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): numb
 	console.log("projectName:", projectName);
 	console.log("tokenId:", tokenId);
 	
+	// Prix en Euros
 	switch (projectName) {
 		case projectMappings.ARTCARDS.projectName: {
 			console.log("project is ARTCARDS.");
@@ -148,6 +149,8 @@ export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): numb
 			return 10;
 		case projectMappings.CADENART.projectName:
 			return 30;
+		case projectMappings.CADENART.projectName:
+			return 2000;
 		default:
 			throw new Error(`Aucune politique de prix définie pour le projet: ${projectName}`);
 	}

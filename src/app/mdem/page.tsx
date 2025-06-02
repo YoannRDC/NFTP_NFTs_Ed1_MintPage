@@ -17,8 +17,8 @@ import InfoBlockchain from "../components/InfoBlockchain";
 
 const contract = getContract({
   client,
-  chain: defineChain(projectMappings["MDEM"].blockchain.id),
-  address: projectMappings["MDEM"].contractAddress,
+  chain: defineChain(projectMappings.MDEM.blockchain.id),
+  address: projectMappings.MDEM.contractAddress,
 });
 
 const videoPresentationLink = "https://youtube.com/embed/i3-5yO6GXw0?rel=0&modestbranding=1&autoplay=0";
