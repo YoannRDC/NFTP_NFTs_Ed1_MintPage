@@ -13,6 +13,7 @@ import { polygon } from "thirdweb/chains";
 import { distributeNFT } from "../ApiRequestDistribution";
 import { extractPaymentMetadataCryptoTransfer, PaymentMetadata } from "../PaymentMetadata";
 import { initializeThirdwebClient } from "../ApiPaymentReception";
+import { sendCryptoPaymentErrorEmail, sendTraceEmailToAdmin } from "../ApiEmailCodes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
       // Distribution du NFT via la fonction dédiée
       const distributionResult = await distributeNFT(client, paymentMetadata);
       
+      sendTraceEmailToAdmin(paymentMetadata);
       
       // Retour du hash de transaction dans la réponse JSON
       return NextResponse.json({ transactionHash: distributionResult.transaction });
@@ -125,6 +127,14 @@ async function assertCryptoPaymentTransaction(
       expected: artcardPolWeiPrice.toString()
     };
     console.log("Erreur détaillée :", errorResponse);
+
+    await sendCryptoPaymentErrorEmail(paymentMetadata, {
+      reason: "Le montant payé ne correspond pas au montant attendu",
+      paid: paymentTx.value.toString(),
+      expected: artcardPolWeiPrice.toString(),
+      paymentTxHash: paymentMetadata.paymentTxHashCrypto
+    });
+
     return NextResponse.json(errorResponse, { status: 400 });
   }
 }

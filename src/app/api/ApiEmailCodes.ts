@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { createClient } from 'redis';
 import { TransactionStatus } from '../constants';
 import crypto from 'crypto'
+import { PaymentMetadata } from './PaymentMetadata';
 
 const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 
@@ -128,6 +129,116 @@ L’équipe AuthentArt.com
     return "ok";
   } catch (err) {
     console.error("❌ Erreur lors de l'envoi de l'email :", err);
+    return "error";
+  }
+}
+
+export async function sendTraceEmailToAdmin(payment: PaymentMetadata): Promise<"ok" | "error"> {
+  console.log("Envoi de l'email de traçabilité à l'admin :", payment);
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST_NFTP,
+    port: parseInt(process.env.SMTP_PORT_NFTP || "465", 10),
+    secure: process.env.SMTP_SECURE_NFTP === "true",
+    auth: {
+      user: process.env.SMTP_USER_NFTP,
+      pass: process.env.SMTP_PASS_NFTP,
+    },
+  });
+
+  const text = `
+🎯 Nouveau paiement NFT reçu
+
+🖼 Projet : ${payment.projectName}
+🔁 Mode de distribution : ${payment.distributionType}
+🔹 Wallet acheteur : ${payment.buyerWalletAddress}
+📨 Destinataire : ${payment.recipientWalletAddressOrEmail}
+🎨 Token ID : ${payment.tokenId}
+📦 Quantité : ${payment.requestedQuantity}
+📍 Adresse contrat : ${payment.nftContractAddress}
+🌐 Blockchain ID : ${payment.blockchainId}
+💰 Paiement fiat : ${payment.paymentPriceFiat ?? "—"}
+🔗 Hash transaction crypto : ${payment.paymentTxHashCrypto ?? "—"}
+💳 Réf. Stripe : ${payment.paymentTxRefStripe ?? "—"}
+🎁 Nom de l’offreur : ${payment.offererName ?? "—"}
+
+🕒 Horodatage serveur : ${new Date().toISOString()}
+  `;
+
+  try {
+    const result = await transporter.sendMail({
+      from: `"AuthentArt Tracker" <${process.env.SMTP_USER_NFTP}>`,
+      to: "contact@nftpropulsion.fr",
+      subject: `[TRACE] Nouveau paiement - ${payment.projectName} (token ${payment.tokenId})`,
+      text,
+    });
+
+    console.log("→ Email de traçabilité envoyé :", result.messageId);
+    return "ok";
+  } catch (err) {
+    console.error("❌ Erreur lors de l'envoi de l'email de traçabilité :", err);
+    return "error";
+  }
+}
+
+interface CryptoPaymentErrorDetails {
+  reason: string;
+  paid?: string;
+  expected?: string;
+  paymentTxHash?: string;
+}
+
+/**
+ * Envoie un email à contact@nftpropulsion.fr pour signaler une anomalie dans une transaction crypto.
+ */
+export async function sendCryptoPaymentErrorEmail(
+  payment: PaymentMetadata,
+  errorDetails: CryptoPaymentErrorDetails
+): Promise<"ok" | "error"> {
+  console.log("Envoi de l'alerte crypto :", errorDetails);
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST_NFTP,
+    port: parseInt(process.env.SMTP_PORT_NFTP || "465", 10),
+    secure: process.env.SMTP_SECURE_NFTP === "true",
+    auth: {
+      user: process.env.SMTP_USER_NFTP,
+      pass: process.env.SMTP_PASS_NFTP,
+    },
+  });
+
+  const text = `
+🚨 Anomalie détectée dans une transaction crypto NFT
+
+❌ Raison : ${errorDetails.reason}
+
+📄 Projet : ${payment.projectName}
+🖼 Token ID : ${payment.tokenId}
+💰 Quantité : ${payment.requestedQuantity}
+🔗 Hash TX : ${errorDetails.paymentTxHash ?? payment.paymentTxHashCrypto ?? "—"}
+💸 Payé (wei) : ${errorDetails.paid ?? "—"}
+🎯 Attendu (wei) : ${errorDetails.expected ?? "—"}
+
+👤 Wallet acheteur : ${payment.buyerWalletAddress}
+🎁 Destinataire : ${payment.recipientWalletAddressOrEmail}
+📍 Contrat : ${payment.nftContractAddress}
+🌐 Blockchain : ${payment.blockchainId}
+
+🕒 Timestamp : ${new Date().toISOString()}
+  `;
+
+  try {
+    const result = await transporter.sendMail({
+      from: `"AuthentArt Alert" <${process.env.SMTP_USER_NFTP}>`,
+      to: "contact@nftpropulsion.fr",
+      subject: `[ALERTE] Erreur transaction crypto - ${payment.projectName}`,
+      text,
+    });
+
+    console.log("→ Email d’erreur envoyé :", result.messageId);
+    return "ok";
+  } catch (err) {
+    console.error("❌ Erreur lors de l'envoi de l'email d'alerte :", err);
     return "error";
   }
 }
