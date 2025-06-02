@@ -47,7 +47,7 @@ export const BlockchainInfo: Record<Blockchain, { name: string; id: number }> = 
 		id: 80002,
 	},
 	[Blockchain.Base]: {
-		name: "Amoy",
+		name: "Base",
 		id: 8453,
 	},
 };
@@ -149,7 +149,7 @@ export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): numb
 			return 10;
 		case projectMappings.CADENART.projectName:
 			return 30;
-		case projectMappings.CADENART.projectName:
+		case projectMappings.MDEM.projectName:
 			return 2000;
 		default:
 			throw new Error(`Aucune politique de prix définie pour le projet: ${projectName}`);
