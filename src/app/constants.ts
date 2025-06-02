@@ -101,7 +101,7 @@ export const projectMappings = {
 	MDEM: {
 	  projectName: "MDEM",
 	  contractAddress: "0xF611C63e9Fc381D701e71fB6D8E4fddDB046E087",
-	  minterPublicKey: "0x430481956fb0e456b5Ad121c2606a2EfbAdb814a",
+	  minterPublicKey: "0xb97605f0705e7A4Bf76281E8aD5AD4e49178a397",
 	  minterPrivateKeyEnvVarName: "PRIVATE_KEY_MDEM",
 	  blockchain: BlockchainInfo[Blockchain.Base],
 	},
