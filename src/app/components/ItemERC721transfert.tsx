@@ -19,7 +19,7 @@ import StripePurchasePage from "./StripePurchasePage";
 import { performCryptoPaymentAndStoreTxInBdd } from "../utils/cryptoOperation";
 
 interface ItemERC721transfertProps {
-  priceInPol: number | string | null;
+  priceInCrypto: number | string | null;
   priceInEur: number | string | null;
   contract: any;
   stripeMode: StripeMode;
@@ -32,10 +32,11 @@ interface ItemERC721transfertProps {
   projectName: string;
   requestedQuantity: string;
   offererName: string;
+  chain: any;
 }
 
 export default function ItemERC721transfert({
-  priceInPol,
+  priceInCrypto,
   priceInEur,
   contract,
   stripeMode,
@@ -46,7 +47,8 @@ export default function ItemERC721transfert({
   recipientWalletAddressOrEmail,
   tokenId,
   projectName,
-  offererName
+  offererName, 
+  chain,
 }: ItemERC721transfertProps) {
   const smartAccount = useActiveAccount();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -76,7 +78,7 @@ export default function ItemERC721transfert({
     createWallet("io.zerion.wallet"),
   ];
 
-  const parsedPricePol = priceInPol !== null ? Number(priceInPol) : 0;
+  const parsedPriceCrypto = priceInCrypto !== null ? Number(priceInCrypto) : 0;
   const parsedPriceEur = priceInEur !== null ? Number(priceInEur) : 0;
   const totalPriceEurCents = Math.round(parsedPriceEur * 100);
 
@@ -85,7 +87,7 @@ export default function ItemERC721transfert({
       console.error("Aucun wallet connecté");
       return;
     }
-    if (!parsedPricePol) {
+    if (!parsedPriceCrypto) {
       console.error("Le montant à payer n'est pas défini");
       return;
     }
@@ -94,8 +96,8 @@ export default function ItemERC721transfert({
 
       const paymentTxHashCrypto = await performCryptoPaymentAndStoreTxInBdd({
         client,
-        chain: polygon,
-        priceInPol: parsedPricePol,
+        chain,
+        priceInCrypto: parsedPriceCrypto,
         minterAddress,
         account: smartAccount,
         email: "", // TODO: Add from Mon compte.
@@ -191,7 +193,7 @@ export default function ItemERC721transfert({
                 >
                   Acheter en Crypto
                 </button>
-                <p className="mb-2">{parsedPricePol} POL</p>
+                <p className="mb-2">{parsedPriceCrypto} POL</p>
 
                 <StripePurchasePage
                   projectName={projectName}

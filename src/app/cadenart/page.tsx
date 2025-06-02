@@ -4,22 +4,18 @@ export const dynamic = "force-dynamic";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MediaRenderer, useActiveAccount } from "thirdweb/react";
-import { client, DistributionType, projectMappings, StripeMode } from "../constants";
+import { client, DistributionType, getNFTEuroPrice, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
-import { convertEurToPOL } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ItemERC1155 from "../components/ItemERC1155";
 import { balanceOf } from "thirdweb/extensions/erc1155";
-
-// Constantes de configuration
-const NFT_PRICE_EUR = 5; // Prix fixe en Euros
-const DISPLAYED_NFT_PRICE_POL = 49; // Only for display, real price in POL in set in the claim conditions.
+import { getCryptoToEurRate } from "../utils/conversion";
 
 const theContract = getContract({
   client,
-  chain: defineChain(137),
+  chain: defineChain(projectMappings.CADENART.blockchain.id),
   address: projectMappings.CADENART.contractAddress,
 });
 
@@ -78,29 +74,20 @@ function PageContent() {
   const paymentResult = searchParams.get("paymentResult");
   const errorMessage = searchParams.get("errorMessage");
   const smartAccount = useActiveAccount();
-  const [conversionResult, setConversionResult] = useState<{ amount: number; datetime: string } | null>(null);
+  const [conversionRate, setConversionRate] = useState<number | null>(null);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
   // ownedTokens contiendra pour chaque token possédé : tokenId, balance, metadata et imageUri
   const [ownedTokens, setOwnedTokens] = useState<
     { tokenId: bigint; balance: bigint; metadata?: any; imageUri?: string }[]
   >([]);
 
-  // Actualiser périodiquement la conversion EUR -> POL
   useEffect(() => {
     async function fetchConversion() {
       try {
-        const result = await convertEurToPOL(NFT_PRICE_EUR);
-        setConversionResult(result);
-        console.log(
-          "convertEurToPOL :",
-          new Date(result.datetime).toLocaleString(),
-          ", value (EUR):",
-          NFT_PRICE_EUR,
-          ", value (POL):",
-          result.amount
-        );
+        const { rate } = await getCryptoToEurRate(projectMappings.CADENART.blockchain.nativeSymbol);
+        setConversionRate(rate);
       } catch (error) {
-        console.error("Erreur lors de la conversion EUR vers POL :", error);
+        console.error("Erreur lors de la conversion EUR vers crypto :", error);
       }
     }
     fetchConversion();
@@ -213,8 +200,8 @@ function PageContent() {
           <div key={tokenId.toString()}>
             <ItemERC1155
               tokenId={tokenId}
-              priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
-              priceInEur={NFT_PRICE_EUR}
+              priceInCrypto={conversionRate ? Math.ceil(getNFTEuroPrice(projectMappings.CADENART.projectName, tokenId.toString()) / conversionRate) : null}
+              priceInEur={getNFTEuroPrice(projectMappings.CADENART.projectName, tokenId.toString())}
               contract={theContract}
               stripeMode={stripeMode}
               previewImage={`/cadenart/oeuvres/${tokenId.toString()}.jpg`}
@@ -223,6 +210,7 @@ function PageContent() {
               projectName={projectMappings.CADENART.projectName}
               showSupply={false}
               offererName=""
+              chain={projectMappings.CADENART.blockchain.name}
             />
           </div>
         ))}

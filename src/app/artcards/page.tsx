@@ -12,8 +12,8 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
-import { getPolEuroRate } from "../utils/conversion";
 import InfoBlockchain from "../components/InfoBlockchain";
+import { getCryptoToEurRate } from "../utils/conversion";
 
 const contract = getContract({
   client,
@@ -41,10 +41,8 @@ function ArtcardsContent() {
   const smartAccount = useActiveAccount();
   const [nfts, setNfts] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
-  // Stocker les prix en POL pour chaque tokenId (clé : tokenId, valeur : number)
-  const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
-  // Stocker le taux de conversion POL/EUR (récupéré une seule fois)
-  const [polEurRate, setPolEurRate] = useState<number | null>(null);
+  const [pricesInCrypto, setPricesInCrypto] = useState<{ [tokenId: number]: number }>({});
+  const [cryptoEurRate, setCryptoEurRate] = useState<number | null>(null);
   const stripeMode=StripeMode.Live;
 
   // Récupérer le nombre total de tokens mintés
@@ -76,35 +74,31 @@ function ArtcardsContent() {
     fetchNFTs();
   }, [smartAccount?.address]);
 
-  // Appeler getPolEurRate() une seule fois pour récupérer le taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
       try {
-        const { rate } = await getPolEuroRate();
-        setPolEurRate(rate);
+        const { rate } = await getCryptoToEurRate(projectMappings.ARTCARDS.blockchain.nativeSymbol);
+        setCryptoEurRate(rate);
       } catch (error) {
-        console.error("Erreur lors de la récupération du taux de conversion POL/EUR:", error);
+        console.error("Erreur lors de la récupération du taux de conversion:", error);
       }
     }
     fetchConversionRate();
   }, []);
 
-  // Calculer et stocker les prix en POL pour chaque token une fois que mintedCount et le taux de conversion sont disponibles
   useEffect(() => {
     async function fetchPrices() {
-      if (mintedCount > 0 && polEurRate !== null) {
+      if (mintedCount > 0 && cryptoEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
           const euroPrice = getNFTEuroPrice(projectMappings.ARTCARDS.projectName,i.toString());
-          // Conversion : si 1 POL vaut "polEurRate" euros, alors:
-          // montant en POL = montant en EUR / polEurRate, arrondi au supérieur.
-          newPrices[i] = Math.ceil(euroPrice / polEurRate);
+          newPrices[i] = Math.ceil(euroPrice / cryptoEurRate);
         }
-        setPricesInPol(newPrices);
+        setPricesInCrypto(newPrices);
       }
     }
     fetchPrices();
-  }, [mintedCount, polEurRate]);
+  }, [mintedCount, cryptoEurRate]);
 
   return (
     <div className="flex flex-col items-center">
@@ -179,7 +173,7 @@ function ArtcardsContent() {
             <div key={index} className="border p-4 rounded-lg shadow-lg text-center">
               <ItemERC721transfert 
                 tokenId={BigInt(index)}
-                priceInPol={pricesInPol[index] ?? null}
+                priceInCrypto={pricesInCrypto[index] ?? null}
                 priceInEur={getNFTEuroPrice(projectMappings.ARTCARDS.projectName, index.toString())}
                 contract={contract}
                 stripeMode={stripeMode}
@@ -191,6 +185,7 @@ function ArtcardsContent() {
                 projectName={projectMappings.ARTCARDS.projectName}
                 requestedQuantity={requestedQuantity}
                 offererName=""
+                chain={projectMappings.ARTCARDS.blockchain.name}
               />
             </div>
           ))

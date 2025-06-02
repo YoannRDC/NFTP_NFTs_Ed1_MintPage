@@ -1,7 +1,7 @@
 import { createThirdwebClient } from "thirdweb";  
-import { convertEurToPOL } from "./utils/conversion";
+import { convertEurToCrypto } from "./utils/conversion";
 
-export const MAILCHIMP_LIST_ID="c642fe82cc";
+export const MAILCHIMP_LIST_ID = "c642fe82cc";
 
 const clientId = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 if (!clientId) {
@@ -20,41 +20,41 @@ export enum Blockchain {
 	Ethereum = "Ethereum",
 	Amoy = "Amoy",
 	Base = "Base"
-  }
+}
 
 export enum TransactionStatus {
-  TX_PENDING = "tx_pending",            // Tx en attente de confirmation
-  TX_CONFIRMED = "tx_confirmed",        // Tx confirmée sur la blockchain
-  TX_FAILED = "tx_failed",              // Tx en échec sur la blockchain
-  EMAIL_SENT = "email_sent",      // Email envoyé
-  EMAIL_FAILED = "email_failed",  // Échec de l’envoi d’email
-  NFT_DOWNLOADED = "nft_downloaded",  // Échec de l’envoi d’email. Last status
+  TX_PENDING = "tx_pending",
+  TX_CONFIRMED = "tx_confirmed",
+  TX_FAILED = "tx_failed",
+  EMAIL_SENT = "email_sent",
+  EMAIL_FAILED = "email_failed",
+  NFT_DOWNLOADED = "nft_downloaded",
   OPERATION_CANCELLED = "operation_cancelled"
 }
 
-
-export const BlockchainInfo: Record<Blockchain, { name: string; id: number }> = {
+export const BlockchainInfo: Record<Blockchain, { name: string; id: number; nativeSymbol: string }> = {
 	[Blockchain.Polygon]: {
 		name: "Polygon",
 		id: 137,
+		nativeSymbol: "MATIC",
 	},
 	[Blockchain.Ethereum]: {
 		name: "Ethereum",
-		id: 1, // ou undefined
+		id: 1,
+		nativeSymbol: "ETH",
 	},
 	[Blockchain.Amoy]: {
 		name: "Amoy",
 		id: 80002,
+		nativeSymbol: "MATIC",
 	},
 	[Blockchain.Base]: {
 		name: "Base",
 		id: 8453,
+		nativeSymbol: "ETH",
 	},
 };
 
-// -----------------------------------------------------------------------------
-// Mapping entre le nom du projet et ses clés
-// -----------------------------------------------------------------------------
 export const projectMappings = {
 	ARTCARDS: {
 	  projectName: "ARTCARDS",
@@ -105,11 +105,11 @@ export const projectMappings = {
 	  minterPrivateKeyEnvVarName: "PRIVATE_KEY_MDEM",
 	  blockchain: BlockchainInfo[Blockchain.Base],
 	},
-  } as const;
+} as const;
 
 export type ProjectName = keyof typeof projectMappings;
 
-  export function parseProjectName(projectNameRaw: string): ProjectName {
+export function parseProjectName(projectNameRaw: string): ProjectName {
 	const upper = projectNameRaw.toUpperCase() as ProjectName;
 	if (!(upper in projectMappings)) {
 		throw new Error(`Projet inconnu: ${projectNameRaw}`);
@@ -118,26 +118,20 @@ export type ProjectName = keyof typeof projectMappings;
 }
 
 export function getProjectMinterAddress(projectNameRaw: string): string {
-	const projectName = parseProjectName(projectNameRaw); // sécurise le nom du projet
+	const projectName = parseProjectName(projectNameRaw);
 	const project = projectMappings[projectName];
 	return project.minterPublicKey;
-  }
+}
 
-  export function getProjectMinterPrivateKeyEnvName(projectNameRaw: string): string {
-	const projectName = parseProjectName(projectNameRaw); // sécurise et vérifie le projet
+export function getProjectMinterPrivateKeyEnvName(projectNameRaw: string): string {
+	const projectName = parseProjectName(projectNameRaw);
 	const project = projectMappings[projectName];
 	return project.minterPrivateKeyEnvVarName;
-  }
-  
+}
 
 export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): number {
-	console.log("projectName:", projectName);
-	console.log("tokenId:", tokenId);
-	
-	// Prix en Euros
 	switch (projectName) {
 		case projectMappings.ARTCARDS.projectName: {
-			console.log("project is ARTCARDS.");
 			const artCardEuroPrices = [120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 300];
 			return artCardEuroPrices[Number(tokenId) % artCardEuroPrices.length];
 		}
@@ -157,29 +151,28 @@ export function getNFTEuroPrice(projectName: ProjectName, tokenId: string): numb
 }
 
 export async function getNFTPolPriceInWei(projectName: ProjectName, tokenId: string): Promise<bigint> {
-	const artcardEuroPrice = getNFTEuroPrice(projectName, tokenId);
-	const conversion = await convertEurToPOL(artcardEuroPrice);
-	// conversion.amount est un nombre décimal, on le convertit en wei (BigInt) en multipliant par 1e18
+	const euroPrice = getNFTEuroPrice(projectName, tokenId);
+	const project = projectMappings[projectName];
+	const cryptoSymbol = project.blockchain.nativeSymbol;
+	const conversion = await convertEurToCrypto(euroPrice, cryptoSymbol);
 	return BigInt(Math.floor(conversion.amount * 1e18));
-  }
-  
-  export enum DistributionType {
+}
+
+export enum DistributionType {
 	ClaimToERC721 = "claimToERC721",
 	ClaimToERC1155 = "claimToERC1155",
 	SafeTransferFromERC721 = "safeTransferFromERC721",
-  	SafeTransferFromERC1155 = "safeTransferFromERC1155",
-  	EmailCode = "emailCode",
-  }
+	SafeTransferFromERC1155 = "safeTransferFromERC1155",
+	EmailCode = "emailCode",
+}
 
-  export enum StripeMode {
+export enum StripeMode {
 	Live = "live",
 	Test = "test",
-  }
+}
 
-  export enum NFTrecipient {
-	BuyerAddress= "buyerAddress",
-	SpecificWallet= "specificWallet",
-	Email= "email"
-  }
-
-
+export enum NFTrecipient {
+	BuyerAddress = "buyerAddress",
+	SpecificWallet = "specificWallet",
+	Email = "email"
+}

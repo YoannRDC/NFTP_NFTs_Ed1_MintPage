@@ -1,100 +1,71 @@
 import ccxt from "ccxt";
 
 /**
- * Retourne le taux de conversion de POL (MATIC) en EUR.
- * La valeur retournée correspond au prix d'une unité de POL en EUR.
- * Si la paire "POL/EUR" ne fournit pas de prix valide, un fallback est utilisé via "MATIC/USDT" et "USDT/EUR".
- * Cette fonction doit être exécutée côté serveur.
+ * Retourne le taux de conversion d'une crypto donnée en EUR.
+ * Exemple : symbol = "MATIC" ou "ETH"
  *
- * @returns Un objet contenant le taux de conversion (rate) et le datetime associé.
+ * Si la paire directe "MATIC/EUR" n'existe pas ou est invalide,
+ * elle utilise un fallback via MATIC/USDT + USDT/EUR.
  */
-export async function getPolEuroRate(): Promise<{ rate: number; datetime: string }> {
+export async function getCryptoToEurRate(symbol: string): Promise<{ rate: number; datetime: string }> {
   const exchange = new ccxt.kraken();
   await exchange.loadMarkets();
-  let priceInEur: number | undefined = undefined;
-  let usedDatetime: string | undefined = undefined;
-  const symbolDirect = "POL/EUR";
+
+  const directSymbol = `${symbol}/EUR`;
+  let rate: number | undefined;
+  let datetime: string | undefined;
+
   try {
-    const tickerDirect = await exchange.fetchTicker(symbolDirect);
-    priceInEur = tickerDirect.last;
-    // Si le prix direct n'est pas valide, essayer avec prevClosePrice
-    if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
+    const tickerDirect = await exchange.fetchTicker(directSymbol);
+    rate = tickerDirect.last;
+    if (!rate || rate === 0) {
       const prev = parseFloat((tickerDirect.info as any).prevClosePrice);
       if (!isNaN(prev) && prev > 0) {
-        priceInEur = prev;
+        rate = prev;
       }
     }
-    usedDatetime = tickerDirect.datetime;
+    datetime = tickerDirect.datetime;
   } catch (error) {
-    console.error(`Erreur lors de la récupération du ticker pour ${symbolDirect}:`, error);
+    console.warn(`Paire directe non disponible (${directSymbol}), tentative fallback...`);
   }
-  
-  // Si le ticker direct n'est pas disponible ou ne fournit pas un prix valide, utiliser le fallback.
-  if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
-    const symbolMaticUsdt = "MATIC/USDT";
-    const symbolUsdtEur = "USDT/EUR";
-    const tickerMaticUsdt = await exchange.fetchTicker(symbolMaticUsdt);
-    let priceMaticUsdt = tickerMaticUsdt.last;
-    if (priceMaticUsdt === undefined || typeof priceMaticUsdt !== "number" || priceMaticUsdt === 0) {
-      const prev = parseFloat((tickerMaticUsdt.info as any).prevClosePrice);
-      if (!isNaN(prev) && prev > 0) {
-        priceMaticUsdt = prev;
-      }
+
+  // Fallback via USDT
+  if (!rate || rate === 0) {
+    const tickerCryptoUsdt = await exchange.fetchTicker(`${symbol}/USDT`);
+    const tickerUsdtEur = await exchange.fetchTicker("USDT/EUR");
+
+    let priceCryptoUsdt = tickerCryptoUsdt.last || parseFloat((tickerCryptoUsdt.info as any).prevClosePrice);
+    let priceUsdtEur = tickerUsdtEur.last || parseFloat((tickerUsdtEur.info as any).prevClosePrice);
+
+    if (!priceCryptoUsdt || !priceUsdtEur) {
+      throw new Error(`Impossible d'obtenir le taux de conversion pour ${symbol} -> EUR.`);
     }
-    if (priceMaticUsdt === undefined || typeof priceMaticUsdt !== "number" || priceMaticUsdt === 0) {
-      throw new Error(`Le prix pour ${symbolMaticUsdt} n'est pas disponible.`);
-    }
-    const tickerUsdtEur = await exchange.fetchTicker(symbolUsdtEur);
-    let priceUsdtEur = tickerUsdtEur.last;
-    if (priceUsdtEur === undefined || typeof priceUsdtEur !== "number" || priceUsdtEur === 0) {
-      const prev = parseFloat((tickerUsdtEur.info as any).prevClosePrice);
-      if (!isNaN(prev) && prev > 0) {
-        priceUsdtEur = prev;
-      }
-    }
-    if (priceUsdtEur === undefined || typeof priceUsdtEur !== "number" || priceUsdtEur === 0) {
-      throw new Error(`Le prix pour ${symbolUsdtEur} n'est pas disponible.`);
-    }
-    priceInEur = priceMaticUsdt * priceUsdtEur;
-    usedDatetime = tickerMaticUsdt.datetime;
+
+    rate = priceCryptoUsdt * priceUsdtEur;
+    datetime = tickerCryptoUsdt.datetime;
   }
-  
-  if (priceInEur === undefined || typeof priceInEur !== "number" || priceInEur === 0) {
-    throw new Error("Le prix n'est pas disponible après fallback.");
-  }
-  
-  return { rate: priceInEur, datetime: usedDatetime || new Date().toISOString() };
+
+  return {
+    rate,
+    datetime: datetime || new Date().toISOString(),
+  };
 }
 
 /**
- * Convertit un montant en EUR en POL (MATIC) en utilisant le taux de conversion récupéré via getPolEuroRate.
- *
- * @param eur Montant en euros à convertir
- * @returns Un objet contenant le montant converti en POL et le datetime associé.
+ * Convertit un montant en EUR en une crypto donnée (ex: ETH, MATIC)
  */
-export async function convertEurToPOL(eur: number): Promise<{ amount: number; datetime: string }> {
-  const { rate, datetime } = await getPolEuroRate();
-  const amountInPOL = eur / rate;
-  return { amount: amountInPOL, datetime };
+export async function convertEurToCrypto(eur: number, symbol: string): Promise<{ amount: number; datetime: string }> {
+  const { rate, datetime } = await getCryptoToEurRate(symbol);
+  return { amount: eur / rate, datetime };
 }
 
 /**
- * Convertit un montant en POL en Wei (1 POL = 10^18 Wei).
- *
- * @param priceInPol Montant en POL à convertir (number, string ou null)
- * @returns Le montant en Wei sous forme de bigint.
+ * Convertit un montant en crypto (ex: MATIC) en Wei (1 crypto = 10^18 Wei).
  */
-export function convertPriceInPolToWei(priceInPol: number | string | null): bigint {
-  if (priceInPol === null) return 0n;
-  const priceStr = typeof priceInPol === "string" ? priceInPol : priceInPol.toString();
-  const parts = priceStr.split(".");
-  const whole = parts[0];
-  let fraction = parts[1] || "";
-  // On complète la partie fractionnaire jusqu'à 18 décimales
-  if (fraction.length < 18) {
-    fraction = fraction.padEnd(18, "0");
-  } else {
-    fraction = fraction.slice(0, 18);
-  }
-  return BigInt(whole + fraction);
+export function convertCryptoToWei(amount: number | string | null): bigint {
+  if (amount === null) return 0n;
+  const priceStr = typeof amount === "string" ? amount : amount.toString();
+  const [whole, fraction = ""] = priceStr.split(".");
+  const fractionPadded = (fraction + "000000000000000000").slice(0, 18);
+  return BigInt(whole + fractionPadded);
 }

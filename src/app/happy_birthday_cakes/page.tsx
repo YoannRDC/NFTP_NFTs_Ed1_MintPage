@@ -11,7 +11,6 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC1155_HBC from "../components/ItemERC1155_HBC";
-import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
 import InfoBlockchain from "../components/InfoBlockchain";
@@ -19,6 +18,7 @@ import { projectMappings } from "../constants";
 import { getNFTBalance } from "../utils/fetchBlockchainData";
 import { getOwnedERC1155 } from "../components/getOwnedERC1155";
 import CheckTransactionForm from "../components/CheckTransactionForm";
+import { getCryptoToEurRate } from "../utils/conversion";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -123,11 +123,10 @@ function PageContent() {
     fetchNFTs();
   }, [smartAccount?.address]);
 
-  // Taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
       try {
-        const { rate } = await getPolEuroRate();
+        const { rate } = await getCryptoToEurRate(projectMappings.HAPPYBIRTHDAYCAKES.blockchain.nativeSymbol);
         setPolEurRate(rate);
       } catch (error) {
         console.error("Erreur lors du chargement du taux de conversion POL/EUR:", error);
@@ -374,7 +373,7 @@ function PageContent() {
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
                 <ItemERC1155_HBC
                   tokenId={BigInt(tokenIndex)}
-                  priceInPol={pricesInPol[tokenIndex] ?? null}
+                  priceInCrypto={pricesInPol[tokenIndex] ?? null}
                   priceInEur={getNFTEuroPrice(projectMappings.HAPPYBIRTHDAYCAKES.projectName, tokenIndex.toString())}
                   contract={contract}
                   blockchainId={contract.chain.id}

@@ -21,7 +21,7 @@ import { polygon } from "thirdweb/chains";
 import { ConnectButtonSimple } from "./ConnectButtonSimple";
 
 interface ItemERC1155_HBCProps {
-  priceInPol: number;
+  priceInCrypto: number;
   priceInEur: number;
   contract: any;
   stripeMode: StripeMode;
@@ -33,7 +33,7 @@ interface ItemERC1155_HBCProps {
 }
 
 export default function ItemERC1155_HBC({
-  priceInPol,
+  priceInCrypto,
   priceInEur,
   contract,
   stripeMode,
@@ -63,7 +63,7 @@ export default function ItemERC1155_HBC({
   const radioGroupName = `deliveryMethod-${tokenId.toString()}`;
   const minterAddress = getProjectMinterAddress(projectName);
 
-  const totalPricePol = (priceInPol ?? 0) * Number(requestedQuantity);
+  const totalPricePol = (priceInCrypto ?? 0) * Number(requestedQuantity);
   const totalPriceEur = (priceInEur ?? 0) * Number(requestedQuantity);
   const totalPriceEurCents = Math.round(totalPriceEur * 100);
 
@@ -111,7 +111,7 @@ export default function ItemERC1155_HBC({
       txResult = await performCryptoPaymentAndStoreTxInBdd({
         client,
         chain: polygon,
-        priceInPol: priceInPol,
+        priceInCrypto,
         minterAddress: minterAddress,
         account: smartAccount,
         email: recipientEmail || "", // TODO: Add from Mon compte.

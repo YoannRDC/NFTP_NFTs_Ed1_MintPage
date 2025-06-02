@@ -12,12 +12,12 @@ import MenuItem from "../components/MenuItem";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract } from "thirdweb";
 import ItemERC721transfert from "../components/ItemERC721transfert";
-import { getPolEuroRate } from "../utils/conversion";
 import { Pagination } from "../components/Pagination";
 import MailchimpAccount from "../components/MailchimpAccount";
 import InfoBlockchain from "../components/InfoBlockchain";
 import { projectMappings } from "../constants";
 import { getNFTBalance } from "../utils/fetchBlockchainData";
+import { getCryptoToEurRate } from "../utils/conversion";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -64,8 +64,8 @@ function PageContent() {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
-  const [polEurRate, setPolEurRate] = useState<number | null>(null);
+  const [priceInCrypto, setPriceInCrypto] = useState<{ [tokenId: number]: number }>({});
+  const [cryptoEurRate, setCryptoEurRate] = useState<number | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -122,33 +122,31 @@ function PageContent() {
     fetchNFTs();
   }, [smartAccount?.address]);
 
-  // Taux de conversion POL/EUR
   useEffect(() => {
     async function fetchConversionRate() {
       try {
-        const { rate } = await getPolEuroRate();
-        setPolEurRate(rate);
+        const { rate } = await getCryptoToEurRate(projectMappings.NATETGITES.blockchain.nativeSymbol);
+        setCryptoEurRate(rate);
       } catch (error) {
-        console.error("Erreur lors du chargement du taux de conversion POL/EUR:", error);
+        console.error("Erreur lors du chargement du taux de conversion:", error);
       }
     }
     fetchConversionRate();
   }, []);
 
-  // Calculer les prix en POL
   useEffect(() => {
     async function fetchPrices() {
-      if (mintedCount > 0 && polEurRate !== null) {
+      if (mintedCount > 0 && cryptoEurRate !== null) {
         const newPrices: { [tokenId: number]: number } = {};
         for (let i = 0; i < mintedCount; i++) {
           const euroPrice = getNFTEuroPrice(projectMappings.NATETGITES.projectName, i.toString());
-          newPrices[i] = Math.ceil(euroPrice / polEurRate);
+          newPrices[i] = Math.ceil(euroPrice / cryptoEurRate);
         }
-        setPricesInPol(newPrices);
+        setPriceInCrypto(newPrices);
       }
     }
     fetchPrices();
-  }, [mintedCount, polEurRate]);
+  }, [mintedCount, cryptoEurRate]);
 
   // --- Filtres ---
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -424,7 +422,7 @@ function PageContent() {
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
                 <ItemERC721transfert
                   tokenId={BigInt(tokenIndex)}
-                  priceInPol={pricesInPol[tokenIndex] ?? null}
+                  priceInCrypto={priceInCrypto[tokenIndex] ?? null}
                   priceInEur={getNFTEuroPrice(projectMappings.NATETGITES.projectName, tokenIndex.toString())}
                   contract={contract}
                   stripeMode={stripeMode}
@@ -437,7 +435,8 @@ function PageContent() {
                   requestedQuantity={requestedQuantity} 
                   buyerWalletAddress={smartAccount?.address ?? ""} 
                   recipientWalletAddressOrEmail={smartAccount?.address ?? ""}  
-                  offererName=""              
+                  offererName="" 
+                  chain={projectMappings.NATETGITES.blockchain.name} 
                 />
               </div>
             );

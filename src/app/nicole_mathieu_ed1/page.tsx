@@ -7,7 +7,7 @@ import { MediaRenderer, useActiveAccount } from "thirdweb/react";
 import { client, DistributionType, projectMappings, StripeMode } from "../constants";
 import Link from "next/link";
 import MenuItem from "../components/MenuItem";
-import { convertEurToPOL } from "../utils/conversion";
+import { convertEurToCrypto } from "../utils/conversion";
 import VideoPresentation from "../components/NFTP_presentation";
 import { defineChain, getContract, readContract } from "thirdweb";
 import ItemERC1155 from "../components/ItemERC1155";
@@ -90,7 +90,7 @@ function PageContent() {
   useEffect(() => {
     async function fetchConversion() {
       try {
-        const result = await convertEurToPOL(NFT_PRICE_EUR);
+        const result = await convertEurToCrypto(NFT_PRICE_EUR, projectMappings.NMMATHIEU.blockchain.nativeSymbol);
         setConversionResult(result);
         console.log(
           "convertEurToPOL :",
@@ -213,7 +213,7 @@ function PageContent() {
         <div>
           <ItemERC1155
             tokenId={0n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -223,12 +223,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={1n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -238,12 +239,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={2n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -253,12 +255,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={3n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -268,12 +271,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={4n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -283,12 +287,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={5n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -298,12 +303,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={6n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -313,12 +319,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={7n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -328,12 +335,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={8n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -343,12 +351,13 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
         <div>
           <ItemERC1155
             tokenId={9n}
-            priceInPol={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
+            priceInCrypto={conversionResult ? Math.ceil(conversionResult.amount) : DISPLAYED_NFT_PRICE_POL}
             priceInEur={NFT_PRICE_EUR}
             contract={nicoleMathieuEd1Contract}
             stripeMode={stripeMode}
@@ -358,6 +367,7 @@ function PageContent() {
             projectName={projectMappings.NMMATHIEU.projectName}
             showSupply={false}
             offererName=""
+            chain={projectMappings.NMMATHIEU.blockchain.name}
           />
         </div>
       </div>

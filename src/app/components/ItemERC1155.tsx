@@ -4,7 +4,6 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   ConnectButton,
-  MediaRenderer,
   TransactionButton,
   useActiveAccount,
 } from "thirdweb/react";
@@ -20,7 +19,7 @@ import { claimTo } from "thirdweb/extensions/erc1155";
 import StripePurchasePage from "./StripePurchasePage";
 
 interface ItemERC721Props {
-  priceInPol: number | string | null;
+  priceInCrypto: number | string | null;
   priceInEur: number | string | null;
   contract: any;
   stripeMode: StripeMode;
@@ -31,10 +30,11 @@ interface ItemERC721Props {
   projectName: string;
   showSupply: boolean;
   offererName: string;
+  chain: string;
 }
 
 export default function ItemERC1155({
-  priceInPol,
+  priceInCrypto,
   priceInEur,
   contract,
   stripeMode,
@@ -45,6 +45,7 @@ export default function ItemERC1155({
   projectName,
   showSupply,
   offererName,
+  chain
 }: ItemERC721Props) {
   const smartAccount = useActiveAccount();
   const [totalSupply, setTotalSupply] = useState<number>(0);
@@ -53,10 +54,10 @@ export default function ItemERC1155({
   const minterAddress = getProjectMinterAddress(projectName);
 													   
   const totalPricePol =
-    (priceInPol !== null && priceInPol !== undefined
-      ? typeof priceInPol === "number"
-        ? priceInPol
-        : parseFloat(priceInPol)
+    (priceInCrypto !== null && priceInCrypto !== undefined
+      ? typeof priceInCrypto === "number"
+        ? priceInCrypto
+        : parseFloat(priceInCrypto)
       : 0) * Number(requestedQuantity);
 
   const totalPriceEur =
@@ -105,10 +106,7 @@ export default function ItemERC1155({
         const sold = total - sellerBal;
         setSoldCount(sold);
       } catch (error) {
-					  
         console.error("Erreur lors de la récupération des infos de supply :", error);
-			   
-		  
       }
     };
 
