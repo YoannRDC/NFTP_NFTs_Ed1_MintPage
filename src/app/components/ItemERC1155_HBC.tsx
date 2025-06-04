@@ -253,7 +253,7 @@ export default function ItemERC1155_HBC({
             </div>
 
             {/* Crypto purchase button */}
-            <div className="mb-4">
+            <div>
             {selectedOption === NFTrecipient.Email ? (
                 <button
                   onClick={handleEmailCryptoPayment}
