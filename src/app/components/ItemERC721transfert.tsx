@@ -11,6 +11,7 @@ import {
   client,
   DistributionType,
   getProjectMinterAddress,
+  projectMappings,
   StripeMode,
 } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
@@ -193,7 +194,10 @@ export default function ItemERC721transfert({
                 >
                   Acheter en Crypto
                 </button>
-                <p className="mb-2">{parsedPriceCrypto} POL</p>
+                <p className="mb-2">
+                  {parsedPriceCrypto} {projectMappings[projectName as keyof typeof projectMappings].blockchain.nativeSymbol}
+                </p>
+
 
                 <StripePurchasePage
                   projectName={projectName}

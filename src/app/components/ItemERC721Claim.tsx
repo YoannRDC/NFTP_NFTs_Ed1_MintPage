@@ -7,7 +7,7 @@ import {
   useActiveAccount,
 } from "thirdweb/react";
 import StripePurchasePage from "./StripePurchasePage";
-import { client, DistributionType, StripeMode } from "../constants";
+import { client, DistributionType, projectMappings, StripeMode } from "../constants";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { readContract } from "thirdweb";
 import { claimTo } from "thirdweb/extensions/erc721";
@@ -180,7 +180,9 @@ export default function ItemERC721Claim({
               Acheter en Crypto
             </TransactionButton>
 
-            <p className="mb-2">{totalPricePol} POL</p>
+            <p className="mb-2">
+              {totalPricePol} {projectMappings[projectName as keyof typeof projectMappings].blockchain.nativeSymbol}
+            </p>
 
             <StripePurchasePage
               projectName={projectName}

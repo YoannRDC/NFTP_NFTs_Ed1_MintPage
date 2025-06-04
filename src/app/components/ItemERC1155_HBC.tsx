@@ -11,6 +11,7 @@ import {
   DistributionType,
   getProjectMinterAddress,
   NFTrecipient,
+  projectMappings,
   StripeMode,
 } from "../constants";
 import { readContract } from "thirdweb";
@@ -287,7 +288,9 @@ export default function ItemERC1155_HBC({
             </div>
 
             {/* Prices */}
-            <p className="mb-2">{totalPricePol} POL</p>
+            <p className="mb-2">
+              {totalPricePol} {projectMappings[projectName as keyof typeof projectMappings].blockchain.nativeSymbol}
+            </p>
 
             {/* Stripe */}
             <StripePurchasePage

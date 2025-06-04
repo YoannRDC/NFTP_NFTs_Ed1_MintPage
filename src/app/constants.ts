@@ -36,7 +36,7 @@ export const BlockchainInfo: Record<Blockchain, { name: string; id: number; nati
 	[Blockchain.Polygon]: {
 		name: "Polygon",
 		id: 137,
-		nativeSymbol: "MATIC",
+		nativeSymbol: "POL",
 	},
 	[Blockchain.Ethereum]: {
 		name: "Ethereum",
@@ -46,7 +46,7 @@ export const BlockchainInfo: Record<Blockchain, { name: string; id: number; nati
 	[Blockchain.Amoy]: {
 		name: "Amoy",
 		id: 80002,
-		nativeSymbol: "MATIC",
+		nativeSymbol: "POL",
 	},
 	[Blockchain.Base]: {
 		name: "Base",
