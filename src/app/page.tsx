@@ -127,6 +127,12 @@ function Menu({ isAdmin }: MenuProps) {
           description="🎂 Offrez un gâteau d’anniversaire en NFT !"
           imageSrc="/happy_birthday_cakes/preview.gif"
         />
+        <MenuItem
+          title="NFT collection by MdeM"
+          href="/mdem"
+          description="L'art animalier, avec intensité !"
+          imageSrc="/mdem/Maya_Profil_square.jpg"
+        />
         {isAdmin && (
           <MenuItem
             title="Nicole Mathieu"
