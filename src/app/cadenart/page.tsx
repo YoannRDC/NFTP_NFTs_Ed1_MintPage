@@ -33,6 +33,8 @@ const stripeMode=StripeMode.Live;
 
 // Pour cet exemple, la collection comporte 10 NFTs avec des tokenIds de 0 à 10.
 const tokenIds: bigint[] = [0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n, 13n, 14n, 15n, 16n, 17n, 18n, 19n];
+// priceInCrypto en const car getClaimConditionById(tokenid, getActiveClaimConditionId(tokenId)) sur chaque token est couteux en call API. 
+const priceInCrypto = 30;
 
 /**
  * Récupère l'URI des métadonnées pour un token donné via le contrat.
@@ -200,7 +202,7 @@ function PageContent() {
           <div key={tokenId.toString()}>
             <ItemERC1155
               tokenId={tokenId}
-              priceInCrypto={conversionRate ? Math.ceil(getNFTEuroPrice(projectMappings.CADENART.projectName, tokenId.toString()) / conversionRate) : null}
+              priceInCrypto={priceInCrypto}
               priceInEur={getNFTEuroPrice(projectMappings.CADENART.projectName, tokenId.toString())}
               contract={theContract}
               stripeMode={stripeMode}

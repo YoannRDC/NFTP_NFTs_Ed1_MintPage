@@ -18,7 +18,6 @@ import { projectMappings } from "../constants";
 import { getNFTBalance } from "../utils/fetchBlockchainData";
 import { getOwnedERC1155 } from "../components/getOwnedERC1155";
 import CheckTransactionForm from "../components/CheckTransactionForm";
-import { getCryptoToEurRate } from "../utils/conversion";
 
 // Interface pour typer le contenu de metadata.json
 interface NFTMetadata {
@@ -65,8 +64,8 @@ function PageContent() {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoadingNfts, setIsLoadingNfts] = useState(false);
 
-  const [pricesInPol, setPricesInPol] = useState<{ [tokenId: number]: number }>({});
-  const [polEurRate, setPolEurRate] = useState<number | null>(null);
+  // priceInCrypto en const car getClaimConditionById(tokenid, getActiveClaimConditionId(tokenId)) sur chaque token est couteux en call API. 
+  const priceInCrypto = 50;
 
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -122,33 +121,6 @@ function PageContent() {
     }
     fetchNFTs();
   }, [smartAccount?.address]);
-
-  useEffect(() => {
-    async function fetchConversionRate() {
-      try {
-        const { rate } = await getCryptoToEurRate(projectMappings.HAPPYBIRTHDAYCAKES.blockchain.nativeSymbol);
-        setPolEurRate(rate);
-      } catch (error) {
-        console.error("Erreur lors du chargement du taux de conversion POL/EUR:", error);
-      }
-    }
-    fetchConversionRate();
-  }, []);
-
-  // Calculer les prix en POL pour chaque token minté
-  useEffect(() => {
-    async function fetchPrices() {
-      if (totalNFTcount > 0 && polEurRate !== null) {
-        const newPrices: { [tokenId: number]: number } = {};
-        for (let i = 0; i < totalNFTcount; i++) {
-          const euroPrice = getNFTEuroPrice(projectMappings.HAPPYBIRTHDAYCAKES.projectName, i.toString());
-          newPrices[i] = Math.ceil(euroPrice / polEurRate);
-        }
-        setPricesInPol(newPrices);
-      }
-    }
-    fetchPrices();
-  }, [totalNFTcount, polEurRate]);
 
   // --- Filtres basés sur les nouveaux traits : Hundreds, Tens, Units ---
   const [selectedHundreds, setSelectedHundreds] = useState<string>("");
@@ -373,7 +345,7 @@ function PageContent() {
               <div key={tokenIndex} className="border p-4 rounded-lg shadow-lg text-center">
                 <ItemERC1155_HBC
                   tokenId={BigInt(tokenIndex)}
-                  priceInCrypto={pricesInPol[tokenIndex] ?? null}
+                  priceInCrypto={priceInCrypto}
                   priceInEur={getNFTEuroPrice(projectMappings.HAPPYBIRTHDAYCAKES.projectName, tokenIndex.toString())}
                   contract={contract}
                   blockchainId={contract.chain.id}
