@@ -213,7 +213,7 @@ function MDEMContent() {
                 className="border p-4 rounded-lg shadow-lg text-center cursor-pointer hover:shadow-xl transition-shadow duration-300"
                 onClick={() =>
                   window.open(
-                    `https://basescan.org//${contract.address}/${nft.metadata?.id || nft.id}`,
+                    `https://basescan.org/${contract.address}/${nft.metadata?.id || nft.id}`,
                     "_blank"
                   )
                 }
