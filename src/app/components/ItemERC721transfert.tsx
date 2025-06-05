@@ -129,7 +129,8 @@ export default function ItemERC721transfert({
       )}
 
       {/* Aperçu de l’image cliquable */}
-      <div className="mt-10 flex justify-center cursor-pointer" onClick={() => setIsFullscreen(true)}>
+      <div className="mt-5 flex justify-center cursor-pointer" onClick={() => setIsFullscreen(true)}>
+        <p>tokenId: {tokenId}</p>
         <Image
           src={previewImage}
           alt="NFT Preview"
