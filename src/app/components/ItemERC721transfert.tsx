@@ -129,9 +129,7 @@ export default function ItemERC721transfert({
       )}
 
       {/* Aperçu de l’image cliquable */}
-      <div className="mt-5 flex justify-center cursor-pointer" onClick={() => setIsFullscreen(true)}>
-        <p>tokenId: {tokenId.toString()}</p>
-        <br/>
+      <div className="relative flex justify-center cursor-pointer" onClick={() => setIsFullscreen(true)}>
         <Image
           src={previewImage}
           alt="NFT Preview"
@@ -141,6 +139,9 @@ export default function ItemERC721transfert({
           blurDataURL={`${previewImage}?w=10&q=10`}
           className="rounded-lg"
         />
+        <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-sm px-2 py-1 rounded">
+          {tokenId.toString()}
+        </div>
       </div>
 
       {/* Modal plein écran avec bouton de téléchargement */}
