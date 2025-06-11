@@ -139,7 +139,7 @@ export default function ItemERC721transfert({
           blurDataURL={`${previewImage}?w=10&q=10`}
           className="rounded-lg"
         />
-        <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-sm px-2 py-1 rounded">
+        <div className="absolute top-2 right-4 bg-black bg-opacity-60 text-white text-sm px-2 py-1 rounded">
           {tokenId.toString()}
         </div>
       </div>

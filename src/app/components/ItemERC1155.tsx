@@ -168,6 +168,9 @@ export default function ItemERC1155({
               className="rounded-none"
               onClick={toggleModal} // Clic sur l'image ferme la modal
             />
+            <div className="absolute top-2 right-4 bg-black bg-opacity-60 text-white text-sm px-2 py-1 rounded">
+              {tokenId.toString()}
+            </div>
           </div>
         </div>
       )}

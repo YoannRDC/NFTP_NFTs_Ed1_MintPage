@@ -182,6 +182,9 @@ export default function ItemERC1155_HBC({
               style={{ objectFit: "contain", cursor: "pointer" }}
               className="rounded-none"
             />
+            <div className="absolute top-2 right-4 bg-black bg-opacity-60 text-white text-sm px-2 py-1 rounded">
+              {tokenId.toString()}
+            </div>
           </div>
         </div>
       )}
