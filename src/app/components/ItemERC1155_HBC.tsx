@@ -148,7 +148,7 @@ export default function ItemERC1155_HBC({
     <div>
       {/* Image Preview */}
       <div className="flex justify-center mt-10">
-        <div onClick={toggleModal} style={{ cursor: "pointer" }}>
+        <div className="relative" onClick={toggleModal} style={{ cursor: "pointer" }}>
           <Image
             src={previewImage}
             alt="NFT preview"

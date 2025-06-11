@@ -127,7 +127,7 @@ export default function ItemERC1155({
     <div className="border p-4 rounded-lg shadow-lg text-center">
       {/* Aperçu optimisé du NFT */}
       <div className="mt-10 flex justify-center">
-        <div onClick={toggleModal} style={{ cursor: "pointer" }}>
+        <div className="relative" onClick={toggleModal} style={{ cursor: "pointer" }}>
           <Image
             src={previewImage}
             alt="NFT preview"
