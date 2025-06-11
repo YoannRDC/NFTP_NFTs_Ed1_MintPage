@@ -137,7 +137,7 @@ export default function ItemERC721Claim({
       </div>
 
       <div className="text-center mt-10">
-        {withAccAbstraction} (<ConnectButtonSimpleWithAccAbstraction/>) : (<ConnectButtonSimple/>)
+        {withAccAbstraction ? (<ConnectButtonSimpleWithAccAbstraction/>) : (<ConnectButtonSimple/>)}
       </div>
 
       <div className="flex flex-col m-10">
